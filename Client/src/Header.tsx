@@ -1,11 +1,11 @@
-import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/material/Menu';
+import * as React from "react";
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import MenuIcon from "@mui/material/Menu";
 
 export default function Header() {
   return (
@@ -19,10 +19,10 @@ export default function Header() {
             aria-label="menu"
             sx={{ mr: 2 }}
           >
-            <MenuIcon open={true} />
+            <MenuIcon open />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            News
+            おたスケ
           </Typography>
           <Button color="inherit">Login</Button>
         </Toolbar>
