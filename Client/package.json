@@ -5,7 +5,9 @@
   "dependencies": {
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
-    "@mui/material": "^5.10.9",
+    "@mui/icons-material": "^5.10.9",
+    "@mui/lab": "^5.0.0-alpha.104",
+    "@mui/material": "^5.10.10",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -22,7 +24,7 @@
   "scripts": {
     "test": "react-scripts test",
     "lint": "eslint src",
-		"start": "react-scripts start"
+    "start": "react-scripts start"
   },
   "eslintConfig": {
     "extends": [
