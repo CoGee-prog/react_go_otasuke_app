@@ -7,7 +7,9 @@ services:
       dockerfile: ./Client/build/Dockerfile
     volumes:
       - ./Client:/usr/src/app
-    command: sh -c "npm start"
+    environment:
+      - WATCHPACK_POLLING=true
+    command: sh -c "npm run dev"
     ports:
       - "53000:3000"
     stdin_open: true 
