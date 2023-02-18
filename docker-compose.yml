@@ -3,11 +3,16 @@ version: '3.9'
 services:
   client:
     build:
-      context: .
-      dockerfile: ./Client/build/Dockerfile
+      context: ./Client
+      dockerfile: ./build/dev/Dockerfile
     volumes:
-      - ./Client:/usr/src/app
-    command: sh -c "npm start"
+      - ./Client:/app
+      - node_modules_volume:/app/node_modules
+    environment:
+      - WATCHPACK_POLLING=true
+    command: sh -c "npm run dev"
     ports:
       - "53000:3000"
     stdin_open: true 
+volumes:
+  node_modules_volume:
