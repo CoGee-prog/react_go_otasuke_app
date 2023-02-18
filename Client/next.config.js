@@ -5,15 +5,6 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
 	distDir: "./.next",
-	// webpack: (config) => {
-  //   return (merge(config, {
-  //     resolve: {
-  //       alias: {
-  //         firebaseui: "firebaseui-ja"
-  //       }
-  //     }
-  //   }))
-  // },
 	env: {
 		REACT_APP_FIREBASE_API_KEY: process.env.REACT_APP_FIREBASE_API_KEY,
 		REACT_APP_FIREBASE_AUTH_DOMAIN: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
