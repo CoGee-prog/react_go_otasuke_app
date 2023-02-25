@@ -1,25 +1,24 @@
 package main
 
 import (
-	"react_go_otasuke_app/Server/server"
 
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	r := gin.New()
-	r.LoadHTMLGlob("web/templates/**/*.gtpl.html")
-	r.Static("/web/assets/", "./web/assets/")
-	store := cookie.NewStore([]byte("secret"))
-	r.Use(sessions.Sessions("session", store))
-	r.Use((server.GinContextToContextMiddleware()))
+	r := gin.Default()
+	r.GET("/",func(c *gin.Context) {
+		c.JSON(200,gin.H{
+			"message": "success",
+		})
+	})
+	// store := cookie.NewStore([]byte("secret"))
+	// r.Use(sessions.Sessions("session", store))
 
-	db.LoadEnv()
-	db.Migrate()
+	// db.LoadEnv()
+	// db.Migrate()
 
-	router.DefineRoutes(r, entclient.EntClient{})
+	// router.DefineRoutes(r, entclient.EntClient{})
 
 	r.Run()
 }

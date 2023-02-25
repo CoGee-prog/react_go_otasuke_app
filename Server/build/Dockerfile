@@ -1,12 +1,9 @@
-FROM golang:1.19.2-alpine
+FROM golang:1.19.2-alpine3.16
 
-RUN apk add --update &&  apk add git
+RUN apk add --update && apk add git
 
-COPY go.mod /go/src/app/go.mod
-COPY go.sum /go/src/app/go.sum
 WORKDIR /go/src/app
-COPY ./Server /go/src/app
 
-RUN go get github.com/cosmtrek/air@v1.27.3
+RUN go install github.com/cosmtrek/air@v1.41.0
 
 CMD ["air", "-c", ".air.toml"]**
