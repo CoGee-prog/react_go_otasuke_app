@@ -3,6 +3,7 @@ package main
 import (
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 func main() {
@@ -12,13 +13,6 @@ func main() {
 			"message": "success",
 		})
 	})
-	// store := cookie.NewStore([]byte("secret"))
-	// r.Use(sessions.Sessions("session", store))
-
-	// db.LoadEnv()
-	// db.Migrate()
-
-	// router.DefineRoutes(r, entclient.EntClient{})
 
 	r.Run()
 }
