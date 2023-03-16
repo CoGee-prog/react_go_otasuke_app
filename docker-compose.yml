@@ -37,6 +37,7 @@ services:
     environment:
       - MYSQL_DATABASE=react_go_otasuke_db
       - MYSQL_ROOT_PASSWORD=password
+      - TZ=Asia/Tokyo
     ports:
       - "3306:3306"
 volumes:

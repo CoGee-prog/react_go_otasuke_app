@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/jinzhu/gorm"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var d *gorm.DB
