@@ -5,6 +5,7 @@ import (
 	"react_go_otasuke_app/config"
 	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/server"
+	"react_go_otasuke_app/models"
 
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
@@ -14,7 +15,7 @@ func main() {
 	flag.Parse()
 
 	config.Init(*env)
-	database.Init()
+	database.Init(models.OpponentRecruiting{})
 	if err := server.Init(); err != nil {
 		panic(err)
 	}

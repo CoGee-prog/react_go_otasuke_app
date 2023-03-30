@@ -30,7 +30,6 @@ services:
     image: mysql:8.0
     container_name: "dockerMySQL"
     volumes:
-      # - ./db/init:/docker-entrypoint-initdb.d
       - ./Server/db/my.cnf:/etc/mysql/conf.d/my.cnf
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     restart: always
