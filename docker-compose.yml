@@ -22,8 +22,6 @@ services:
     ports:
       - "58080:8080"
     restart: always
-    environment:
-      - MYSQL_HOST=${MYSQL_HOST}
     depends_on:
       - db
   db:

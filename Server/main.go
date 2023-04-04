@@ -16,6 +16,7 @@ func main() {
 
 	config.Init(*env)
 	database.Init(models.OpponentRecruiting{})
+	defer database.Close()
 	if err := server.Init(); err != nil {
 		panic(err)
 	}

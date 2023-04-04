@@ -9,7 +9,13 @@ import (
 func NewRouter() (*gin.Engine, error) {
 	router := gin.Default()
 	v1 := router.Group("/")
-	UserController := controllers.NewUserController()
-	v1.GET("/", UserController.Create())
+	userController := controllers.NewUserController()
+	opponentRecruitingController := controllers.NewOpponentRecruitingController()
+	{
+		v1.POST("/user", userController.Create())
+	}
+	{
+		v1.POST("/opponent_recruiting", opponentRecruitingController.Create())
+	}
 	return router, nil
 }

@@ -20,3 +20,10 @@ func Init(models ...interface{}) {
 	d.AutoMigrate(models...)
 }
 
+func GetDB() *gorm.DB{
+	return d
+}
+
+func Close() {
+	d.Close()
+}
