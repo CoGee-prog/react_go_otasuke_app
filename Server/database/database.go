@@ -9,18 +9,24 @@ import (
 
 var d *gorm.DB
 
-func Init(models ...interface{}) {
+func Init() {
 	c := config.GetConfig()
 	var err error
-	d, err := gorm.Open(c.GetString("db.provider"), c.GetString("db.url"))
+	d, err = gorm.Open(c.GetString("db.provider"), c.GetString("db.url"))
 	if err != nil {
 		panic(err)
 	}
+}
 
+func Migration(models ...interface{}) {
 	d.AutoMigrate(models...)
 }
 
-func GetDB() *gorm.DB{
+func GetDB() *gorm.DB {
+	if d == nil {
+		Init()
+	}
+
 	return d
 }
 

@@ -15,6 +15,7 @@ func NewRouter() (*gin.Engine, error) {
 		v1.POST("/user", userController.Create())
 	}
 	{
+		v1.POST("/opponent_recruiting/:page", opponentRecruitingController.Index())
 		v1.POST("/opponent_recruiting", opponentRecruitingController.Create())
 	}
 	return router, nil
