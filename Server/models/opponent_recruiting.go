@@ -10,11 +10,11 @@ import (
 
 type OpponentRecruiting struct {
 	BaseModel
-	TeamId int        `json:"team_id"`
-	Date   *time.Time `json:"date" gorm:"type:date"`
-	Time   *time.Time `json:"time" gorm:"type:time"`
-	AreaId int        `json:"area" gorm:"not null"`
-	Detail *string    `json:"detail" gorm:"type:text"`
+	TeamId    int        `json:"team_id" gorm:"type:int"`
+	Date      *time.Time `json:"date" gorm:"type:date"`
+	Time      *time.Time `json:"time" gorm:"type:time"`
+	AreaId    int        `json:"area" gorm:"type:int; not null"`
+	Detail    *string    `json:"detail" gorm:"type:text"`
 }
 
 var opponentRecruitings []OpponentRecruiting

@@ -8,9 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type OpponentRecruitingController struct {
-	OpponentRecruiting *models.OpponentRecruiting
-}
+type OpponentRecruitingController struct{}
 
 func NewOpponentRecruitingController() *OpponentRecruitingController {
 	return new(OpponentRecruitingController)
@@ -24,8 +22,10 @@ func (oc *OpponentRecruitingController) Index() gin.HandlerFunc {
 			Size:   10,
 		}
 
+		opponentRecruiting := &models.OpponentRecruiting{}
+
 		// データを取得する
-		opponentRecruitings := oc.OpponentRecruiting.GetByPagination(page).Value
+		opponentRecruitings := opponentRecruiting.GetByPagination(page).Value
 
 		c.JSON(http.StatusOK, newResponse(
 			http.StatusOK,
@@ -38,9 +38,10 @@ func (oc *OpponentRecruitingController) Index() gin.HandlerFunc {
 
 func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		opponentRecruiting := &models.OpponentRecruiting{}
 
-		// リクエストパラメーターをバインドする
-		if err := c.ShouldBindJSON(&oc.OpponentRecruiting); err != nil {
+		// // リクエストパラメーターをバインドする
+		if err := c.ShouldBindJSON(opponentRecruiting); err != nil {
 			c.JSON(http.StatusBadRequest, newResponse(
 				http.StatusBadRequest,
 				err.Error(),
@@ -50,7 +51,7 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 		}
 
 		// リクエストのバリデーションチェック
-		if err := oc.OpponentRecruiting.Validate(); err != nil {
+		if err := opponentRecruiting.Validate(); err != nil {
 			c.JSON(http.StatusBadRequest, newResponse(
 				http.StatusBadRequest,
 				err.Error(),
@@ -60,7 +61,7 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 		}
 
 		// データを作成する
-		if err := oc.OpponentRecruiting.Create(); err != nil {
+		if err := opponentRecruiting.Create(); err != nil {
 			c.JSON(http.StatusBadRequest, newResponse(
 				http.StatusBadRequest,
 				err.Error(),

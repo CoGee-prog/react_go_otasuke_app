@@ -20,7 +20,7 @@ func main() {
 
 	config.Init(*env)
 	database.Init()
-	database.Migration(models.OpponentRecruiting{})
+	database.Migration(&models.OpponentRecruiting{})
 	defer database.Close()
 	if err := server.Init(); err != nil {
 		panic(err)
