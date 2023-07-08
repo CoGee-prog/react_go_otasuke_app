@@ -9,21 +9,20 @@ import (
 )
 
 type OpponentRecruiting struct {
-	BaseModel
-	TeamId    int        `json:"team_id" gorm:"type:int"`
-	Date      *time.Time `json:"date" gorm:"type:date"`
-	Time      *time.Time `json:"time" gorm:"type:time"`
-	AreaId    int        `json:"area" gorm:"type:int; not null"`
-	Detail    *string    `json:"detail" gorm:"type:text"`
+	gorm.Model
+	TeamId   int       `json:"team_id" gorm:"type:int"`
+	DateTime time.Time `json:"date_time"`
+	AreaId   int       `json:"area" gorm:"type:int; not null"`
+	Detail   *string   `json:"detail" gorm:"type:text"`
 }
 
 var opponentRecruitings []OpponentRecruiting
 
-func (opponentRecruiting *OpponentRecruiting) Validate() error {
-	if opponentRecruiting.TeamId == 0 {
+func (oc *OpponentRecruiting) Validate() error {
+	if oc.TeamId == 0 {
 		return errors.New("チームが選択されていません")
 	}
-	if opponentRecruiting.AreaId == 0 {
+	if oc.AreaId == 0 {
 		return errors.New("エリアが選択されていません")
 	}
 	return nil
