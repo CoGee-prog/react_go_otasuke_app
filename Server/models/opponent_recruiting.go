@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"react_go_otasuke_app/database"
 	"time"
 
@@ -17,7 +16,7 @@ type OpponentRecruiting struct {
 	Detail   *string   `json:"detail" gorm:"type:text"`
 }
 
-var opponentRecruitings []OpponentRecruiting
+var opponentRecruitings []*OpponentRecruiting
 
 func (oc *OpponentRecruiting) Validate() error {
 	if oc.TeamId == 0 {
@@ -26,7 +25,6 @@ func (oc *OpponentRecruiting) Validate() error {
 	if oc.AreaId == 0 {
 		return errors.New("エリアが選択されていません")
 	}
-	fmt.Print(time.Now())
 	if oc.DateTime.Before(time.Now()) {
 		return errors.New("過去の日時は選択できません")
 	}
@@ -38,11 +36,12 @@ func (or *OpponentRecruiting) Create() (err error) {
 	return db.Create(or).Error
 }
 
-func (or *OpponentRecruiting) GetByPagination(page *Page) *gorm.DB {
+func (or *OpponentRecruiting) GetByPagination(page *Page) []*OpponentRecruiting {
 	db := database.GetDB()
 	sort := &Sort{
 		IsDesc:  true,
 		OrderBy: "created_at",
 	}
-	return db.Scopes(page.Paginate()).Scopes(sort.Sort()).Find(&opponentRecruitings)
+	db.Scopes(page.Paginate()).Scopes(sort.Sort()).Find(&opponentRecruitings)
+	return opponentRecruitings
 }
