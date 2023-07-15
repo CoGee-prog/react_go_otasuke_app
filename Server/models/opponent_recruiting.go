@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"react_go_otasuke_app/database"
 	"time"
 
@@ -24,6 +25,10 @@ func (oc *OpponentRecruiting) Validate() error {
 	}
 	if oc.AreaId == 0 {
 		return errors.New("エリアが選択されていません")
+	}
+	fmt.Print(time.Now())
+	if oc.DateTime.Before(time.Now()) {
+		return errors.New("過去の日時は選択できません")
 	}
 	return nil
 }
