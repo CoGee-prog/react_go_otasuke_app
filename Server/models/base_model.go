@@ -25,8 +25,10 @@ func (sort *Sort) Sort() func(db *gorm.DB) *gorm.DB {
 }
 
 type Page struct {
-	Number int
-	Size   int
+	Number        int `json:"number"`
+	Size          int `json:"size"`
+	TotalElements int `json:"total_elements"`
+	TotalPages    int `json:"total_pages"`
 }
 
 func (page *Page) Paginate() func(db *gorm.DB) *gorm.DB {

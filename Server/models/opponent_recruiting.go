@@ -2,9 +2,12 @@ package models
 
 import (
 	"errors"
+	"math"
 	"react_go_otasuke_app/database"
+	"strconv"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
 
@@ -17,6 +20,8 @@ type OpponentRecruiting struct {
 }
 
 var opponentRecruitings []*OpponentRecruiting
+
+var pageSize int = 10
 
 func (oc *OpponentRecruiting) Validate() error {
 	if oc.TeamId == 0 {
@@ -36,12 +41,26 @@ func (or *OpponentRecruiting) Create() (err error) {
 	return db.Create(or).Error
 }
 
-func (or *OpponentRecruiting) GetByPagination(page *Page) []*OpponentRecruiting {
+func (or *OpponentRecruiting) GetOpponentRecruitingList(c *gin.Context) ([]*OpponentRecruiting, *Page) {
+	pageNumber, _ := strconv.Atoi(c.Param("page"))
 	db := database.GetDB()
+	totalElements := int(db.Find(&opponentRecruitings).RowsAffected)
+	if pageSize > totalElements {
+		pageSize = totalElements
+	}
+
+	page := &Page{
+		Number:        pageNumber,
+		Size:          pageSize,
+		TotalElements: totalElements,
+		TotalPages:    int(math.Ceil(float64(totalElements) / float64(pageSize))),
+	}
+
 	sort := &Sort{
 		IsDesc:  true,
 		OrderBy: "created_at",
 	}
+
 	db.Scopes(page.Paginate()).Scopes(sort.Sort()).Find(&opponentRecruitings)
-	return opponentRecruitings
+	return opponentRecruitings, page
 }
