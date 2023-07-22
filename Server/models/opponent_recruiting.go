@@ -26,14 +26,14 @@ var opponentRecruitings []*OpponentRecruiting
 var pageSize int = 10
 
 // 対戦相手募集のバリデーション
-func (oc *OpponentRecruiting) Validate() error {
-	if oc.TeamId == 0 {
+func (or *OpponentRecruiting) Validate() error {
+	if or.TeamId == 0 {
 		return errors.New("チームが選択されていません")
 	}
-	if oc.AreaId == 0 {
+	if or.AreaId == 0 {
 		return errors.New("エリアが選択されていません")
 	}
-	if oc.DateTime.Before(time.Now()) {
+	if or.DateTime.Before(time.Now()) {
 		return errors.New("過去の日時は選択できません")
 	}
 	return nil
