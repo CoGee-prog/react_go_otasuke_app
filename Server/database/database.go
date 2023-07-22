@@ -9,6 +9,7 @@ import (
 
 var d *gorm.DB
 
+// DBに接続する
 func Init() {
 	c := config.GetConfig()
 	var err error
@@ -18,10 +19,12 @@ func Init() {
 	}
 }
 
+// 自動マイグレーションを行う
 func Migration(models ...interface{}) {
 	d.AutoMigrate(models...)
 }
 
+// DBを取得する
 func GetDB() *gorm.DB {
 	if d == nil {
 		Init()
@@ -30,6 +33,7 @@ func GetDB() *gorm.DB {
 	return d
 }
 
+// DBの接続を切る
 func Close() {
 	d.Close()
 }

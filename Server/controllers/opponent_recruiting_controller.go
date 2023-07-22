@@ -10,6 +10,7 @@ import (
 
 type OpponentRecruitingController struct{}
 
+// 対戦相手募集のコントローラーを返す
 func NewOpponentRecruitingController() *OpponentRecruitingController {
 	return new(OpponentRecruitingController)
 }
@@ -42,7 +43,7 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		opponentRecruiting := &models.OpponentRecruiting{}
 
-		// // リクエストパラメーターをバインドする
+		// リクエストパラメーターをバインドする
 		if err := c.ShouldBindJSON(opponentRecruiting); err != nil {
 			c.JSON(http.StatusBadRequest, newResponse(
 				http.StatusBadRequest,

@@ -8,9 +8,11 @@ import (
 
 type UserController struct{}
 
+// ユーザーコントローラーを返す
 func NewUserController() *UserController {
 	return new(UserController)
 }
+
 
 func (uc *UserController) Create() gin.HandlerFunc {
 	return func(c *gin.Context) {

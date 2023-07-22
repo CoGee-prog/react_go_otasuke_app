@@ -11,6 +11,7 @@ type Sort struct {
 	OrderBy string
 }
 
+// ソートした結果を返す
 func (sort *Sort) Sort() func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		direction := "asc"
@@ -31,6 +32,7 @@ type Page struct {
 	TotalPages    int `json:"total_pages"`
 }
 
+// ページネーションした結果を返す
 func (page *Page) Paginate() func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		if page.Number <= 0 {

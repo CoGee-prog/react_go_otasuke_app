@@ -11,13 +11,17 @@ import (
 )
 
 func main() {
+	// 設定を読み込み
 	env := flag.String("e", "development", "")
 	flag.Parse()
-
 	config.Init(*env)
+
+	// データベースの設定
 	database.Init()
 	database.Migration(&models.OpponentRecruiting{})
 	defer database.Close()
+	
+	// サーバー起動
 	if err := server.Init(); err != nil {
 		panic(err)
 	}

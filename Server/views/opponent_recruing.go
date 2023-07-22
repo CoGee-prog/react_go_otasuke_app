@@ -13,6 +13,7 @@ type OpponentRecruitingView struct {
 	Detail   *string   `json:"detail"`
 }
 
+// 対戦相手募集の構造体から必要なキーのみ返す
 func IndexOpponentRecruitingView(opponentRecruiting []*models.OpponentRecruiting) []*OpponentRecruitingView {
 	newArray := make([]*OpponentRecruitingView, len(opponentRecruiting))
 	for i, v := range opponentRecruiting {

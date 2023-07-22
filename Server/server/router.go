@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// ルーティング設定
 func NewRouter() (*gin.Engine, error) {
 	router := gin.Default()
 	v1 := router.Group("/")
