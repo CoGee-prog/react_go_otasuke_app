@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 	"react_go_otasuke_app/models"
+	"react_go_otasuke_app/services"
 	"react_go_otasuke_app/views"
 
 	"github.com/gin-gonic/gin"
@@ -22,11 +23,8 @@ type indexResponse struct {
 
 func (oc *OpponentRecruitingController) Index() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
-		opponentRecruiting := &models.OpponentRecruiting{}
-
 		// データを取得する
-		opponentRecruitings, page := opponentRecruiting.GetOpponentRecruitingList(c)
+		opponentRecruitings, page := services.GetOpponentRecruitingList(c)
 
 		c.JSON(http.StatusOK, newResponse(
 			http.StatusOK,
