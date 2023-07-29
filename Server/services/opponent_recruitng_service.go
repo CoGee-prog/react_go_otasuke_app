@@ -9,6 +9,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type OpponentRecruitingService struct {
+	db *database.GormDatabase
+}
+
+// 対戦相手募集のサービスを作成する
+func NewOpponentRecruitingService(db *database.GormDatabase) *OpponentRecruitingService {
+	return &OpponentRecruitingService{
+		db: db,
+	}
+}
+
 // 対戦相手募集の構造体の配列
 var opponentRecruitings []*models.OpponentRecruiting
 
@@ -16,11 +27,11 @@ var opponentRecruitings []*models.OpponentRecruiting
 var pageSize int = 10
 
 // 対戦相手募集のリストとページ情報を返す
-func GetOpponentRecruitingList(c *gin.Context) ([]*models.OpponentRecruiting, *models.Page) {
+func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context) ([]*models.OpponentRecruiting, *models.Page) {
 	pageNumber, _ := strconv.Atoi(c.Param("page"))
-	db := database.GetDB()
+
 	// 合計要素数
-	totalElements := int(db.Find(&opponentRecruitings).RowsAffected)
+	totalElements := int(ors.db.DB.Find(&opponentRecruitings).RowsAffected)
 	// ページサイズが合計要素数を超えていたら合計要素数に合わせる
 	if pageSize > totalElements {
 		pageSize = totalElements
@@ -29,7 +40,7 @@ func GetOpponentRecruitingList(c *gin.Context) ([]*models.OpponentRecruiting, *m
 	// 合計ページ数
 	totalPages := int(math.Ceil(float64(totalElements) / float64(pageSize)))
 	// 指定されたページ数が合計ページ数を超えていたら合計ページ数に合わせる
-	if pageNumber > totalPages{
+	if pageNumber > totalPages {
 		pageNumber = totalPages
 	}
 
@@ -45,6 +56,11 @@ func GetOpponentRecruitingList(c *gin.Context) ([]*models.OpponentRecruiting, *m
 		OrderBy: "created_at",
 	}
 
-	db.Scopes(page.Paginate()).Scopes(sort.Sort()).Find(&opponentRecruitings)
+	ors.db.DB.Scopes(page.Paginate()).Scopes(sort.Sort()).Find(&opponentRecruitings)
 	return opponentRecruitings, page
 }
+
+// func DeleteOpponentRecruiting(c *gin.Context) {
+// 	id, _ := strconv.Atoi(c.Param("id"))
+
+// }

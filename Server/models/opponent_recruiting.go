@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"react_go_otasuke_app/database"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -28,10 +27,4 @@ func (or *OpponentRecruiting) Validate() error {
 		return errors.New("過去の日時は選択できません")
 	}
 	return nil
-}
-
-// 対戦相手募集のデータを作成する
-func (or *OpponentRecruiting) Create() (err error) {
-	db := database.GetDB()
-	return db.Create(or).Error
 }

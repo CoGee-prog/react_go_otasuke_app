@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/models"
 	"react_go_otasuke_app/services"
 	"react_go_otasuke_app/views"
@@ -9,11 +10,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type OpponentRecruitingController struct{}
+type OpponentRecruitingController struct {
+	*BaseController
+}
 
-// 対戦相手募集のコントローラーを返す
-func NewOpponentRecruitingController() *OpponentRecruitingController {
-	return new(OpponentRecruitingController)
+// 対戦相手募集のコントローラーを作成する
+func NewOpponentRecruitingController(db *database.GormDatabase) *OpponentRecruitingController {
+	return &OpponentRecruitingController{
+		BaseController: NewBaseController(db),
+	}
 }
 
 type indexResponse struct {
@@ -23,8 +28,9 @@ type indexResponse struct {
 
 func (oc *OpponentRecruitingController) Index() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		opponentRecruitingService := services.NewOpponentRecruitingService(oc.db)
 		// データを取得する
-		opponentRecruitings, page := services.GetOpponentRecruitingList(c)
+		opponentRecruitings, page := opponentRecruitingService.GetOpponentRecruitingList(c)
 
 		c.JSON(http.StatusOK, newResponse(
 			http.StatusOK,
@@ -62,7 +68,7 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 		}
 
 		// データを作成する
-		if err := opponentRecruiting.Create(); err != nil {
+		if err := oc.db.DB.Create(opponentRecruiting).Error; err != nil {
 			c.JSON(http.StatusBadRequest, newResponse(
 				http.StatusBadRequest,
 				err.Error(),
@@ -76,5 +82,11 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 			http.StatusText(http.StatusOK),
 			"OK",
 		))
+	}
+}
+
+func (oc *OpponentRecruitingController) Delete() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
 	}
 }
