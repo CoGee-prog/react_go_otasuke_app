@@ -18,12 +18,13 @@ func NewRouter() (*gin.Engine, error) {
 	userController := controllers.NewUserController(gormDatabase)
 	opponentRecruitingController := controllers.NewOpponentRecruitingController(gormDatabase)
 	{
-		v1.POST("/user", userController.Create())
+		v1.POST("/users", userController.Create())
 	}
 	{
-		v1.GET("/opponent_recruiting/:page", opponentRecruitingController.Index())
-		v1.POST("/opponent_recruiting", opponentRecruitingController.Create())
-		v1.DELETE("/opponent_recruiting/:id", opponentRecruitingController.Delete())
+		v1.GET("/opponent_recruitings/:page", opponentRecruitingController.Index())
+		v1.POST("/opponent_recruitings", opponentRecruitingController.Create())
+		v1.PATCH("/opponent_recruitings/:id", opponentRecruitingController.Update())
+		v1.DELETE("/opponent_recruitings/:id", opponentRecruitingController.Delete())
 	}
 	return router, nil
 }

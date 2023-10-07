@@ -10,8 +10,8 @@ import (
 type OpponentRecruiting struct {
 	gorm.Model
 	TeamId   int       `json:"team_id" gorm:"type:int"`
+	AreaId   int       `json:"area_id" gorm:"type:int; not null"`
 	DateTime time.Time `json:"date_time"`
-	AreaId   int       `json:"area" gorm:"type:int; not null"`
 	Detail   *string   `json:"detail" gorm:"type:text"`
 }
 

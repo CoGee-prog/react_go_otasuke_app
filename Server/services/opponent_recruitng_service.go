@@ -59,8 +59,3 @@ func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context) 
 	ors.db.DB.Scopes(page.Paginate()).Scopes(sort.Sort()).Find(&opponentRecruitings)
 	return opponentRecruitings, page
 }
-
-// func DeleteOpponentRecruiting(c *gin.Context) {
-// 	id, _ := strconv.Atoi(c.Param("id"))
-
-// }
