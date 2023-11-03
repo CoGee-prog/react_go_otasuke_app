@@ -9,21 +9,31 @@ import (
 
 var d *gorm.DB
 
-func Init(models ...interface{}) {
+// DBに接続する
+func Init() {
 	c := config.GetConfig()
 	var err error
-	d, err := gorm.Open(c.GetString("db.provider"), c.GetString("db.url"))
+	d, err = gorm.Open(c.GetString("db.provider"), c.GetString("db.url"))
 	if err != nil {
 		panic(err)
 	}
+}
 
+// 自動マイグレーションを行う
+func Migration(models ...interface{}) {
 	d.AutoMigrate(models...)
 }
 
-func GetDB() *gorm.DB{
+// DBを取得する
+func GetDB() *gorm.DB {
+	if d == nil {
+		Init()
+	}
+
 	return d
 }
 
+// DBの接続を切る
 func Close() {
 	d.Close()
 }

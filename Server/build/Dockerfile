@@ -1,6 +1,8 @@
 FROM golang:1.19.2-alpine3.16
 
-RUN apk add --update && apk add git
+RUN apk add --update --no-cache tzdata && apk add git
+
+ENV TZ=Asia/Tokyo
 
 WORKDIR /go/src/app
 

@@ -2,14 +2,20 @@ package controllers
 
 import (
 	"net/http"
+	"react_go_otasuke_app/database"
 
 	"github.com/gin-gonic/gin"
 )
 
-type UserController struct{}
+type UserController struct {
+	*BaseController
+}
 
-func NewUserController() *UserController {
-	return new(UserController)
+// ユーザーコントローラーを返す
+func NewUserController(db *database.GormDatabase) *UserController {
+	return &UserController{
+		BaseController: NewBaseController(db),
+	}
 }
 
 func (uc *UserController) Create() gin.HandlerFunc {

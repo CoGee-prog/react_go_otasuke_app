@@ -5,6 +5,7 @@ import (
 	"react_go_otasuke_app/config"
 )
 
+// サーバー設定
 func Init() error {
 	router, err := NewRouter()
 	if err != nil {
