@@ -32,13 +32,20 @@ func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context) 
 
 	// 合計要素数
 	totalElements := int(ors.db.DB.Find(&opponentRecruitings).RowsAffected)
-	// ページサイズが合計要素数を超えていたら合計要素数に合わせる
+	// ページサイズが合計要素数を超えている場合
 	if pageSize > totalElements {
-		pageSize = totalElements
+		// 合計要素数が0より大きければ合計要素数に合わせる
+		if totalElements > 0 {
+			pageSize = totalElements
+		} else {
+			// それより小さければ1にする
+			pageSize = 1
+		}
 	}
 
 	// 合計ページ数
 	totalPages := int(math.Ceil(float64(totalElements) / float64(pageSize)))
+
 	// 指定されたページ数が合計ページ数を超えていたら合計ページ数に合わせる
 	if pageNumber > totalPages {
 		pageNumber = totalPages
