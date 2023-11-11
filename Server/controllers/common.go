@@ -7,6 +7,6 @@ type response struct {
 }
 
 // レスポンスの構造体を返す
-func newResponse(status int, message string, result interface{}) *response {
-    return &response{status, message, result}
+func NewResponse(status int, message string, result interface{}) *response {
+	return &response{status, message, result}
 }

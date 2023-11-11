@@ -14,9 +14,9 @@ type OpponentRecruitingView struct {
 }
 
 // 対戦相手募集の構造体から必要なキーのみ返す
-func IndexOpponentRecruitingView(opponentRecruiting []*models.OpponentRecruiting) []*OpponentRecruitingView {
-	newArray := make([]*OpponentRecruitingView, len(opponentRecruiting))
-	for i, v := range opponentRecruiting {
+func CreateOpponentRecruitingView(opponentRecruitings []*models.OpponentRecruiting) []*OpponentRecruitingView {
+	newArray := make([]*OpponentRecruitingView, len(opponentRecruitings))
+	for i, v := range opponentRecruitings {
 		newArray[i] = &OpponentRecruitingView{
 			ID:       v.ID,
 			TeamId:   v.TeamId,

@@ -14,7 +14,7 @@ func NewRouter() (*gin.Engine, error) {
 	db := database.GetDB()
 	gormDatabase := database.NewGormDatabase(db)
 	// コントローラーを作成する
-	userController := controllers.NewUserController(gormDatabase)
+	userController, firebaseApp := controllers.NewUserController(gormDatabase)
 	opponentRecruitingController := controllers.NewOpponentRecruitingController(gormDatabase)
 
 	router := gin.Default()
@@ -22,16 +22,14 @@ func NewRouter() (*gin.Engine, error) {
 	// 認証がいらないエンドポイント
 	{
 		router.GET("/opponent_recruitings/:page", opponentRecruitingController.Index())
+		router.POST("/login", userController.Login())
 	}
 
 	// 認証が必要なエンドポイント
 	authRequired := router.Group("/")
-
-	middlewares.Init()
-	authRequired.Use(middlewares.FirebaseAuthMiddleware())
+	authRequired.Use(middlewares.AuthMiddleware(firebaseApp,gormDatabase))
 
 	{
-		authRequired.POST("/users", userController.Create())
 		authRequired.POST("/opponent_recruitings", opponentRecruitingController.Create())
 		authRequired.PATCH("/opponent_recruitings/:id", opponentRecruitingController.Update())
 		authRequired.DELETE("/opponent_recruitings/:id", opponentRecruitingController.Delete())

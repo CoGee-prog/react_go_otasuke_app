@@ -12,6 +12,7 @@ import {
   GoogleAuthProvider,
   FacebookAuthProvider,
 } from 'firebase/auth'
+import fetchAPI from 'helpers/apiService'
 
 
 // Configure Firebase.
@@ -33,13 +34,23 @@ const uiConfig: firebaseui.auth.Config = {
   // Popup signin flow rather than redirect flow.
   signInFlow: 'popup',
   // We will display Google and Facebook as auth providers.
-  signInOptions: [
-    GoogleAuthProvider.PROVIDER_ID,
-    FacebookAuthProvider.PROVIDER_ID,
-  ],
+  signInOptions: [GoogleAuthProvider.PROVIDER_ID, FacebookAuthProvider.PROVIDER_ID],
   callbacks: {
     // Avoid redirects after sign-in.
-    signInSuccessWithAuthResult: () => false,
+    signInSuccessWithAuthResult: (authResult) => {
+      // ユーザーが認証された後、サーバーにトークンを送る
+      const token = authResult.credential.accessToken
+      // POST リクエストでサーバーにトークンを送る
+      fetchAPI('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // トークンをAuthorizationヘッダーに含める
+          Authorization: `${token}`,
+        },
+      })
+      return false
+    },
   },
 }
 

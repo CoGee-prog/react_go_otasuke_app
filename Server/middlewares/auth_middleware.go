@@ -1,58 +1,66 @@
 package middlewares
 
 import (
-	"context"
+	// "net/http"
 	"net/http"
-	"os"
+	"react_go_otasuke_app/controllers"
+	"react_go_otasuke_app/database"
+	"react_go_otasuke_app/services"
 
 	firebase "firebase.google.com/go"
 	"github.com/gin-gonic/gin"
-	"google.golang.org/api/option"
+	"github.com/gorilla/sessions"
 )
 
-// FirebaseApp はFirebaseのアプリインスタンスを保持するためのグローバル変数
-var FirebaseApp *firebase.App
-
-// Firebase Admin SDKの初期化
-func Init() {
-	firebaseConfig := os.Getenv("FIREBASE_CONFIG")
-	if firebaseConfig == "" {
-		panic("Firebase config is empty")
-	}
-	opt := option.WithCredentialsJSON([]byte(firebaseConfig))
-	ctx := context.Background()
-	app, err := firebase.NewApp(ctx, nil, opt)
-	if err != nil {
-		panic("Failed to initialize Firebase app: " + err.Error())
-	}
-	FirebaseApp = app
-}
+// セッションストアの初期化（キーは秘密にしてください）
+var store = sessions.NewCookieStore([]byte("secret-key"))
 
 // Firebaseで認証を行うMiddleware関数
-func FirebaseAuthMiddleware() gin.HandlerFunc {
+func AuthMiddleware(firebaseApp *firebase.App, db *database.GormDatabase) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// IDトークンをヘッダーから取得
-		idToken := c.GetHeader("Authorization")
-		if idToken == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is required"})
+		// クライアントから送信されたセッションCookieを取得
+		cookie, err := c.Cookie("session")
+		if err != nil {
+			// セッションCookieが利用できない場合、ユーザーにログインを強制する
+			c.Redirect(http.StatusFound, "/login")
 			return
 		}
 
-		// Firebase Admin SDKを使ってIDトークンを検証
-		ctx := context.Background()
-		client, err := FirebaseApp.Auth(ctx)
+		client, err := firebaseApp.Auth(c)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Error getting Auth client"})
 			return
 		}
-		token, err := client.VerifyIDToken(ctx, idToken)
+
+		// セッションCookieの検証。ユーザーのFirebaseセッションが取り消されたかどうかもチェック
+		decoded, err := client.VerifySessionCookieAndCheckRevoked(c, cookie)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid ID token"})
+			// セッションCookieが無効な場合、ユーザーにログインを強制する
+			c.Redirect(http.StatusFound, "/login")
 			return
 		}
+		// ユーザーサービスを取得する
+		userService := services.NewUserService(db)
+		// ユーザーを取得する
+		user, err :=  userService.GetUser(decoded.UID)
+			if err != nil {
+			c.JSON(http.StatusServiceUnavailable, controllers.NewResponse(
+				http.StatusServiceUnavailable,
+				err.Error(),
+				"",
+			))
+			return
+		}
+		// ユーザーが見つからなければエラー
+		if user == nil {
+			c.JSON(http.StatusBadRequest, controllers.NewResponse(
+				http.StatusBadRequest,
+				err.Error(),
+				"",
+			))
+		}
 
-		// 検証が成功したら、リクエストコンテキストにユーザー情報を追加
-		c.Set("firebaseUID", token.UID)
+		// ユーザーが存在する場合はリクエストを続ける
 		c.Next()
 	}
 }

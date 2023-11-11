@@ -18,7 +18,11 @@ func main() {
 
 	// データベースの設定
 	database.Init()
-	database.Migration(&models.OpponentRecruiting{})
+	models := []interface{}{
+		&models.OpponentRecruiting{},
+		&models.User{},
+	}
+	database.Migration(models)
 	defer database.Close()
 
 	// サーバー起動
