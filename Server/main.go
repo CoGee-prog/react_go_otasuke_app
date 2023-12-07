@@ -1,6 +1,7 @@
 package main
 
 import (
+	"react_go_otasuke_app/config"
 	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/models"
 	"react_go_otasuke_app/server"
@@ -14,7 +15,7 @@ func init() {
 
 func main() {
 	// 設定を読み込み
-	// config.Init(os.Getenv("APP_ENV"))
+	config.Init()
 
 	// データベースの設定
 	database.Init()
@@ -22,7 +23,7 @@ func main() {
 		&models.OpponentRecruiting{},
 		&models.User{},
 	}
-	database.Migration(models)
+	database.Migration(models...)
 	defer database.Close()
 
 	// サーバー起動
