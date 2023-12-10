@@ -12,7 +12,6 @@ import (
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 	"google.golang.org/api/option"
 )
@@ -30,14 +29,14 @@ func NewUserService(db *database.GormDatabase) *UserService {
 	}
 }
 
-// 対戦相手募集の構造体の配列
+// ユーザーの構造体の配列
 var Users []*models.User
 
 // Firebaseのアプリインスタンスを保持するためのグローバル変数
 var FirebaseApp *firebase.App
 
 // Firebase認証クライアント
-var client *auth.Client
+var firebaseClient *auth.Client
 
 // Firebase Admin SDKの初期化
 func initFirebase() *firebase.App {
@@ -55,11 +54,6 @@ func initFirebase() *firebase.App {
 	return FirebaseApp
 }
 
-
-var (
-	store = sessions.NewCookieStore([]byte("secret-key"))
-)
-
 // IDトークンの検証
 func VerifyIDToken(c *gin.Context) (*auth.Token, error) {
 	// IDトークンをヘッダーから取得
@@ -71,12 +65,14 @@ func VerifyIDToken(c *gin.Context) (*auth.Token, error) {
 
 	// Firebase Admin SDKを使ってIDトークンを検証
 	client, err := FirebaseApp.Auth(c)
+	// サービスの変数に代入
+	firebaseClient = client
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Error getting Auth client"})
 		return nil, errors.New("Error getting Auth client")
 	}
 	// IDトークンを検証する
-	token, err := client.VerifyIDToken(c, idToken)
+	token, err := firebaseClient.VerifyIDToken(c, idToken)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid ID token"})
 		return nil, errors.New("Invalid ID token")
@@ -92,32 +88,32 @@ func CreateSessionCookie(c *gin.Context) error {
 	// 有効期限を7日間に設定
 	expiresIn := time.Hour * 24 * 7
 	// セッションCookieを作成
-	sessionCookie, err := client.SessionCookie(c, c.GetHeader("Authorization"), expiresIn)
+	sessionCookie, err := firebaseClient.SessionCookie(c, c.GetHeader("Authorization"), expiresIn)
 	if err != nil {
 		return errors.New("Failed to create a session cookie")
 	}
 
 	// セッションCookieをクライアントに設定
-	c.SetCookie("session", sessionCookie, int(expiresIn.Seconds()), "/", "", true, true)
+	c.SetCookie("session", sessionCookie, int(expiresIn.Seconds()), "/", "*", false, false)
+	c.SetSameSite(http.SameSiteLaxMode)
 
 	return nil
 }
 
 // Firebaseのアプリインスタンスを取得する
-func (userService *UserService) GetFireBaseApp() *firebase.App{
+func (us *UserService) GetFireBaseApp() *firebase.App {
 	return FirebaseApp
 }
 
 // ユーザーを取得する
-func (userService *UserService) GetUser(id string) (*models.User, error) {
+func (us *UserService) GetUser(id string) (*models.User, error) {
 	var user models.User
-	result := userService.db.DB.Where("id = ?", id).First(&user)
-	if result.Error != nil {
-		if result.Error == gorm.ErrRecordNotFound {
-			// レコードが見つからない場合はnilを返す
-			return nil, nil
-		}
+	result := us.db.DB.Where("id = ?", id).First(&user)
+	// レコードが見つからない場合はnilを返す
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, nil
 		// その他のエラーの場合
+	} else if result.Error != nil {
 		return nil, result.Error
 	}
 	// レコードが見つかった場合
@@ -125,8 +121,8 @@ func (userService *UserService) GetUser(id string) (*models.User, error) {
 }
 
 // 新規ユーザーを作成する
-func (userService *UserService) CreateUser(user *models.User) error {
-	result := userService.db.DB.Create(user)
+func (us *UserService) CreateUser(user *models.User) error {
+	result := us.db.DB.Create(user)
 	if result.Error != nil {
 		return result.Error
 	}

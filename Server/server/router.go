@@ -4,7 +4,6 @@ import (
 	"react_go_otasuke_app/controllers"
 	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/middlewares"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,6 +17,8 @@ func NewRouter() (*gin.Engine, error) {
 	opponentRecruitingController := controllers.NewOpponentRecruitingController(gormDatabase)
 
 	router := gin.Default()
+	// CORSを設定
+	setCors(router)
 
 	// 認証がいらないエンドポイント
 	{

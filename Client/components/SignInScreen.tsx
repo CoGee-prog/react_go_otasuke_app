@@ -35,7 +35,6 @@ function SignInScreen() {
               Authorization: `${idToken}`,
             },
           })
-            .then((response) => response.json())
             .then((data) => {
 							// サインイン状態にする
 							setIsSignedIn(true);

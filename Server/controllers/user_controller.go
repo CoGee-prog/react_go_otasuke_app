@@ -19,7 +19,7 @@ var userService *services.UserService
 
 // ユーザーコントローラーを返す
 func NewUserController(db *database.GormDatabase) (*UserController, *firebase.App) {
-	userService := services.NewUserService(db)
+	userService = services.NewUserService(db)
 	return &UserController{
 		BaseController: NewBaseController(db),
 	}, userService.GetFireBaseApp()

@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -16,7 +15,6 @@ func Init() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	}
-	fmt.Println(os.Getenv("APP_ENV"))
 	c = viper.New()
 	c.SetConfigFile("yml")
 	c.SetConfigName(os.Getenv("APP_ENV"))

@@ -62,7 +62,7 @@ func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context) 
 		IsDesc:  true,
 		OrderBy: "created_at",
 	}
-
+	
 	ors.db.DB.Scopes(page.Paginate()).Scopes(sort.Sort()).Find(&opponentRecruitings)
 	return opponentRecruitings, page
 }

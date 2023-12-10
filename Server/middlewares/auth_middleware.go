@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	// "net/http"
 	"net/http"
 	"react_go_otasuke_app/controllers"
 	"react_go_otasuke_app/database"
@@ -9,11 +8,8 @@ import (
 
 	firebase "firebase.google.com/go"
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/sessions"
 )
 
-// セッションストアの初期化（キーは秘密にしてください）
-var store = sessions.NewCookieStore([]byte("secret-key"))
 
 // Firebaseで認証を行うMiddleware関数
 func AuthMiddleware(firebaseApp *firebase.App, db *database.GormDatabase) gin.HandlerFunc {
