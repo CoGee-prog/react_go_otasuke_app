@@ -34,10 +34,11 @@ function SignInScreen() {
               // トークンをAuthorizationヘッダーに含める
               Authorization: `${idToken}`,
             },
+						credentials: 'include'
           })
             .then((data) => {
-							// サインイン状態にする
-							setIsSignedIn(true);
+              // サインイン状態にする
+              setIsSignedIn(true)
               // サーバーからのレスポンスを状態に保存
               setServerMessage(data.message)
             })
