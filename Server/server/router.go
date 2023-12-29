@@ -31,6 +31,7 @@ func NewRouter() (*gin.Engine, error) {
 	authRequired.Use(middlewares.AuthMiddleware(firebaseApp,gormDatabase))
 
 	{
+		authRequired.POST("/logout",)
 		authRequired.POST("/opponent_recruitings", opponentRecruitingController.Create())
 		authRequired.PATCH("/opponent_recruitings/:id", opponentRecruitingController.Update())
 		authRequired.DELETE("/opponent_recruitings/:id", opponentRecruitingController.Delete())

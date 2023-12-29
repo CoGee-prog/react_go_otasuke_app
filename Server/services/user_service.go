@@ -4,9 +4,10 @@ import (
 	"context"
 	"errors"
 	"net/http"
-	"os"
+	"react_go_otasuke_app/config"
 	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/models"
+	"react_go_otasuke_app/utils"
 	"time"
 
 	firebase "firebase.google.com/go"
@@ -40,7 +41,8 @@ var firebaseClient *auth.Client
 
 // Firebase Admin SDKの初期化
 func initFirebase() *firebase.App {
-	firebaseConfig := os.Getenv("FIREBASE_CONFIG")
+	c := config.GetConfig()
+	firebaseConfig := c.GetString("firebase.config")
 	if firebaseConfig == "" {
 		panic("Firebase config is empty")
 	}
@@ -93,11 +95,17 @@ func CreateSessionCookie(c *gin.Context) error {
 		return errors.New("Failed to create a session cookie")
 	}
 
+	conf := config.GetConfig()
 	// セッションCookieをクライアントに設定
-	c.SetCookie("session", sessionCookie, int(expiresIn.Seconds()), "/", "*", false, false)
+	c.SetCookie("session", sessionCookie, int(expiresIn.Seconds()), "/", conf.GetString("client.domain"), true, true)
 	c.SetSameSite(http.SameSiteLaxMode)
 
 	return nil
+}
+
+// Firebaseのセッショントークンを無効化する
+func (us *UserService) RevokeRefreshTokens(c *gin.Context) error{
+	return firebaseClient.RevokeRefreshTokens(c, utils.GetUserID())
 }
 
 // Firebaseのアプリインスタンスを取得する

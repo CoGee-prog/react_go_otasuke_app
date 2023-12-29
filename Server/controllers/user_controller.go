@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"react_go_otasuke_app/config"
 	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/models"
 	"react_go_otasuke_app/services"
@@ -88,6 +89,21 @@ func (uc *UserController) Login() gin.HandlerFunc {
 			&loginResponse{
 				User: views.CreateUserView(newUser),
 			},
+		))
+	}
+}
+
+func (uc *UserController) Logout() gin.HandlerFunc{
+		return func(c *gin.Context) {
+		userService.RevokeRefreshTokens(c)
+		conf := config.GetConfig()
+		// クッキーを削除するレスポンスを設定
+    c.SetCookie("session", "", -1, "/", conf.GetString("client.domain"), true, true)
+
+		c.JSON(http.StatusOK, NewResponse(
+			http.StatusOK,
+			http.StatusText(http.StatusOK),
+			[]string{},
 		))
 	}
 }

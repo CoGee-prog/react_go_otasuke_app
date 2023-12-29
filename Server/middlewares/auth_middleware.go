@@ -5,11 +5,11 @@ import (
 	"react_go_otasuke_app/controllers"
 	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/services"
+	"react_go_otasuke_app/utils"
 
 	firebase "firebase.google.com/go"
 	"github.com/gin-gonic/gin"
 )
-
 
 // Firebaseで認証を行うMiddleware関数
 func AuthMiddleware(firebaseApp *firebase.App, db *database.GormDatabase) gin.HandlerFunc {
@@ -37,8 +37,9 @@ func AuthMiddleware(firebaseApp *firebase.App, db *database.GormDatabase) gin.Ha
 		}
 		// ユーザーサービスを取得する
 		userService := services.NewUserService(db)
+		userId := decoded.UID
 		// ユーザーを取得する
-		user, err :=  userService.GetUser(decoded.UID)
+		user, err :=  userService.GetUser(userId)
 			if err != nil {
 			c.JSON(http.StatusServiceUnavailable, controllers.NewResponse(
 				http.StatusServiceUnavailable,
@@ -55,6 +56,9 @@ func AuthMiddleware(firebaseApp *firebase.App, db *database.GormDatabase) gin.Ha
 				"",
 			))
 		}
+
+		// ユーザーIDをセットする
+		utils.SetUserID(userId)
 
 		// ユーザーが存在する場合はリクエストを続ける
 		c.Next()
