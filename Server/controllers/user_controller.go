@@ -54,16 +54,15 @@ func (uc *UserController) Login() gin.HandlerFunc {
 			return
 		}
 
-		newUser := &models.User{}
 		// ユーザーデータがなければ作成
 		if user == nil {
 			name, _ := token.Claims["name"].(string)
-			newUser = &models.User{
+			user = &models.User{
 				Id:   token.UID,
 				Name: name,
 			}
 			// ユーザーデータを作成
-			if err := userService.CreateUser(newUser); err != nil {
+			if err := userService.CreateUser(user); err != nil {
 				c.JSON(http.StatusBadRequest, NewResponse(
 					http.StatusBadRequest,
 					err.Error(),
@@ -87,7 +86,7 @@ func (uc *UserController) Login() gin.HandlerFunc {
 			http.StatusOK,
 			http.StatusText(http.StatusOK),
 			&loginResponse{
-				User: views.CreateUserView(newUser),
+				User: views.CreateUserView(user),
 			},
 		))
 	}
