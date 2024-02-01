@@ -21,9 +21,10 @@ import { loginApiResponse } from 'src/types/apiResponses'
 const firebaseAuth = getAuth(firebaseConfig)
 
 function SignInScreen() {
-  const { login, logout, isLoggedIn } = useContext(AuthContext)
+  const { login, isLoggedIn } = useContext(AuthContext)
 
   useEffect(() => {
+		// ログイン時のみ動くようにする
     const unregisterAuthObserver = onAuthStateChanged(firebaseAuth, (user) => {
       if (user) {
         user.getIdToken().then((idToken) => {

@@ -4,6 +4,7 @@ import (
 	"react_go_otasuke_app/controllers"
 	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/middlewares"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,10 +29,10 @@ func NewRouter() (*gin.Engine, error) {
 
 	// 認証が必要なエンドポイント
 	authRequired := router.Group("/")
-	authRequired.Use(middlewares.AuthMiddleware(firebaseApp,gormDatabase))
+	authRequired.Use(middlewares.AuthMiddleware(firebaseApp, gormDatabase))
 
 	{
-		authRequired.POST("/logout",)
+		authRequired.POST("/logout", userController.Logout())
 		authRequired.POST("/opponent_recruitings", opponentRecruitingController.Create())
 		authRequired.PATCH("/opponent_recruitings/:id", opponentRecruitingController.Update())
 		authRequired.DELETE("/opponent_recruitings/:id", opponentRecruitingController.Delete())

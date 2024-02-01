@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { AuthContext } from 'src/contexts/AuthContext'
+import fetchAPI from 'src/helpers/apiService'
 import { User } from 'src/types/user'
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -14,6 +15,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = () => {
     setIsLoggedIn(false)
     setUser(null)
+    fetchAPI('/logout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    })
   }
 
   return (
