@@ -16,8 +16,11 @@ type OpponentRecruitingController struct {
 	*BaseController
 }
 
+var opponentRecruitingService *services.OpponentRecruitingService
+
 // 対戦相手募集のコントローラーを作成する
 func NewOpponentRecruitingController(db *database.GormDatabase) *OpponentRecruitingController {
+	opponentRecruitingService = services.NewOpponentRecruitingService(db)
 	return &OpponentRecruitingController{
 		BaseController: NewBaseController(db),
 	}
@@ -36,15 +39,14 @@ type updateRequest struct {
 
 func (oc *OpponentRecruitingController) Index() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		opponentRecruitingService := services.NewOpponentRecruitingService(oc.db)
 		// データを取得する
 		opponentRecruitings, page := opponentRecruitingService.GetOpponentRecruitingList(c)
 
-		c.JSON(http.StatusOK, newResponse(
+		c.JSON(http.StatusOK, NewResponse(
 			http.StatusOK,
 			http.StatusText(http.StatusOK),
 			&indexResponse{
-				OpponentRecruitings: views.IndexOpponentRecruitingView(opponentRecruitings),
+				OpponentRecruitings: views.CreateOpponentRecruitingView(opponentRecruitings),
 				Page:                page,
 			},
 		))
@@ -57,7 +59,7 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 
 		// リクエストパラメーターをバインドする
 		if err := c.ShouldBindJSON(opponentRecruiting); err != nil {
-			c.JSON(http.StatusBadRequest, newResponse(
+			c.JSON(http.StatusBadRequest, NewResponse(
 				http.StatusBadRequest,
 				err.Error(),
 				"",
@@ -67,7 +69,7 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 
 		// リクエストのバリデーションチェック
 		if err := opponentRecruiting.Validate(); err != nil {
-			c.JSON(http.StatusBadRequest, newResponse(
+			c.JSON(http.StatusBadRequest, NewResponse(
 				http.StatusBadRequest,
 				err.Error(),
 				"",
@@ -77,7 +79,7 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 
 		// データを作成する
 		if err := oc.db.DB.Create(opponentRecruiting).Error; err != nil {
-			c.JSON(http.StatusBadRequest, newResponse(
+			c.JSON(http.StatusBadRequest, NewResponse(
 				http.StatusBadRequest,
 				err.Error(),
 				"",
@@ -85,7 +87,7 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, newResponse(
+		c.JSON(http.StatusOK, NewResponse(
 			http.StatusOK,
 			http.StatusText(http.StatusOK),
 			"OK",
@@ -99,7 +101,7 @@ func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {
 
 		// リクエストパラメーターをバインドする
 		if err := c.ShouldBindJSON(request); err != nil {
-			c.JSON(http.StatusBadRequest, newResponse(
+			c.JSON(http.StatusBadRequest, NewResponse(
 				http.StatusBadRequest,
 				err.Error(),
 				"",
@@ -112,7 +114,7 @@ func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {
 		result := oc.db.DB.Model(&models.OpponentRecruiting{}).Where("id = ?", id).Updates(request)
 		// エラーが起きているかどうか
 		if result.Error != nil {
-			c.JSON(http.StatusBadRequest, newResponse(
+			c.JSON(http.StatusBadRequest, NewResponse(
 				http.StatusBadRequest,
 				result.Error.Error(),
 				"",
@@ -122,7 +124,7 @@ func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {
 
 		// 更新したデータが0件の場合はエラー
 		if result.RowsAffected == 0 {
-			c.JSON(http.StatusBadRequest, newResponse(
+			c.JSON(http.StatusBadRequest, NewResponse(
 				http.StatusBadRequest,
 				"更新対象のデータがありません",
 				"",
@@ -130,7 +132,7 @@ func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, newResponse(
+		c.JSON(http.StatusOK, NewResponse(
 			http.StatusOK,
 			http.StatusText(http.StatusOK),
 			"",
@@ -146,7 +148,7 @@ func (oc *OpponentRecruitingController) Delete() gin.HandlerFunc {
 		result := oc.db.DB.Unscoped().Delete(&models.OpponentRecruiting{}, "id = ?", id)
 		// エラーが起きているかどうか
 		if result.Error != nil {
-			c.JSON(http.StatusBadRequest, newResponse(
+			c.JSON(http.StatusBadRequest, NewResponse(
 				http.StatusBadRequest,
 				result.Error.Error(),
 				"",
@@ -156,7 +158,7 @@ func (oc *OpponentRecruitingController) Delete() gin.HandlerFunc {
 
 		// 削除したデータが0件の場合はエラー
 		if result.RowsAffected == 0 {
-			c.JSON(http.StatusBadRequest, newResponse(
+			c.JSON(http.StatusBadRequest, NewResponse(
 				http.StatusBadRequest,
 				"削除対象のデータがありません",
 				"",
@@ -164,7 +166,7 @@ func (oc *OpponentRecruitingController) Delete() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, newResponse(
+		c.JSON(http.StatusOK, NewResponse(
 			http.StatusOK,
 			http.StatusText(http.StatusOK),
 			"OK",

@@ -1,8 +1,7 @@
 import Head from 'next/head'
-import Image from 'next/image'
-import Header from '../../components/Header'
-import Tabs from '../../components/Tabs'
-import styles from '../styles/Home.module.css'
+import Header from '../components/Header'
+import Tabs from '../components/Tabs'
+import { AuthProvider } from 'src/providers/AuthProvider'
 
 export default function Home() {
   return (
@@ -15,8 +14,10 @@ export default function Home() {
           href='https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.css'
         />
       </Head>
-      <Header />
-      <Tabs />
+			<AuthProvider>
+				<Header />
+				<Tabs />
+			</AuthProvider>
     </div>
   )
 }

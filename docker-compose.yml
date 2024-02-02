@@ -19,6 +19,8 @@ services:
       dockerfile: ./build/Dockerfile
     volumes:
       - ./Server:/go/src/app
+    environment:
+      - APP_ENV=dev
     ports:
       - "58080:8080"
     restart: always

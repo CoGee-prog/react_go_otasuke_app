@@ -1,22 +1,29 @@
 package config
 
 import (
+	"log"
+	"os"
+
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
 
 var c *viper.Viper
 
-func Init(env string) {
+func Init() {
+	// .envファイルをロードする
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	c = viper.New()
-	c.SetConfigFile("yaml")
-	c.SetConfigName(env)
+	c.SetConfigFile("yml")
+	c.SetConfigName(os.Getenv("APP_ENV"))
 	c.AddConfigPath("config/environments/")
-	c.AddConfigPath("/run/secrets/")
 	if err := c.ReadInConfig(); err != nil {
 		panic(err)
 	}
 }
 
-func GetConfig() *viper.Viper{
+func GetConfig() *viper.Viper {
 	return c
 }

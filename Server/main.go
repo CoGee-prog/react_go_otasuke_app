@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"react_go_otasuke_app/config"
 	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/models"
@@ -10,17 +9,23 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
+func init() {
+
+}
+
 func main() {
 	// 設定を読み込み
-	env := flag.String("e", "development", "")
-	flag.Parse()
-	config.Init(*env)
+	config.Init()
 
 	// データベースの設定
 	database.Init()
-	database.Migration(&models.OpponentRecruiting{})
+	models := []interface{}{
+		&models.OpponentRecruiting{},
+		&models.User{},
+	}
+	database.Migration(models...)
 	defer database.Close()
-	
+
 	// サーバー起動
 	if err := server.Init(); err != nil {
 		panic(err)
