@@ -3,6 +3,7 @@ import { User } from 'src/types/user'
 
 interface AuthContextType {
   isLoggedIn: boolean
+	isLoading: boolean
   user: User | null
   login: (userData: User) => void
   logout: () => void
@@ -10,6 +11,7 @@ interface AuthContextType {
 
 const defaultAuthContext: AuthContextType = {
   isLoggedIn: false,
+	isLoading: false,
   user: null,
   login: () => {},
   logout: () => {},
