@@ -6,9 +6,10 @@ import React, { useContext } from 'react'
 import SignInBackdrop from './SignInBackdrop'
 import { AuthContext } from 'src/contexts/AuthContext'
 import AccountMenu from './AccountMenu'
+import LoadingScreen from './LoadingScreen'
 
 export default function Header() {
-  const {isLoggedIn} = useContext(AuthContext)
+  const {isLoggedIn, isLoading} = useContext(AuthContext)
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position='static'>
@@ -17,11 +18,7 @@ export default function Header() {
             おたスケ
           </Typography>
           <div>
-            {isLoggedIn ? (
-                <AccountMenu />
-            ) : (
-              <SignInBackdrop />
-            )}
+            {isLoading ? <LoadingScreen/>: isLoggedIn ? <AccountMenu /> : <SignInBackdrop />}
           </div>
         </Toolbar>
       </AppBar>
