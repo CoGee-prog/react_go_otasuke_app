@@ -6,6 +6,7 @@ import (
 	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/models"
 	"react_go_otasuke_app/services"
+	"react_go_otasuke_app/utils"
 	"react_go_otasuke_app/views"
 
 	firebase "firebase.google.com/go"
@@ -35,10 +36,10 @@ func (uc *UserController) Login() gin.HandlerFunc {
 		// IDトークンを検証
 		token, err := services.VerifyIDToken(c)
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, NewResponse(
+			c.JSON(http.StatusUnauthorized, utils.NewResponse(
 				http.StatusUnauthorized,
 				err.Error(),
-				"",
+				nil,
 			))
 			return
 		}
@@ -46,10 +47,10 @@ func (uc *UserController) Login() gin.HandlerFunc {
 		// ユーザーデータを検索
 		user, err := userService.GetUser(token.UID)
 		if err != nil {
-			c.JSON(http.StatusServiceUnavailable, NewResponse(
+			c.JSON(http.StatusServiceUnavailable, utils.NewResponse(
 				http.StatusServiceUnavailable,
 				err.Error(),
-				"",
+				nil,
 			))
 			return
 		}
@@ -63,10 +64,10 @@ func (uc *UserController) Login() gin.HandlerFunc {
 			}
 			// ユーザーデータを作成
 			if err := userService.CreateUser(user); err != nil {
-				c.JSON(http.StatusBadRequest, NewResponse(
+				c.JSON(http.StatusBadRequest, utils.NewResponse(
 					http.StatusBadRequest,
 					err.Error(),
-					"",
+					nil,
 				))
 				return
 			}
@@ -74,15 +75,15 @@ func (uc *UserController) Login() gin.HandlerFunc {
 
 		// セッションを作成
 		if err := services.CreateSessionCookie(c); err != nil {
-			c.JSON(http.StatusInternalServerError, NewResponse(
+			c.JSON(http.StatusInternalServerError, utils.NewResponse(
 				http.StatusInternalServerError,
 				err.Error(),
-				"",
+				nil,
 			))
 			return
 		}
 
-		c.JSON(http.StatusOK, NewResponse(
+		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,
 			http.StatusText(http.StatusOK),
 			&loginResponse{
@@ -99,7 +100,7 @@ func (uc *UserController) Logout() gin.HandlerFunc{
 		// クッキーを削除するレスポンスを設定
     c.SetCookie("session", "", -1, "/", conf.GetString("client.domain"), true, true)
 
-		c.JSON(http.StatusOK, NewResponse(
+		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,
 			http.StatusText(http.StatusOK),
 			[]string{},

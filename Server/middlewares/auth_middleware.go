@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"net/http"
-	"react_go_otasuke_app/controllers"
 	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/services"
 	"react_go_otasuke_app/utils"
@@ -17,44 +16,57 @@ func AuthMiddleware(firebaseApp *firebase.App, db *database.GormDatabase) gin.Ha
 		// クライアントから送信されたセッションCookieを取得
 		cookie, err := c.Cookie("session")
 		if err != nil {
-			// セッションCookieが利用できない場合、ユーザーにログインを強制する
-			c.Redirect(http.StatusFound, "/login")
+			// セッションCookieが利用できない場合、認証エラー
+			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.NewResponse(
+				http.StatusUnauthorized,
+				err.Error(),
+				nil,
+			))
 			return
 		}
 
 		client, err := firebaseApp.Auth(c)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Error getting Auth client"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.NewResponse(
+				http.StatusUnauthorized,
+				err.Error(),
+				nil,
+			))
 			return
 		}
 
 		// セッションCookieの検証。ユーザーのFirebaseセッションが取り消されたかどうかもチェック
 		decoded, err := client.VerifySessionCookieAndCheckRevoked(c, cookie)
 		if err != nil {
-			// セッションCookieが無効な場合、ユーザーにログインを強制する
-			c.Redirect(http.StatusFound, "/login")
+			// セッションCookieが無効な場合、認証エラー
+			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.NewResponse(
+				http.StatusUnauthorized,
+				err.Error(),
+				nil,
+			))
 			return
 		}
 		// ユーザーサービスを取得する
 		userService := services.NewUserService(db)
 		userId := decoded.UID
 		// ユーザーを取得する
-		user, err :=  userService.GetUser(userId)
-			if err != nil {
-			c.JSON(http.StatusServiceUnavailable, controllers.NewResponse(
-				http.StatusServiceUnavailable,
+		user, err := userService.GetUser(userId)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, utils.NewResponse(
+				http.StatusBadRequest,
 				err.Error(),
-				"",
+				nil,
 			))
 			return
 		}
 		// ユーザーが見つからなければエラー
 		if user == nil {
-			c.JSON(http.StatusBadRequest, controllers.NewResponse(
+			c.AbortWithStatusJSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				err.Error(),
-				"",
+				nil,
 			))
+			return
 		}
 
 		// ユーザーIDをセットする
