@@ -7,9 +7,9 @@ import (
 
 type OpponentRecruitingView struct {
 	ID       uint      `json:"id"`
-	TeamId   int       `json:"team_id"`
+	TeamId   uint       `json:"team_id"`
 	DateTime time.Time `json:"date_time"`
-	AreaId   int       `json:"area"`
+	AreaId   uint       `json:"area"`
 	Detail   *string   `json:"detail"`
 }
 

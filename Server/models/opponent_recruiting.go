@@ -4,14 +4,15 @@ import (
 	"errors"
 	"time"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type OpponentRecruiting struct {
 	gorm.Model
-	TeamId   int       `json:"team_id" gorm:"type:int"`
-	AreaId   int       `json:"area_id" gorm:"type:int; not null"`
-	DateTime time.Time `json:"date_time"`
+	TeamId   uint      `json:"team_id" gorm:"type:int;not null"`
+	Team     Team      `gorm:"foreignKey:TeamId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	AreaId   uint      `json:"area_id" gorm:"type:int; not null"`
+	DateTime time.Time `json:"date_time" gorm:"not null"`
 	Detail   *string   `json:"detail" gorm:"type:text"`
 }
 

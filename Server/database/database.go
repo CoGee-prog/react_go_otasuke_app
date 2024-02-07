@@ -3,8 +3,8 @@ package database
 import (
 	"react_go_otasuke_app/config"
 
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/jinzhu/gorm"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 var d *gorm.DB
@@ -13,7 +13,7 @@ var d *gorm.DB
 func Init() {
 	c := config.GetConfig()
 	var err error
-	d, err = gorm.Open(c.GetString("db.provider"), c.GetString("db.url"))
+	d, err = gorm.Open(mysql.Open(c.GetString("db.url")), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
@@ -35,5 +35,9 @@ func GetDB() *gorm.DB {
 
 // DBの接続を切る
 func Close() {
-	d.Close()
+	db, err := d.DB()
+	if err != nil{
+		panic(err)
+	}
+	db.Close()
 }

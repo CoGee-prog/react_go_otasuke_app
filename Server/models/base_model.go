@@ -3,7 +3,7 @@ package models
 import (
 	"strings"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type Sort struct {

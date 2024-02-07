@@ -13,8 +13,8 @@ import (
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"google.golang.org/api/option"
+	"gorm.io/gorm"
 )
 
 type UserService struct {
@@ -104,7 +104,7 @@ func CreateSessionCookie(c *gin.Context) error {
 }
 
 // Firebaseのセッショントークンを無効化する
-func (us *UserService) RevokeRefreshTokens(c *gin.Context) error{
+func (us *UserService) RevokeRefreshTokens(c *gin.Context) error {
 	return firebaseClient.RevokeRefreshTokens(c, utils.GetUserID())
 }
 
