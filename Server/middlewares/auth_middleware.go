@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"net/http"
+	"react_go_otasuke_app/config"
 	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/services"
 	"react_go_otasuke_app/utils"
@@ -13,6 +14,10 @@ import (
 // Firebaseで認証を行うMiddleware関数
 func AuthMiddleware(firebaseApp *firebase.App, db *database.GormDatabase) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// 開発環境の場合は認証をスキップする
+		if config.Get().GetString("server.env") == "dev" {
+			return
+		}
 		// クライアントから送信されたセッションCookieを取得
 		cookie, err := c.Cookie("session")
 		if err != nil {

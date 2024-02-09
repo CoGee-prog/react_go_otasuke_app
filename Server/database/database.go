@@ -11,7 +11,7 @@ var d *gorm.DB
 
 // DBに接続する
 func Init() {
-	c := config.GetConfig()
+	c := config.Get()
 	var err error
 	d, err = gorm.Open(mysql.Open(c.GetString("db.url")), &gorm.Config{})
 	if err != nil {
@@ -36,7 +36,7 @@ func GetDB() *gorm.DB {
 // DBの接続を切る
 func Close() {
 	db, err := d.DB()
-	if err != nil{
+	if err != nil {
 		panic(err)
 	}
 	db.Close()

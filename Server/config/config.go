@@ -24,6 +24,6 @@ func Init() {
 	}
 }
 
-func GetConfig() *viper.Viper {
+func Get() *viper.Viper {
 	return c
 }

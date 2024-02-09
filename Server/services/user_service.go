@@ -21,7 +21,7 @@ type UserService struct {
 	db *database.GormDatabase
 }
 
-// 対戦相手募集のサービスを作成する
+// ユーザーサービスを作成する
 func NewUserService(db *database.GormDatabase) *UserService {
 	// Firebase Admin SDKの初期化
 	initFirebase()
@@ -41,7 +41,7 @@ var firebaseClient *auth.Client
 
 // Firebase Admin SDKの初期化
 func initFirebase() *firebase.App {
-	c := config.GetConfig()
+	c := config.Get()
 	firebaseConfig := c.GetString("firebase.config")
 	if firebaseConfig == "" {
 		panic("Firebase config is empty")
@@ -95,7 +95,7 @@ func CreateSessionCookie(c *gin.Context) error {
 		return errors.New("Failed to create a session cookie")
 	}
 
-	conf := config.GetConfig()
+	conf := config.Get()
 	// セッションCookieをクライアントに設定
 	c.SetCookie("session", sessionCookie, int(expiresIn.Seconds()), "/", conf.GetString("client.domain"), true, true)
 	c.SetSameSite(http.SameSiteLaxMode)

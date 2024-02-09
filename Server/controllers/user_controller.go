@@ -93,12 +93,12 @@ func (uc *UserController) Login() gin.HandlerFunc {
 	}
 }
 
-func (uc *UserController) Logout() gin.HandlerFunc{
-		return func(c *gin.Context) {
+func (uc *UserController) Logout() gin.HandlerFunc {
+	return func(c *gin.Context) {
 		userService.RevokeRefreshTokens(c)
-		conf := config.GetConfig()
+		conf := config.Get()
 		// クッキーを削除するレスポンスを設定
-    c.SetCookie("session", "", -1, "/", conf.GetString("client.domain"), true, true)
+		c.SetCookie("session", "", -1, "/", conf.GetString("client.domain"), true, true)
 
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,
