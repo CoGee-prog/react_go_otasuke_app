@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type OpponentRecruitingService struct {
@@ -18,6 +19,25 @@ func NewOpponentRecruitingService(db *database.GormDatabase) *OpponentRecruiting
 	return &OpponentRecruitingService{
 		db: db,
 	}
+}
+
+// 対戦相手募集を作成する
+func (ors *OpponentRecruitingService) CreateOpponentRecruiting(opponentRecruiting *models.OpponentRecruiting) error {
+	result := ors.db.DB.Create(opponentRecruiting)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+// 対戦相手募集を変更する
+func (ors *OpponentRecruitingService) UpdateOpponentRecruiting(opponentRecruiting *models.OpponentRecruiting, id uint) *gorm.DB {
+		return ors.db.DB.Model(&models.OpponentRecruiting{}).Where("id = ?", id).Updates(opponentRecruiting)
+}
+
+// 対戦相手募集を削除する
+func (ors *OpponentRecruitingService) DeleteOpponentRecruiting(id uint) *gorm.DB {
+		return ors.db.DB.Unscoped().Delete(&models.OpponentRecruiting{}, "id = ?", id)
 }
 
 // 対戦相手募集の構造体の配列

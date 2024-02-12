@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/models"
 	"react_go_otasuke_app/services"
 	"react_go_otasuke_app/utils"
@@ -11,16 +10,13 @@ import (
 )
 
 type TeamController struct {
-	*BaseController
+	TeamService *services.TeamService
 }
 
-var teamService *services.TeamService
-
 // チームコントローラーを返す
-func NewTeamController(db *database.GormDatabase) (*TeamController) {
-	teamService = services.NewTeamService(db)
+func NewTeamController(teamService *services.TeamService) *TeamController {
 	return &TeamController{
-		BaseController: NewBaseController(db),
+		TeamService: teamService,
 	}
 }
 
@@ -49,7 +45,7 @@ func (tc *TeamController) Create() gin.HandlerFunc {
 		}
 
 		// チームを作成する
-		if err := teamService.CreateTeam(team); err != nil {
+		if err := tc.TeamService.CreateTeam(team); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				"チーム作成に失敗しました",
@@ -57,6 +53,8 @@ func (tc *TeamController) Create() gin.HandlerFunc {
 			))
 			return
 		}
+
+		// ユーザーの現在のチームを作成したチームに変更する
 
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,

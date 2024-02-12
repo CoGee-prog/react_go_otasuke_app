@@ -3,28 +3,24 @@ package controllers
 import (
 	"net/http"
 	"react_go_otasuke_app/config"
-	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/models"
 	"react_go_otasuke_app/services"
 	"react_go_otasuke_app/utils"
 	"react_go_otasuke_app/views"
 
-	firebase "firebase.google.com/go"
 	"github.com/gin-gonic/gin"
 )
 
 type UserController struct {
-	*BaseController
+	// *BaseController
+	UserService *services.UserService
 }
 
-var userService *services.UserService
-
 // ユーザーコントローラーを返す
-func NewUserController(db *database.GormDatabase) (*UserController, *firebase.App) {
-	userService = services.NewUserService(db)
+func NewUserController(userService *services.UserService) *UserController {
 	return &UserController{
-		BaseController: NewBaseController(db),
-	}, userService.GetFireBaseApp()
+		UserService: userService,
+	}
 }
 
 type loginResponse struct {
@@ -43,7 +39,7 @@ func (uc *UserController) Login() gin.HandlerFunc {
 				Name: "dev-user",
 			}
 			// ユーザーデータを作成
-			if err := userService.CreateUser(devUser); err != nil {
+			if err := uc.UserService.CreateUser(devUser); err != nil {
 				c.JSON(http.StatusBadRequest, utils.NewResponse(
 					http.StatusBadRequest,
 					err.Error(),
@@ -74,7 +70,7 @@ func (uc *UserController) Login() gin.HandlerFunc {
 		}
 
 		// ユーザーデータを検索
-		user, err := userService.GetUser(token.UID)
+		user, err := uc.UserService.GetUser(token.UID)
 		if err != nil {
 			c.JSON(http.StatusServiceUnavailable, utils.NewResponse(
 				http.StatusServiceUnavailable,
@@ -92,7 +88,7 @@ func (uc *UserController) Login() gin.HandlerFunc {
 				Name: name,
 			}
 			// ユーザーデータを作成
-			if err := userService.CreateUser(user); err != nil {
+			if err := uc.UserService.CreateUser(user); err != nil {
 				c.JSON(http.StatusBadRequest, utils.NewResponse(
 					http.StatusBadRequest,
 					err.Error(),
@@ -124,7 +120,7 @@ func (uc *UserController) Login() gin.HandlerFunc {
 
 func (uc *UserController) Logout() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userService.RevokeRefreshTokens(c)
+		uc.UserService.RevokeRefreshTokens(c)
 		conf := config.Get()
 		// クッキーを削除するレスポンスを設定
 		c.SetCookie("session", "", -1, "/", conf.GetString("client.domain"), true, true)

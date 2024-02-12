@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/models"
 	"react_go_otasuke_app/services"
 	"react_go_otasuke_app/utils"
@@ -14,16 +13,13 @@ import (
 )
 
 type OpponentRecruitingController struct {
-	*BaseController
+	OpponentRecruitingService *services.OpponentRecruitingService
 }
 
-var opponentRecruitingService *services.OpponentRecruitingService
-
 // 対戦相手募集のコントローラーを作成する
-func NewOpponentRecruitingController(db *database.GormDatabase) *OpponentRecruitingController {
-	opponentRecruitingService = services.NewOpponentRecruitingService(db)
+func NewOpponentRecruitingController(opponentRecruitingService *services.OpponentRecruitingService) *OpponentRecruitingController {
 	return &OpponentRecruitingController{
-		BaseController: NewBaseController(db),
+		OpponentRecruitingService: opponentRecruitingService,
 	}
 }
 
@@ -32,16 +28,10 @@ type indexResponse struct {
 	Page                *models.Page                    `json:"page"`
 }
 
-type updateRequest struct {
-	AreaId   int       `json:"area_id" gorm:"type:int; not null"`
-	DateTime time.Time `json:"date_time"`
-	Detail   *string   `json:"detail" gorm:"type:text"`
-}
-
 func (oc *OpponentRecruitingController) Index() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// データを取得する
-		opponentRecruitings, page := opponentRecruitingService.GetOpponentRecruitingList(c)
+		opponentRecruitings, page := oc.OpponentRecruitingService.GetOpponentRecruitingList(c)
 
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,
@@ -79,7 +69,7 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 		}
 
 		// データを作成する
-		if err := oc.db.DB.Create(opponentRecruiting).Error; err != nil {
+		if err := oc.OpponentRecruitingService.CreateOpponentRecruiting(opponentRecruiting); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				err.Error(),
@@ -96,9 +86,15 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 	}
 }
 
+type UpdateRequest struct {
+	AreaId   uint       `json:"area_id" gorm:"type:int; not null"`
+	DateTime time.Time `json:"date_time"`
+	Detail   *string   `json:"detail" gorm:"type:text"`
+}
+
 func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		request := &updateRequest{}
+		request := &UpdateRequest{}
 
 		// リクエストパラメーターをバインドする
 		if err := c.ShouldBindJSON(request); err != nil {
@@ -111,8 +107,13 @@ func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {
 		}
 
 		id, _ := strconv.Atoi(c.Param("id"))
+		opponentRecruiting := &models.OpponentRecruiting{
+			AreaId: request.AreaId,
+			DateTime: request.DateTime,
+			Detail: request.Detail,
+		}
 		// データを更新する
-		result := oc.db.DB.Model(&models.OpponentRecruiting{}).Where("id = ?", id).Updates(request)
+		result := oc.OpponentRecruitingService.UpdateOpponentRecruiting(opponentRecruiting, uint(id))
 		// エラーが起きているかどうか
 		if result.Error != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
@@ -146,7 +147,7 @@ func (oc *OpponentRecruitingController) Delete() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, _ := strconv.Atoi(c.Param("id"))
 		// データを削除する
-		result := oc.db.DB.Unscoped().Delete(&models.OpponentRecruiting{}, "id = ?", id)
+		result := oc.OpponentRecruitingService.DeleteOpponentRecruiting(uint(id))
 		// エラーが起きているかどうか
 		if result.Error != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
