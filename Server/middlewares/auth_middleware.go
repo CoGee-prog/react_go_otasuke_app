@@ -16,6 +16,8 @@ func AuthMiddleware(firebaseApp *firebase.App, db *database.GormDatabase) gin.Ha
 	return func(c *gin.Context) {
 		// 開発環境の場合は認証をスキップする
 		if config.Get().GetString("server.env") == "dev" {
+			// ユーザーIDをセットする
+			utils.SetUserID(c.GetHeader("x-user-id"))
 			return
 		}
 		// クライアントから送信されたセッションCookieを取得

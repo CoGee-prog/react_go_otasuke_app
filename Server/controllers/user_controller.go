@@ -33,6 +33,35 @@ type loginResponse struct {
 
 func (uc *UserController) Login() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// 開発環境の場合はIDトークン検証をスキップしてユーザーを作成する
+		if config.Get().GetString("server.env") == "dev" {
+			// ユーザーIDをセットする
+			utils.SetUserID(c.GetHeader("x-user-id"))
+
+			devUser := &models.User{
+				ID:   c.GetHeader("x-user-id"),
+				Name: "dev-user",
+			}
+			// ユーザーデータを作成
+			if err := userService.CreateUser(devUser); err != nil {
+				c.JSON(http.StatusBadRequest, utils.NewResponse(
+					http.StatusBadRequest,
+					err.Error(),
+					nil,
+				))
+				return
+			}
+
+			c.JSON(http.StatusOK, utils.NewResponse(
+				http.StatusOK,
+				http.StatusText(http.StatusOK),
+				&loginResponse{
+					User: views.CreateUserView(devUser),
+				},
+			))
+			return
+		}
+
 		// IDトークンを検証
 		token, err := services.VerifyIDToken(c)
 		if err != nil {
@@ -59,7 +88,7 @@ func (uc *UserController) Login() gin.HandlerFunc {
 		if user == nil {
 			name, _ := token.Claims["name"].(string)
 			user = &models.User{
-				Id:   token.UID,
+				ID:   token.UID,
 				Name: name,
 			}
 			// ユーザーデータを作成

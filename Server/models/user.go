@@ -3,7 +3,7 @@ package models
 import "time"
 
 type User struct {
-	Id            string `json:"id" gorm:"primary_key"`
+	ID            string `json:"id" gorm:"primary_key"`
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 	DeletedAt     *time.Time `sql:"index"`

@@ -23,6 +23,7 @@ func main() {
 		&models.OpponentRecruiting{},
 	  &models.Team{},
 		&models.User{},
+		&models.UserTeams{},
 	}
 	database.Migration(models...)
 	defer database.Close()
