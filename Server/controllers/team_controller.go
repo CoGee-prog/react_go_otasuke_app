@@ -10,12 +10,14 @@ import (
 )
 
 type TeamController struct {
+	UserService *services.UserService
 	TeamService *services.TeamService
 }
 
 // チームコントローラーを返す
-func NewTeamController(teamService *services.TeamService) *TeamController {
+func NewTeamController(userService *services.UserService, teamService *services.TeamService) *TeamController {
 	return &TeamController{
+		UserService: userService,
 		TeamService: teamService,
 	}
 }
@@ -55,6 +57,7 @@ func (tc *TeamController) Create() gin.HandlerFunc {
 		}
 
 		// ユーザーの現在のチームを作成したチームに変更する
+		tc.UserService.UpdateCurrentTeam(team.ID)
 
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,

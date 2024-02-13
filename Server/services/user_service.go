@@ -136,3 +136,19 @@ func (us *UserService) CreateUser(user *models.User) error {
 	}
 	return nil
 }
+
+// 現在のチームを変更する
+func (us *UserService) UpdateCurrentTeam(teamId uint) error {
+	// チームに所属していなければエラー
+	var userTeam models.UserTeams
+	result := us.db.DB.Where("user_id = ? AND team_id = ?", utils.GetUserID(), teamId).First(userTeam)
+	if result.Error != nil {
+		return errors.New("所属チーム以外に切り替えられません")
+	}
+
+	result = us.db.DB.Model(&models.User{}).Where("id = ?", utils.GetUserID()).Update("current_team_id", teamId)
+	if result.Error != nil {
+		return errors.New("チーム切り替えに失敗しました")
+	}
+	return nil
+}

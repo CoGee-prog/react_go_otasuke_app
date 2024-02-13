@@ -21,10 +21,9 @@ func NewRouter() (*gin.Engine, error) {
 	
 	// コントローラーを作成する
 	userController := controllers.NewUserController(userService)
-	teamController := controllers.NewTeamController(teamService)
+	teamController := controllers.NewTeamController(userService, teamService)
 	opponentRecruitingController := controllers.NewOpponentRecruitingController(opponentRecruitingService)
 	
-
 	router := gin.Default()
 	// CORSを設定
 	setCors(router)
