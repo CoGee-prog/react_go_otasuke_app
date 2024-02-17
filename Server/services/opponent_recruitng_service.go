@@ -138,6 +138,7 @@ func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context) 
 		OrderBy: "created_at",
 	}
 
-	ors.db.DB.Scopes(page.Paginate()).Scopes(sort.Sort()).Find(&opponentRecruitings)
+	// 対戦相手募集を指定されたページと作成順に並び替えて、チーム情報とまとめて返す
+	ors.db.DB.Scopes(page.Paginate()).Scopes(sort.Sort()).Preload("Team").Find(&opponentRecruitings)
 	return opponentRecruitings, page
 }

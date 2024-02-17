@@ -113,6 +113,7 @@ func (us *UserService) GetFireBaseApp() *firebase.App {
 // ユーザーを取得する
 func (us *UserService) GetUser(id string) (*models.User, error) {
 	var user models.User
+	
 	result := us.db.DB.Where("id = ?", id).First(&user)
 	// レコードが見つからない場合はnilを返す
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -136,15 +137,15 @@ func (us *UserService) CreateUser(user *models.User) error {
 
 // 現在のチームを変更する
 func (us *UserService) UpdateCurrentTeam(teamId uint) error {
+	userId := utils.GetUserID()
 	// チームに所属していなければエラー
 	var userTeam models.UserTeam
-	result := us.db.DB.Where("user_id = ? AND team_id = ?", utils.GetUserID(), teamId).First(userTeam)
-	if result.Error != nil {
+	if err := us.db.DB.Where("user_id = ? AND team_id = ?", userId, teamId).First(&userTeam).Error; err != nil {
 		return errors.New("所属チーム以外に切り替えられません")
 	}
 
-	result = us.db.DB.Model(&models.User{}).Where("id = ?", utils.GetUserID()).Update("current_team_id", teamId)
-	if result.Error != nil {
+	// 現在のチームを変更する
+	if err := us.db.DB.Model(&models.User{}).Where("id = ?", userId).Update("current_team_id", teamId).Error; err != nil {
 		return errors.New("チーム切り替えに失敗しました")
 	}
 	return nil

@@ -17,9 +17,26 @@ const (
 	PrefecturalLevel
 	// 都道府県上位レベル
 	PrefecturalEliteLevel
-	// 全国レベル（ナショナル）
+	// 全国レベル
 	NationalLevel
 )
+
+func (TL TeamLevel) ToString() string {
+	switch TL {
+	case LocalLevel:
+		return "地区レベル"
+	case LocalEliteLevel:
+		return "地区上位レベル"
+	case PrefecturalLevel:
+		return "都道府県レベル"
+	case PrefecturalEliteLevel:
+		return "都道府県上位レベル"
+	case NationalLevel:
+		return "全国レベル"
+	default:
+		return "未定義"
+	}
+}
 
 type Team struct {
 	gorm.Model
