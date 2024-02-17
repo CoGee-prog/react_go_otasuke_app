@@ -20,9 +20,6 @@ func NewTeamService(db *database.GormDatabase) *TeamService {
 	}
 }
 
-// チームの構造体の配列
-var Teams []*models.Team
-
 // チームを取得する
 func (ts *TeamService) GetTeam(id string) (*models.Team, error) {
 	var team models.Team
@@ -46,10 +43,10 @@ func (ts *TeamService) CreateTeam(team *models.Team) error {
 	}
 
 	// チーム作成者をチーム管理者としてチームに所属させる
-	userTeam := models.UserTeams{
+	userTeam := models.UserTeam{
 		UserID: utils.GetUserID(),
 		TeamID: team.ID,
-		Role: models.TeamAdmin,
+		Role:   models.TeamAdmin,
 	}
 	if err := ts.db.DB.Create(&userTeam).Error; err != nil {
 		return err

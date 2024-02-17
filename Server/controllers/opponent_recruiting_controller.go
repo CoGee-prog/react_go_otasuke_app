@@ -87,7 +87,7 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 }
 
 type UpdateRequest struct {
-	AreaId   uint       `json:"area_id" gorm:"type:int; not null"`
+	AreaId   uint      `json:"area_id" gorm:"type:int; not null"`
 	DateTime time.Time `json:"date_time"`
 	Detail   *string   `json:"detail" gorm:"type:text"`
 }
@@ -107,28 +107,20 @@ func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {
 		}
 
 		id, _ := strconv.Atoi(c.Param("id"))
+		// 対戦相手募集の構造体を作成
 		opponentRecruiting := &models.OpponentRecruiting{
-			AreaId: request.AreaId,
+			AreaId:   request.AreaId,
 			DateTime: request.DateTime,
-			Detail: request.Detail,
-		}
-		// データを更新する
-		result := oc.OpponentRecruitingService.UpdateOpponentRecruiting(opponentRecruiting, uint(id))
-		// エラーが起きているかどうか
-		if result.Error != nil {
-			c.JSON(http.StatusBadRequest, utils.NewResponse(
-				http.StatusBadRequest,
-				result.Error.Error(),
-				nil,
-			))
-			return
+			Detail:   request.Detail,
 		}
 
-		// 更新したデータが0件の場合はエラー
-		if result.RowsAffected == 0 {
+		// データを更新する
+		err := oc.OpponentRecruitingService.UpdateOpponentRecruiting(opponentRecruiting, uint(id))
+		// エラーが起きているかどうか
+		if err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
-				"更新対象のデータがありません",
+				err.Error(),
 				nil,
 			))
 			return
@@ -136,7 +128,7 @@ func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,
-			http.StatusText(http.StatusOK),
+			"対戦相手募集を更新しました",
 			nil,
 		))
 	}
@@ -147,22 +139,10 @@ func (oc *OpponentRecruitingController) Delete() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, _ := strconv.Atoi(c.Param("id"))
 		// データを削除する
-		result := oc.OpponentRecruitingService.DeleteOpponentRecruiting(uint(id))
-		// エラーが起きているかどうか
-		if result.Error != nil {
+		if err := oc.OpponentRecruitingService.DeleteOpponentRecruiting(uint(id)); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
-				result.Error.Error(),
-				nil,
-			))
-			return
-		}
-
-		// 削除したデータが0件の場合はエラー
-		if result.RowsAffected == 0 {
-			c.JSON(http.StatusBadRequest, utils.NewResponse(
-				http.StatusBadRequest,
-				"削除対象のデータがありません",
+				err.Error(),
 				nil,
 			))
 			return
@@ -170,8 +150,8 @@ func (oc *OpponentRecruitingController) Delete() gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,
-			http.StatusText(http.StatusOK),
-			"OK",
+			"対戦相手募集を削除しました",
+			nil,
 		))
 	}
 }

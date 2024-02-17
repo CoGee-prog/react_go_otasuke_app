@@ -30,7 +30,7 @@ func (tc *TeamController) Create() gin.HandlerFunc {
 		if err := c.ShouldBindJSON(team); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
-				err.Error(),
+			  "不正なリクエストです",
 				nil,
 			))
 			return
@@ -57,7 +57,14 @@ func (tc *TeamController) Create() gin.HandlerFunc {
 		}
 
 		// ユーザーの現在のチームを作成したチームに変更する
-		tc.UserService.UpdateCurrentTeam(team.ID)
+		if err := tc.UserService.UpdateCurrentTeam(team.ID); err != nil{
+				c.JSON(http.StatusBadRequest, utils.NewResponse(
+				http.StatusBadRequest,
+				err.Error(),
+				nil,
+			))
+			return
+		}
 
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,

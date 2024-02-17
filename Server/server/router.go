@@ -15,9 +15,10 @@ func NewRouter() (*gin.Engine, error) {
 	db := database.GetDB()
 	gormDatabase := database.NewGormDatabase(db)
 	// DIのためここでサービスを作成する
+	userTeamService := services.NewUserTeamService(gormDatabase)
 	userService := services.NewUserService(gormDatabase)
 	teamService := services.NewTeamService(gormDatabase)
-	opponentRecruitingService := services.NewOpponentRecruitingService(gormDatabase)
+	opponentRecruitingService := services.NewOpponentRecruitingService(gormDatabase, userTeamService)
 	
 	// コントローラーを作成する
 	userController := controllers.NewUserController(userService)

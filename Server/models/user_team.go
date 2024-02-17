@@ -11,10 +11,15 @@ const (
 	TeamSubAdmin
 )
 
-type UserTeams struct {
+type UserTeam struct {
 	UserID string   `gorm:"primaryKey;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	TeamID uint     `gorm:"primaryKey;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Role   TeamRole `gorm:"type:int;not null"`
 	User   User     `gorm:"foreignKey:UserID;references:ID;"`
 	Team   Team     `gorm:"foreignKey:TeamID;references:ID;"`
+}
+
+// ユーザーがチームの管理者または副管理者であるかどうかを確認する
+func (ut *UserTeam) IsAdminOrSubAdmin() bool {
+	return ut.Role == TeamAdmin || ut.Role == TeamSubAdmin
 }

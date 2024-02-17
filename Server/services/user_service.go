@@ -30,9 +30,6 @@ func NewUserService(db *database.GormDatabase) *UserService {
 	}
 }
 
-// ユーザーの構造体の配列
-var Users []*models.User
-
 // Firebaseのアプリインスタンスを保持するためのグローバル変数
 var FirebaseApp *firebase.App
 
@@ -140,7 +137,7 @@ func (us *UserService) CreateUser(user *models.User) error {
 // 現在のチームを変更する
 func (us *UserService) UpdateCurrentTeam(teamId uint) error {
 	// チームに所属していなければエラー
-	var userTeam models.UserTeams
+	var userTeam models.UserTeam
 	result := us.db.DB.Where("user_id = ? AND team_id = ?", utils.GetUserID(), teamId).First(userTeam)
 	if result.Error != nil {
 		return errors.New("所属チーム以外に切り替えられません")

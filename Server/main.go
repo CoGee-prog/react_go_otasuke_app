@@ -21,9 +21,9 @@ func main() {
 	database.Init()
 	models := []interface{}{
 		&models.OpponentRecruiting{},
-	  &models.Team{},
+		&models.Team{},
 		&models.User{},
-		&models.UserTeams{},
+		&models.UserTeam{},
 	}
 	database.Migration(models...)
 	defer database.Close()
