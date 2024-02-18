@@ -3,19 +3,22 @@ package middlewares
 import (
 	"net/http"
 	"react_go_otasuke_app/config"
-	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/services"
 	"react_go_otasuke_app/utils"
+	"strings"
 
 	firebase "firebase.google.com/go"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 // Firebaseで認証を行うMiddleware関数
-func AuthMiddleware(firebaseApp *firebase.App, db *database.GormDatabase) gin.HandlerFunc {
+func AuthMiddleware(firebaseApp *firebase.App) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// 開発環境の場合は認証をスキップする
-		if config.Get().GetString("server.env") == "dev" {
+		// User-Agentヘッダーを取得
+		userAgent := c.GetHeader("User-Agent")
+		// 開発環境かつポストマンからのリクエストの場合は認証をスキップする
+		if config.Get().GetString("server.env") == "dev" && strings.Contains(userAgent, "Postman") {
 			// ユーザーIDをセットする
 			utils.SetUserID(c.GetHeader("x-user-id"))
 			return
@@ -54,10 +57,11 @@ func AuthMiddleware(firebaseApp *firebase.App, db *database.GormDatabase) gin.Ha
 			return
 		}
 		// ユーザーサービスを取得する
-		userService := services.NewUserService(db)
+		userService := services.NewUserService()
 		userId := decoded.UID
+		db := c.MustGet("tx").(*gorm.DB)
 		// ユーザーを取得する
-		user, err := userService.GetUser(userId)
+		user, err := userService.GetUser(db, userId)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,

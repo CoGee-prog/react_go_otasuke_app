@@ -7,6 +7,7 @@ import (
 	"react_go_otasuke_app/utils"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type TeamController struct {
@@ -30,7 +31,7 @@ func (tc *TeamController) Create() gin.HandlerFunc {
 		if err := c.ShouldBindJSON(team); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
-			  "不正なリクエストです",
+				"不正なリクエストです",
 				nil,
 			))
 			return
@@ -46,8 +47,9 @@ func (tc *TeamController) Create() gin.HandlerFunc {
 			return
 		}
 
+		db := c.MustGet("tx").(*gorm.DB)
 		// チームを作成する
-		if err := tc.TeamService.CreateTeam(team); err != nil {
+		if err := tc.TeamService.CreateTeam(db, team); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				"チーム作成に失敗しました",
@@ -57,8 +59,8 @@ func (tc *TeamController) Create() gin.HandlerFunc {
 		}
 
 		// ユーザーの現在のチームを作成したチームに変更する
-		if err := tc.UserService.UpdateCurrentTeam(team.ID); err != nil{
-				c.JSON(http.StatusBadRequest, utils.NewResponse(
+		if err := tc.UserService.UpdateCurrentTeam(db, team.ID); err != nil {
+			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				err.Error(),
 				nil,
@@ -73,4 +75,3 @@ func (tc *TeamController) Create() gin.HandlerFunc {
 		))
 	}
 }
-

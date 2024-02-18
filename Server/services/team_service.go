@@ -2,28 +2,23 @@ package services
 
 import (
 	"errors"
-	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/models"
 	"react_go_otasuke_app/utils"
 
 	"gorm.io/gorm"
 )
 
-type TeamService struct {
-	db *database.GormDatabase
-}
+type TeamService struct{}
 
 // チームサービスを作成する
-func NewTeamService(db *database.GormDatabase) *TeamService {
-	return &TeamService{
-		db: db,
-	}
+func NewTeamService() *TeamService {
+	return &TeamService{}
 }
 
 // チームを取得する
-func (ts *TeamService) GetTeam(id string) (*models.Team, error) {
+func (ts *TeamService) GetTeam(db *gorm.DB, id string) (*models.Team, error) {
 	var team models.Team
-	result := ts.db.DB.Where("id = ?", id).First(&team)
+	result := db.Where("id = ?", id).First(&team)
 	// レコードが見つからない場合はnilを返す
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, nil
@@ -36,9 +31,9 @@ func (ts *TeamService) GetTeam(id string) (*models.Team, error) {
 }
 
 // チームを作成する
-func (ts *TeamService) CreateTeam(team *models.Team) error {
+func (ts *TeamService) CreateTeam(db *gorm.DB, team *models.Team) error {
 	// チームを作成する
-	if err := ts.db.DB.Create(team).Error; err != nil {
+	if err := db.Create(team).Error; err != nil {
 		return err
 	}
 
@@ -48,7 +43,7 @@ func (ts *TeamService) CreateTeam(team *models.Team) error {
 		TeamID: team.ID,
 		Role:   models.TeamAdmin,
 	}
-	if err := ts.db.DB.Create(&userTeam).Error; err != nil {
+	if err := db.Create(&userTeam).Error; err != nil {
 		return err
 	}
 

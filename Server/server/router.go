@@ -13,19 +13,20 @@ import (
 func NewRouter() (*gin.Engine, error) {
 	// DIのためここでDBを取得する
 	db := database.GetDB()
-	gormDatabase := database.NewGormDatabase(db)
+	router := gin.Default()
+	// トランザクションを開始する
+	router.Use(middlewares.Transaction(db))
 	// DIのためここでサービスを作成する
-	userTeamService := services.NewUserTeamService(gormDatabase)
-	userService := services.NewUserService(gormDatabase)
-	teamService := services.NewTeamService(gormDatabase)
-	opponentRecruitingService := services.NewOpponentRecruitingService(gormDatabase, userTeamService)
-	
+	userTeamService := services.NewUserTeamService()
+	userService := services.NewUserService()
+	teamService := services.NewTeamService()
+	opponentRecruitingService := services.NewOpponentRecruitingService(userTeamService)
+
 	// コントローラーを作成する
 	userController := controllers.NewUserController(userService)
 	teamController := controllers.NewTeamController(userService, teamService)
 	opponentRecruitingController := controllers.NewOpponentRecruitingController(opponentRecruitingService, userService)
-	
-	router := gin.Default()
+
 	// CORSを設定
 	setCors(router)
 
@@ -35,11 +36,10 @@ func NewRouter() (*gin.Engine, error) {
 		router.POST("/login", userController.Login())
 	}
 
-
 	firebaseApp := userService.GetFireBaseApp()
 	// 認証が必要なエンドポイント
 	authRequired := router.Group("/")
-	authRequired.Use(middlewares.AuthMiddleware(firebaseApp, gormDatabase))
+	authRequired.Use(middlewares.AuthMiddleware(firebaseApp))
 
 	{
 		authRequired.POST("/logout", userController.Logout())
@@ -48,5 +48,6 @@ func NewRouter() (*gin.Engine, error) {
 		authRequired.PATCH("/opponent_recruitings/:id", opponentRecruitingController.Update())
 		authRequired.DELETE("/opponent_recruitings/:id", opponentRecruitingController.Delete())
 	}
+
 	return router, nil
 }

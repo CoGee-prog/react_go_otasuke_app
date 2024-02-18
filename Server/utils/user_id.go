@@ -5,7 +5,7 @@ import "sync"
 var (
     userID string
     lock   sync.Mutex
-    isSet  bool
+    isSetUserId  bool
 )
 // ユーザーIDをセットする
 func SetUserID(id string) {
@@ -13,13 +13,13 @@ func SetUserID(id string) {
     defer lock.Unlock()
     
     // すでに設定されている場合は何もしない
-    if isSet {
+    if isSetUserId {
         return
     }
 
     userID = id
 		// UserIdを設定済みにする
-    isSet = true
+    isSetUserId = true
 }
 
 // ユーザーIDを取得する

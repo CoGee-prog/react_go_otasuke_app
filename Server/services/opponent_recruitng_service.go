@@ -3,34 +3,32 @@ package services
 import (
 	"errors"
 	"math"
-	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/models"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type OpponentRecruitingService struct {
-	db              *database.GormDatabase
 	userTeamService *UserTeamService
 }
 
 // 対戦相手募集のサービスを作成する
-func NewOpponentRecruitingService(db *database.GormDatabase, uts *UserTeamService) *OpponentRecruitingService {
+func NewOpponentRecruitingService(uts *UserTeamService) *OpponentRecruitingService {
 	return &OpponentRecruitingService{
-		db:              db,
 		userTeamService: uts,
 	}
 }
 
 // 対戦相手募集を作成する
-func (ors *OpponentRecruitingService) CreateOpponentRecruiting(opponentRecruiting *models.OpponentRecruiting) error {
+func (ors *OpponentRecruitingService) CreateOpponentRecruiting(db *gorm.DB, opponentRecruiting *models.OpponentRecruiting) error {
 	// チームの管理者または副管理者でなければエラー
-	if !ors.userTeamService.IsAdminOrSubAdmin(opponentRecruiting.TeamId) {
+	if !ors.userTeamService.IsAdminOrSubAdmin(db, opponentRecruiting.TeamId) {
 		return errors.New("管理者または副管理者のみ対戦相手募集を作成できます")
 	}
 	// 対戦相手募集を作成する
-	result := ors.db.DB.Create(opponentRecruiting)
+	result := db.Create(opponentRecruiting)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -38,19 +36,19 @@ func (ors *OpponentRecruitingService) CreateOpponentRecruiting(opponentRecruitin
 }
 
 // 対戦相手募集を変更する
-func (ors *OpponentRecruitingService) UpdateOpponentRecruiting(opponentRecruiting *models.OpponentRecruiting, id uint) error {
+func (ors *OpponentRecruitingService) UpdateOpponentRecruiting(db *gorm.DB, opponentRecruiting *models.OpponentRecruiting, id uint) error {
 	// 変更する対戦相手募集を取得する
-	originalOpponentRecruiting, err := ors.FindOpponentRecruiting(id)
+	originalOpponentRecruiting, err := ors.FindOpponentRecruiting(db, id)
 	if err != nil {
 		return err
 	}
 	// チームの管理者または副管理者でなければエラー
-	if !ors.userTeamService.IsAdminOrSubAdmin(originalOpponentRecruiting.TeamId) {
+	if !ors.userTeamService.IsAdminOrSubAdmin(db, originalOpponentRecruiting.TeamId) {
 		return errors.New("管理者または副管理者のみ対戦相手募集を変更できます")
 	}
 
 	// データを更新する
-	result := ors.db.DB.Model(&models.OpponentRecruiting{}).Where("id = ?", id).Updates(opponentRecruiting)
+	result := db.Model(&models.OpponentRecruiting{}).Where("id = ?", id).Updates(opponentRecruiting)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -62,9 +60,9 @@ func (ors *OpponentRecruitingService) UpdateOpponentRecruiting(opponentRecruitin
 }
 
 // 対戦相手募集を取得する(なければエラー)
-func (ors *OpponentRecruitingService) FindOpponentRecruiting(id uint) (*models.OpponentRecruiting, error) {
+func (ors *OpponentRecruitingService) FindOpponentRecruiting(db *gorm.DB, id uint) (*models.OpponentRecruiting, error) {
 	var opponentRecruiting models.OpponentRecruiting
-	result := ors.db.DB.First(&opponentRecruiting, id)
+	result := db.First(&opponentRecruiting, id)
 	if result.Error != nil {
 		return nil, errors.New("データ取得に失敗しました")
 	}
@@ -72,19 +70,19 @@ func (ors *OpponentRecruitingService) FindOpponentRecruiting(id uint) (*models.O
 }
 
 // 対戦相手募集を削除する
-func (ors *OpponentRecruitingService) DeleteOpponentRecruiting(id uint) error {
+func (ors *OpponentRecruitingService) DeleteOpponentRecruiting(db *gorm.DB, id uint) error {
 	// 削除する対戦相手募集を取得する
-	opponentRecruiting, err := ors.FindOpponentRecruiting(id)
+	opponentRecruiting, err := ors.FindOpponentRecruiting(db, id)
 	if err != nil {
 		return err
 	}
 	// チームの管理者または副管理者でなければエラー
-	if !ors.userTeamService.IsAdminOrSubAdmin(opponentRecruiting.TeamId) {
+	if !ors.userTeamService.IsAdminOrSubAdmin(db, opponentRecruiting.TeamId) {
 		return errors.New("管理者または副管理者のみ対戦相手募集を削除できます")
 	}
 
 	// 対戦相手募集を削除する
-	result := ors.db.DB.Unscoped().Delete(&models.OpponentRecruiting{}, "id = ?", id)
+	result := db.Unscoped().Delete(&models.OpponentRecruiting{}, "id = ?", id)
 	if result.Error != nil {
 		return errors.New("データ削除に失敗しました")
 	}
@@ -103,10 +101,10 @@ var pageSize int = 10
 func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context) ([]*models.OpponentRecruiting, *models.Page) {
 	// 対戦相手募集の構造体の配列
 	var opponentRecruitings []*models.OpponentRecruiting
-	pageNumber, _ := strconv.Atoi(c.Param("page"))
+	db := c.MustGet("tx").(*gorm.DB)
 
 	// 合計要素数
-	totalElements := int(ors.db.DB.Find(&opponentRecruitings).RowsAffected)
+	totalElements := int(db.Find(&opponentRecruitings).RowsAffected)
 	// ページサイズが合計要素数を超えている場合
 	if pageSize > totalElements {
 		// 合計要素数が0より大きければ合計要素数に合わせる
@@ -120,6 +118,7 @@ func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context) 
 
 	// 合計ページ数
 	totalPages := int(math.Ceil(float64(totalElements) / float64(pageSize)))
+	pageNumber, _ := strconv.Atoi(c.Param("page"))
 
 	// 指定されたページ数が合計ページ数を超えていたら合計ページ数に合わせる
 	if pageNumber > totalPages {
@@ -139,6 +138,6 @@ func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context) 
 	}
 
 	// 対戦相手募集を指定されたページと作成順に並び替えて、チーム情報とまとめて返す
-	ors.db.DB.Scopes(page.Paginate()).Scopes(sort.Sort()).Preload("Team").Find(&opponentRecruitings)
+	db.Scopes(page.Paginate()).Scopes(sort.Sort()).Preload("Team").Find(&opponentRecruitings)
 	return opponentRecruitings, page
 }

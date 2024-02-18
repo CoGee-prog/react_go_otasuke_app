@@ -12,9 +12,16 @@ type UserView struct {
 
 // Userの構造体から必要なキーのみ返す
 func CreateUserView(user *models.User) *UserView {
-	return &UserView{
-		Name:            user.Name,
-		CurrentTeamId:   user.CurrentTeamId,
-		CurrentTeamName: "examples",
+	userView := &UserView{
+		Name:          user.Name,
+		CurrentTeamId: user.CurrentTeamId,
 	}
+
+	// CurrentTeamがnilでなければNameを設定
+	if user.CurrentTeam != nil {
+		userView.CurrentTeamName = user.CurrentTeam.Name
+	}
+
+	return userView
+
 }

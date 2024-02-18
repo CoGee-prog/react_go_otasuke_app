@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type OpponentRecruitingController struct {
@@ -55,20 +56,22 @@ type OpponentRecruitingCreateRequest struct {
 
 func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		request := &OpponentRecruitingCreateRequest{}
+		var request OpponentRecruitingCreateRequest
 
 		// リクエストパラメーターをバインドする
-		if err := c.ShouldBindJSON(request); err != nil {
+		if err := c.ShouldBindJSON(&request); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
+				// "不正なリクエストです",
 				err.Error(),
 				nil,
 			))
 			return
 		}
 
+		db := c.MustGet("tx").(*gorm.DB)
 		// ユーザーを取得する
-		user, err := oc.UserService.GetUser(utils.GetUserID())
+		user, err := oc.UserService.GetUser(db, utils.GetUserID()) 
 		if err != nil || user == nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
@@ -97,7 +100,7 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 		}
 
 		// データを作成する
-		if err := oc.OpponentRecruitingService.CreateOpponentRecruiting(opponentRecruiting); err != nil {
+		if err := oc.OpponentRecruitingService.CreateOpponentRecruiting(db, opponentRecruiting); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				err.Error(),
@@ -128,7 +131,7 @@ func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {
 		if err := c.ShouldBindJSON(request); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
-				err.Error(),
+				"不正なリクエストです",
 				nil,
 			))
 			return
@@ -151,10 +154,9 @@ func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {
 		}
 
 		id, _ := strconv.Atoi(c.Param("id"))
+		db := c.MustGet("tx").(*gorm.DB)
 		// データを更新する
-		err := oc.OpponentRecruitingService.UpdateOpponentRecruiting(opponentRecruiting, uint(id))
-		// エラーが起きているかどうか
-		if err != nil {
+		if err := oc.OpponentRecruitingService.UpdateOpponentRecruiting(db, opponentRecruiting, uint(id)); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				err.Error(),
@@ -175,8 +177,9 @@ func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {
 func (oc *OpponentRecruitingController) Delete() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, _ := strconv.Atoi(c.Param("id"))
+		db := c.MustGet("tx").(*gorm.DB)
 		// データを削除する
-		if err := oc.OpponentRecruitingService.DeleteOpponentRecruiting(uint(id)); err != nil {
+		if err := oc.OpponentRecruitingService.DeleteOpponentRecruiting(db, uint(id)); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				err.Error(),
