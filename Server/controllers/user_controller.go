@@ -32,15 +32,13 @@ func (uc *UserController) Login() gin.HandlerFunc {
 		db := c.MustGet("tx").(*gorm.DB)
 		// 開発環境の場合はIDトークン検証をスキップしてユーザーを作成する
 		if config.Get().GetString("server.env") == "dev" {
-			// ユーザーIDをセットする
-			utils.SetUserID(c.GetHeader("x-user-id"))
 
 			devUser := &models.User{
 				ID:   c.GetHeader("x-user-id"),
 				Name: "dev-user",
 			}
 			// ユーザーデータを作成
-			if err := uc.UserService.CreateUser(db,devUser); err != nil {
+			if err := uc.UserService.CreateUser(db, devUser); err != nil {
 				c.JSON(http.StatusBadRequest, utils.NewResponse(
 					http.StatusBadRequest,
 					err.Error(),
@@ -71,7 +69,7 @@ func (uc *UserController) Login() gin.HandlerFunc {
 		}
 
 		// ユーザーデータを検索
-		user, err := uc.UserService.GetUser(db,token.UID)
+		user, err := uc.UserService.GetUser(db, token.UID)
 		if err != nil {
 			c.JSON(http.StatusServiceUnavailable, utils.NewResponse(
 				http.StatusServiceUnavailable,
@@ -89,7 +87,7 @@ func (uc *UserController) Login() gin.HandlerFunc {
 				Name: name,
 			}
 			// ユーザーデータを作成
-			if err := uc.UserService.CreateUser(db,user); err != nil {
+			if err := uc.UserService.CreateUser(db, user); err != nil {
 				c.JSON(http.StatusBadRequest, utils.NewResponse(
 					http.StatusBadRequest,
 					err.Error(),

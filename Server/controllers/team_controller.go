@@ -48,8 +48,9 @@ func (tc *TeamController) Create() gin.HandlerFunc {
 		}
 
 		db := c.MustGet("tx").(*gorm.DB)
+		userId := c.MustGet("userId").(string)
 		// チームを作成する
-		if err := tc.TeamService.CreateTeam(db, team); err != nil {
+		if err := tc.TeamService.CreateTeam(db, userId, team); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				"チーム作成に失敗しました",
@@ -57,9 +58,8 @@ func (tc *TeamController) Create() gin.HandlerFunc {
 			))
 			return
 		}
-
 		// ユーザーの現在のチームを作成したチームに変更する
-		if err := tc.UserService.UpdateCurrentTeam(db, team.ID); err != nil {
+		if err := tc.UserService.UpdateCurrentTeam(db, userId, team.ID); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				err.Error(),

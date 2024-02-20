@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"react_go_otasuke_app/config"
 	"react_go_otasuke_app/models"
-	"react_go_otasuke_app/utils"
 	"time"
 
 	firebase "firebase.google.com/go"
@@ -97,7 +96,7 @@ func CreateSessionCookie(c *gin.Context) error {
 
 // Firebaseのセッショントークンを無効化する
 func (us *UserService) RevokeRefreshTokens(c *gin.Context) error {
-	return firebaseClient.RevokeRefreshTokens(c, utils.GetUserID())
+	return firebaseClient.RevokeRefreshTokens(c, c.MustGet("userId").(string))
 }
 
 // Firebaseのアプリインスタンスを取得する
@@ -131,8 +130,7 @@ func (us *UserService) CreateUser(db *gorm.DB, user *models.User) error {
 }
 
 // 現在のチームを変更する
-func (us *UserService) UpdateCurrentTeam(db *gorm.DB, teamId uint) error {
-	userId := utils.GetUserID()
+func (us *UserService) UpdateCurrentTeam(db *gorm.DB, userId string,teamId uint) error {
 	// チームに所属していなければエラー
 	var userTeam models.UserTeam
 	if err := db.Where("user_id = ? AND team_id = ?", userId, teamId).First(&userTeam).Error; err != nil {

@@ -20,7 +20,7 @@ func AuthMiddleware(firebaseApp *firebase.App) gin.HandlerFunc {
 		// 開発環境かつポストマンからのリクエストの場合は認証をスキップする
 		if config.Get().GetString("server.env") == "dev" && strings.Contains(userAgent, "Postman") {
 			// ユーザーIDをセットする
-			utils.SetUserID(c.GetHeader("x-user-id"))
+			c.Set("userId", c.GetHeader("x-user-id"))
 			return
 		}
 		// クライアントから送信されたセッションCookieを取得
@@ -81,7 +81,7 @@ func AuthMiddleware(firebaseApp *firebase.App) gin.HandlerFunc {
 		}
 
 		// ユーザーIDをセットする
-		utils.SetUserID(userId)
+		c.Set("userId",userId)
 
 		// ユーザーが存在する場合はリクエストを続ける
 		c.Next()

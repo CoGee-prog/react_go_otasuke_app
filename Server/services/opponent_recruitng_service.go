@@ -22,9 +22,9 @@ func NewOpponentRecruitingService(uts *UserTeamService) *OpponentRecruitingServi
 }
 
 // 対戦相手募集を作成する
-func (ors *OpponentRecruitingService) CreateOpponentRecruiting(db *gorm.DB, opponentRecruiting *models.OpponentRecruiting) error {
+func (ors *OpponentRecruitingService) CreateOpponentRecruiting(db *gorm.DB, userId string, opponentRecruiting *models.OpponentRecruiting) error {
 	// チームの管理者または副管理者でなければエラー
-	if !ors.userTeamService.IsAdminOrSubAdmin(db, opponentRecruiting.TeamId) {
+	if !ors.userTeamService.IsAdminOrSubAdmin(db, userId, opponentRecruiting.TeamId) {
 		return errors.New("管理者または副管理者のみ対戦相手募集を作成できます")
 	}
 	// 対戦相手募集を作成する
@@ -36,14 +36,14 @@ func (ors *OpponentRecruitingService) CreateOpponentRecruiting(db *gorm.DB, oppo
 }
 
 // 対戦相手募集を変更する
-func (ors *OpponentRecruitingService) UpdateOpponentRecruiting(db *gorm.DB, opponentRecruiting *models.OpponentRecruiting, id uint) error {
+func (ors *OpponentRecruitingService) UpdateOpponentRecruiting(db *gorm.DB, userId string, opponentRecruiting *models.OpponentRecruiting, id uint) error {
 	// 変更する対戦相手募集を取得する
 	originalOpponentRecruiting, err := ors.FindOpponentRecruiting(db, id)
 	if err != nil {
 		return err
 	}
 	// チームの管理者または副管理者でなければエラー
-	if !ors.userTeamService.IsAdminOrSubAdmin(db, originalOpponentRecruiting.TeamId) {
+	if !ors.userTeamService.IsAdminOrSubAdmin(db, userId, originalOpponentRecruiting.TeamId) {
 		return errors.New("管理者または副管理者のみ対戦相手募集を変更できます")
 	}
 
@@ -70,14 +70,14 @@ func (ors *OpponentRecruitingService) FindOpponentRecruiting(db *gorm.DB, id uin
 }
 
 // 対戦相手募集を削除する
-func (ors *OpponentRecruitingService) DeleteOpponentRecruiting(db *gorm.DB, id uint) error {
+func (ors *OpponentRecruitingService) DeleteOpponentRecruiting(db *gorm.DB, userId string,id uint) error {
 	// 削除する対戦相手募集を取得する
 	opponentRecruiting, err := ors.FindOpponentRecruiting(db, id)
 	if err != nil {
 		return err
 	}
 	// チームの管理者または副管理者でなければエラー
-	if !ors.userTeamService.IsAdminOrSubAdmin(db, opponentRecruiting.TeamId) {
+	if !ors.userTeamService.IsAdminOrSubAdmin(db, userId, opponentRecruiting.TeamId) {
 		return errors.New("管理者または副管理者のみ対戦相手募集を削除できます")
 	}
 

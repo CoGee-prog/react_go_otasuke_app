@@ -3,7 +3,6 @@ package services
 import (
 	"errors"
 	"react_go_otasuke_app/models"
-	"react_go_otasuke_app/utils"
 
 	"gorm.io/gorm"
 )
@@ -31,7 +30,7 @@ func (ts *TeamService) GetTeam(db *gorm.DB, id string) (*models.Team, error) {
 }
 
 // チームを作成する
-func (ts *TeamService) CreateTeam(db *gorm.DB, team *models.Team) error {
+func (ts *TeamService) CreateTeam(db *gorm.DB, userId string, team *models.Team) error {
 	// チームを作成する
 	if err := db.Create(team).Error; err != nil {
 		return err
@@ -39,7 +38,7 @@ func (ts *TeamService) CreateTeam(db *gorm.DB, team *models.Team) error {
 
 	// チーム作成者をチーム管理者としてチームに所属させる
 	userTeam := models.UserTeam{
-		UserID: utils.GetUserID(),
+		UserID: userId,
 		TeamID: team.ID,
 		Role:   models.TeamAdmin,
 	}
