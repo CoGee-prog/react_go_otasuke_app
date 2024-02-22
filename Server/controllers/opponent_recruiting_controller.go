@@ -27,7 +27,7 @@ func NewOpponentRecruitingController(opponentRecruitingService *services.Opponen
 	}
 }
 
-type indexResponse struct {
+type OpponentRecruitingIndexResponse struct {
 	OpponentRecruitings []*views.OpponentRecruitingView `json:"opponent_recruitings"`
 	Page                *models.Page                    `json:"page"`
 }
@@ -40,7 +40,7 @@ func (oc *OpponentRecruitingController) Index() gin.HandlerFunc {
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,
 			http.StatusText(http.StatusOK),
-			&indexResponse{
+			&OpponentRecruitingIndexResponse{
 				OpponentRecruitings: views.CreateOpponentRecruitingView(opponentRecruitings),
 				Page:                page,
 			},

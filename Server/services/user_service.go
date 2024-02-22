@@ -130,7 +130,7 @@ func (us *UserService) CreateUser(db *gorm.DB, user *models.User) error {
 }
 
 // 現在のチームを変更する
-func (us *UserService) UpdateCurrentTeam(db *gorm.DB, userId string,teamId uint) error {
+func (us *UserService) UpdateCurrentTeam(db *gorm.DB, userId string, teamId uint) error {
 	// チームに所属していなければエラー
 	var userTeam models.UserTeam
 	if err := db.Where("user_id = ? AND team_id = ?", userId, teamId).First(&userTeam).Error; err != nil {
