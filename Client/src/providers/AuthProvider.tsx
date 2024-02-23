@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import firebaseConfig from 'config/firebaseConfig'
+import firebaseConfig from 'config/firebaseApp'
 import { AuthContext } from 'src/contexts/AuthContext'
 import fetchAPI from 'src/helpers/apiService'
 import { User } from 'src/types/user'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { ResponseData } from 'src/types/responseData'
 import { loginApiResponse } from 'src/types/apiResponses'
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -16,10 +15,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const unregisterAuthObserver = onAuthStateChanged(firebaseAuth, (user) => {
       if (user && !isLoggedIn) {
-        setIsLoading(true);
+        setIsLoading(true)
         user.getIdToken().then((idToken) => {
           // APIサーバーにトークンを送信
-          fetchAPI('/login', {
+          fetchAPI<loginApiResponse>('/login', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -28,13 +27,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             },
             credentials: 'include',
           })
-            .then((data: ResponseData<loginApiResponse>) => {
-							login(data.result.user)
+            .then((data) => {
+              login(data.user)
               setIsLoading(false)
             })
             .catch((error) => {
               setIsLoading(false)
-              console.error('Error:', error)
+							// ホーム画面に戻す
             })
         })
       }

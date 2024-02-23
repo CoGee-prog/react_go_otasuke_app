@@ -1,5 +1,5 @@
 // Configure Firebase.
-import { initializeApp } from 'firebase/app'
+import { initializeApp, getApps } from 'firebase/app'
 
 const config = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -11,6 +11,9 @@ const config = {
   measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 }
 
-const firebaseConfig = initializeApp(config)
+// Firebase Appのインスタンスが存在しない場合のみ初期化する
+if (!getApps().length) {
+  initializeApp(config)
+}
 
-export default firebaseConfig
+export default getApps()[0]

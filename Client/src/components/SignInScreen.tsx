@@ -3,17 +3,12 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 // Import FirebaseAuth and firebase.
 import React from 'react'
-import firebaseConfig from 'config/firebaseConfig'
+import firebaseApp from 'config/firebaseApp'
 import { Card, CardContent } from '@mui/material'
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
-import {
-  getAuth,
-  EmailAuthProvider,
-  GoogleAuthProvider,
-  FacebookAuthProvider,
-} from 'firebase/auth'
+import { getAuth, EmailAuthProvider, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth'
 
-const firebaseAuth = getAuth(firebaseConfig)
+const firebaseAuth = getAuth(firebaseApp)
 
 function SignInScreen() {
   const uiConfig = {
@@ -29,12 +24,12 @@ function SignInScreen() {
   }
 
   return (
-    <div> 
-			<Card sx={{ minWidth: 275 }}>
-				<CardContent>
-					<StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseAuth} />
-				</CardContent>
-			</Card>
+    <div>
+      <Card sx={{ minWidth: 275 }}>
+        <CardContent>
+          <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseAuth} />
+        </CardContent>
+      </Card>
     </div>
   )
 }
