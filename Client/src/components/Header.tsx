@@ -13,13 +13,21 @@ import { useNavigateHome } from 'src/hooks/useNavigateHome'
 export default function Header() {
   const { flashMessage } = useContext(FlashMessageContext)
   const { isLoggedIn, isLoading } = useContext(AuthContext)
-
-  const backgroundColor = flashMessage.type === 'success' ? 'green' : 'red'
   const navigateHome = useNavigateHome()
+
+  const appBarColor = '#333' // ダークグレー
+  const successColor = '#4CAF50' // 明るいグリーン
+  const errorColor = '#F44336' // 明るいレッド
+  const flashMessageBackgroundColor =
+    flashMessage.type === 'success'
+      ? successColor
+      : flashMessage.type === 'error'
+      ? errorColor
+      : 'transparent'
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position='static'>
+      <AppBar position='static' style={{ backgroundColor: appBarColor }}>
         <Toolbar style={{ position: 'relative' }}>
           <Typography
             variant='h6'
@@ -32,14 +40,13 @@ export default function Header() {
           {flashMessage.message && (
             <div
               style={{
-                backgroundColor,
+                backgroundColor: flashMessageBackgroundColor,
                 color: 'white',
                 padding: '10px',
                 borderRadius: '5px',
                 position: 'absolute',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                maxWidth: '50%',
                 boxSizing: 'border-box',
               }}
             >
