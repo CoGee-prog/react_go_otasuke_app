@@ -122,8 +122,7 @@ func (us *UserService) GetUser(db *gorm.DB, id string) (*models.User, error) {
 
 // 新規ユーザーを作成する
 func (us *UserService) CreateUser(db *gorm.DB, user *models.User) error {
-	result := db.Create(user)
-	if result.Error != nil {
+	if err:= db.Create(user).Error; err != nil {
 		return errors.New("ユーザー作成に失敗しました")
 	}
 	return nil

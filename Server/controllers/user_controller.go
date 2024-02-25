@@ -7,6 +7,7 @@ import (
 	"react_go_otasuke_app/services"
 	"react_go_otasuke_app/utils"
 	"react_go_otasuke_app/views"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -30,9 +31,9 @@ type loginResponse struct {
 func (uc *UserController) Login() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		db := c.MustGet("tx").(*gorm.DB)
-		// 開発環境の場合はIDトークン検証をスキップしてユーザーを作成する
-		if config.Get().GetString("server.env") == "dev" {
-
+		userAgent := c.GetHeader("User-Agent")
+		// 開発環境かつPostmanからのリクエストの場合はIDトークン検証をスキップしてユーザーを作成する
+		if config.Get().GetString("server.env") == "dev" && strings.Contains(userAgent, "PostmanRuntime") {
 			devUser := &models.User{
 				ID:   c.GetHeader("x-user-id"),
 				Name: "dev-user",
@@ -109,7 +110,7 @@ func (uc *UserController) Login() gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,
-			http.StatusText(http.StatusOK),
+			"ログインしました",
 			&loginResponse{
 				User: views.CreateUserView(user),
 			},
@@ -126,7 +127,7 @@ func (uc *UserController) Logout() gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,
-			http.StatusText(http.StatusOK),
+			"ログアウトしました",
 			[]string{},
 		))
 	}
