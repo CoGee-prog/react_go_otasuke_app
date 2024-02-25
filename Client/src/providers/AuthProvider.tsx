@@ -1,40 +1,50 @@
 import React, { useState, useEffect } from 'react'
-import firebaseConfig from 'config/firebaseApp'
 import { AuthContext } from 'src/contexts/AuthContext'
-import fetchAPI from 'src/helpers/apiService'
+import fetchAPI from 'src/utils/fetchApi'
 import { User } from 'src/types/user'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { loginApiResponse } from 'src/types/apiResponses'
+import { useNavigateHome } from 'src/hooks/useNavigateHome'
+import firebaseApp from 'config/firebaseApp'
+import { useFlashMessage } from 'src/contexts/FlashMessageContext'
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const firebaseAuth = getAuth(firebaseConfig)
+  const firebaseAuth = getAuth(firebaseApp)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [user, setUser] = useState<User | null>(null)
+  const { showFlashMessage } = useFlashMessage()
+  const navigateHome = useNavigateHome()
 
   useEffect(() => {
     const unregisterAuthObserver = onAuthStateChanged(firebaseAuth, (user) => {
       if (user && !isLoggedIn) {
         setIsLoading(true)
         user.getIdToken().then((idToken) => {
-          // APIサーバーにトークンを送信
-          fetchAPI<loginApiResponse>('/login', {
+          const options: RequestInit = {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              // トークンをAuthorizationヘッダーに含める
               Authorization: `${idToken}`,
             },
             credentials: 'include',
-          })
-            .then((data) => {
-              login(data.user)
-              setIsLoading(false)
+          }
+          // APIサーバーにトークンを送信
+          fetchAPI<loginApiResponse>('/login', options)
+            .then((responseData) => {
+              login(responseData.result.user)
+              showFlashMessage({ message: responseData.message, type: 'success' })
             })
             .catch((error) => {
-              setIsLoading(false)
-							// ホーム画面に戻す
+              showFlashMessage({
+                message:
+                  error instanceof Error && error.message ? error.message : 'エラーが発生しました',
+                type: 'error',
+              })
+              // ホーム画面に戻す
+              navigateHome()
             })
+            .finally(() => setIsLoading(false))
         })
       }
     })
@@ -49,13 +59,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = () => {
     firebaseAuth.signOut()
-    fetchAPI('/logout', {
+    const options: RequestInit = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       credentials: 'include',
-    }).then(() => {
+    }
+    fetchAPI('/logout', options).then((responseData) => {
+      showFlashMessage({ message: responseData.message, type: 'success' })
       setIsLoggedIn(false)
       setUser(null)
     })

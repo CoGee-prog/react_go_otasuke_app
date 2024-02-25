@@ -8,22 +8,43 @@ import { AuthContext } from 'src/contexts/AuthContext'
 import AccountMenu from './AccountMenu'
 import LoadingScreen from './LoadingScreen'
 import { FlashMessageContext } from 'src/contexts/FlashMessageContext'
+import { useNavigateHome } from 'src/hooks/useNavigateHome'
 
 export default function Header() {
   const { flashMessage } = useContext(FlashMessageContext)
   const { isLoggedIn, isLoading } = useContext(AuthContext)
 
   const backgroundColor = flashMessage.type === 'success' ? 'green' : 'red'
+  const navigateHome = useNavigateHome()
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position='static'>
-        <Toolbar>
-          <Typography variant='h6' component='div' sx={{ flexGrow: 1 }}>
+        <Toolbar style={{ position: 'relative' }}>
+          <Typography
+            variant='h6'
+            component='div'
+            style={{ cursor: 'pointer', flexGrow: 1 }}
+            onClick={navigateHome}
+          >
             おたスケ
           </Typography>
           {flashMessage.message && (
-            <div style={{ backgroundColor, color: 'white' }}>{flashMessage}</div>
+            <div
+              style={{
+                backgroundColor,
+                color: 'white',
+                padding: '10px',
+                borderRadius: '5px',
+                position: 'absolute',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                maxWidth: '50%',
+                boxSizing: 'border-box',
+              }}
+            >
+              {flashMessage.message}
+            </div>
           )}
           <div>
             {isLoading ? <LoadingScreen /> : isLoggedIn ? <AccountMenu /> : <SignInBackdrop />}

@@ -1,20 +1,18 @@
-import React, { createContext, useContext } from 'react'
+import { createContext, useContext } from 'react'
 
 export interface FlashMessage {
   message: string
-  type: 'success' | 'error'
+  type: 'success' | 'error' | null
 }
 
 interface FlashMessageContextType {
   flashMessage: FlashMessage
-  setFlashMessage: (message: FlashMessage) => void
-  clearFlashMessage: () => void
+  showFlashMessage: (flashMessage: FlashMessage) => void
 }
 
 const defaultFlashMessageContext: FlashMessageContextType = {
   flashMessage: { message: '', type: 'success' },
-  setFlashMessage: (message: FlashMessage) => {},
-  clearFlashMessage: () => {},
+  showFlashMessage: (flashMessage: FlashMessage) => {},
 }
 
 export const FlashMessageContext = createContext<FlashMessageContextType>(

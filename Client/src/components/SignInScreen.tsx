@@ -2,7 +2,6 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 // Import FirebaseAuth and firebase.
-import React from 'react'
 import firebaseApp from 'config/firebaseApp'
 import { Card, CardContent } from '@mui/material'
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'

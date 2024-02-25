@@ -15,5 +15,4 @@ const config = {
 if (!getApps().length) {
   initializeApp(config)
 }
-
 export default getApps()[0]
