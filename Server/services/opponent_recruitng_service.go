@@ -70,7 +70,7 @@ func (ors *OpponentRecruitingService) FindOpponentRecruiting(db *gorm.DB, id uin
 }
 
 // 対戦相手募集を削除する
-func (ors *OpponentRecruitingService) DeleteOpponentRecruiting(db *gorm.DB, userId string,id uint) error {
+func (ors *OpponentRecruitingService) DeleteOpponentRecruiting(db *gorm.DB, userId string, id uint) error {
 	// 削除する対戦相手募集を取得する
 	opponentRecruiting, err := ors.FindOpponentRecruiting(db, id)
 	if err != nil {
@@ -118,7 +118,7 @@ func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context) 
 
 	// 合計ページ数
 	totalPages := int(math.Ceil(float64(totalElements) / float64(pageSize)))
-	pageNumber, _ := strconv.Atoi(c.Param("page"))
+	pageNumber, _ := strconv.Atoi(c.Query("page"))
 
 	// 指定されたページ数が合計ページ数を超えていたら合計ページ数に合わせる
 	if pageNumber > totalPages {

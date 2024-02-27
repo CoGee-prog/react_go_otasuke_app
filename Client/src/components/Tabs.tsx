@@ -30,7 +30,6 @@ export default function Tabs() {
             <Tab label='スケジュール管理' value='/schedules' />
           </TabList>
         </Box>
-        <TabPanel value='/opponent_recruitings'>対戦相手募集</TabPanel>
         <TabPanel value='/schedules'>スケジュール管理</TabPanel>
       </TabContext>
     </Box>

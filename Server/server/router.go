@@ -32,7 +32,7 @@ func NewRouter() (*gin.Engine, error) {
 
 	// 認証がいらないエンドポイント
 	{
-		router.GET("/opponent_recruitings/:page", opponentRecruitingController.Index())
+		router.GET("/opponent_recruitings", opponentRecruitingController.Index())
 		router.POST("/login", userController.Login())
 	}
 
@@ -44,6 +44,7 @@ func NewRouter() (*gin.Engine, error) {
 	{
 		authRequired.POST("/logout", userController.Logout())
 		authRequired.POST("/teams", teamController.Create())
+		// authRequired.GET("/opponent_recruitings/:pid", opponentRecruitingController.Get())
 		authRequired.POST("/opponent_recruitings", opponentRecruitingController.Create())
 		authRequired.PATCH("/opponent_recruitings/:id", opponentRecruitingController.Update())
 		authRequired.DELETE("/opponent_recruitings/:id", opponentRecruitingController.Delete())

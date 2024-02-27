@@ -12,6 +12,8 @@ services:
     command: sh -c "npm run dev"
     ports:
       - "53000:3000"
+    networks:
+      - otasuke_app_network
     stdin_open: true
   server:
     build:
@@ -23,6 +25,8 @@ services:
       - APP_ENV=dev
     ports:
       - "58080:8080"
+    networks:
+      - otasuke_app_network
     restart: always
     depends_on:
       - db
@@ -39,5 +43,10 @@ services:
       - TZ=Asia/Tokyo
     ports:
       - "3306:3306"
+    networks:
+      - otasuke_app_network
 volumes:
   node_modules_volume:
+networks:
+  otasuke_app_network:
+    external: true

@@ -1,4 +1,4 @@
-import { OpponentRecruiting } from "./opponentRecruitings";
+import { OpponentRecruiting } from "./opponentRecruiting";
 import { Page } from "./page";
 import { User } from "./user";
 
@@ -7,6 +7,6 @@ export interface loginApiResponse {
 }
 
 export interface getOpponentRecruitingsApiResponse {
-  opponent_recruitings: OpponentRecruiting
+  opponent_recruitings: OpponentRecruiting[]
 	page: Page
 }
