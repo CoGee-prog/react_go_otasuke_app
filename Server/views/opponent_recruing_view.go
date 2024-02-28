@@ -8,7 +8,8 @@ import (
 type OpponentRecruitingView struct {
 	ID         uint      `json:"id"`
 	Team       *TeamView `json:"team"`
-	DateTime   time.Time `json:"date_time"`
+	StartTime  time.Time `json:"start_time"`
+	EndTime    time.Time `json:"end_time"`
 	Prefecture string    `json:"prefecture"`
 	Detail     *string   `json:"detail"`
 }
@@ -20,7 +21,8 @@ func CreateOpponentRecruitingView(opponentRecruitings []*models.OpponentRecruiti
 		newArray[i] = &OpponentRecruitingView{
 			ID:         v.ID,
 			Team:       CreateTeamView(v.Team),
-			DateTime:   v.DateTime,
+			StartTime:  v.StartTime,
+			EndTime:    v.EndTime,
 			Prefecture: v.PrefectureId.ToString(),
 			Detail:     v.Detail,
 		}

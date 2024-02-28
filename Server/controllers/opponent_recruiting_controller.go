@@ -49,9 +49,10 @@ func (oc *OpponentRecruitingController) Index() gin.HandlerFunc {
 }
 
 type OpponentRecruitingCreateRequest struct {
-	PrefectureId models.Prefecture `json:"prefecture_id" gorm:"type:int; not null"`
-	DateTime     time.Time         `json:"date_time"`
-	Detail       *string           `json:"detail" gorm:"type:text"`
+	PrefectureId models.Prefecture `json:"prefecture_id" binding:"required"`
+	StartTime    time.Time         `json:"start_time" binding:"required"`
+	EndTime      time.Time         `json:"end_time" binding:"required"`
+	Detail       *string           `json:"detail"`
 }
 
 func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
@@ -62,8 +63,7 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 		if err := c.ShouldBindJSON(&request); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
-				// "不正なリクエストです",
-				err.Error(),
+				"不正なリクエストです",
 				nil,
 			))
 			return
@@ -85,7 +85,8 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 		opponentRecruiting := &models.OpponentRecruiting{
 			TeamId:       *user.CurrentTeamId,
 			PrefectureId: request.PrefectureId,
-			DateTime:     request.DateTime,
+			StartTime:    request.StartTime,
+			EndTime:      request.EndTime,
 			Detail:       request.Detail,
 		}
 
@@ -140,7 +141,7 @@ func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {
 		// 対戦相手募集の構造体を作成
 		opponentRecruiting := &models.OpponentRecruiting{
 			PrefectureId: request.PrefectureId,
-			DateTime:     request.DateTime,
+			StartTime:    request.DateTime,
 			Detail:       request.Detail,
 		}
 		// リクエストのバリデーションチェック
