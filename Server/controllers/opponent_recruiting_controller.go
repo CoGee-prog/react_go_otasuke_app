@@ -86,6 +86,9 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 
 		// 対戦相手募集の構造体を作成
 		opponentRecruiting := &models.OpponentRecruiting{
+			Title:        request.Title,
+			HasGround:    request.HasGround,
+			GroundName:   request.GroundName,
 			TeamId:       *user.CurrentTeamId,
 			PrefectureId: request.PrefectureId,
 			StartTime:    request.StartTime,
