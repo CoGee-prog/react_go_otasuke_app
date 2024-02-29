@@ -28,8 +28,9 @@ func Transaction(db *gorm.DB) gin.HandlerFunc {
 		// リクエストを処理
 		c.Next()
 
-		// レスポンスが200系以外ならロールバック
-		if c.Writer.Status() != http.StatusOK {
+		// レスポンスが2xx系以外ならロールバック
+		statusCode := c.Writer.Status() 
+		if statusCode < 200 || statusCode >= 300 {
 			tx.Rollback()
 			return
 		}

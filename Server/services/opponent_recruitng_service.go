@@ -94,24 +94,25 @@ func (ors *OpponentRecruitingService) DeleteOpponentRecruiting(db *gorm.DB, user
 	return nil
 }
 
-// リスト表示時の1ページあたりの要素数
-var pageSize int = 10
 
 // 対戦相手募集のリストとページ情報を返す
 func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context) ([]*models.OpponentRecruiting, *models.Page) {
+	// リスト表示時の1ページあたりの要素数
+	var pageSize int = 10
+
 	// 対戦相手募集の構造体の配列
 	var opponentRecruitings []*models.OpponentRecruiting
 	db := c.MustGet("tx").(*gorm.DB)
 
 	// 合計要素数
-	totalElements := int(db.Find(&opponentRecruitings).RowsAffected)
-	// ページサイズが合計要素数を超えている場合
-	if pageSize > totalElements {
-		// 合計要素数が0より大きければ合計要素数に合わせる
-		if totalElements > 0 {
-			pageSize = totalElements
-		} else {
-			// それより小さければ1にする
+	var totalElements int64
+	db.Model(&models.OpponentRecruiting{}).Count(&totalElements)
+
+	// 合計要素数がページサイズより小さい場合はページサイズを合計要素数に合わせる
+	if int(totalElements) < pageSize {
+		pageSize = int(totalElements)
+		if pageSize <= 0 {
+			// 最低でも1ページは存在するようにする
 			pageSize = 1
 		}
 	}
@@ -128,7 +129,7 @@ func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context) 
 	page := &models.Page{
 		Number:        pageNumber,
 		Size:          pageSize,
-		TotalElements: totalElements,
+		TotalElements: int(totalElements),
 		TotalPages:    totalPages,
 	}
 
@@ -138,6 +139,7 @@ func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context) 
 	}
 
 	// 対戦相手募集を指定されたページと作成順に並び替えて、チーム情報とまとめて返す
-	db.Scopes(page.Paginate()).Scopes(sort.Sort()).Preload("Team").Find(&opponentRecruitings)
+	db = db.Scopes(page.Paginate(), sort.Sort()).Preload("Team").Find(&opponentRecruitings)
+
 	return opponentRecruitings, page
 }
