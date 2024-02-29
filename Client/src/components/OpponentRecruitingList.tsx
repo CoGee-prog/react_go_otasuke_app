@@ -94,7 +94,7 @@ export const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
                       {recruitment.team.name}
                     </Typography>
                     <Typography sx={{ mb: 1.5 }} color='text.secondary'>
-                      {formatDateTime(recruitment.date_time)}
+                      {formatDateTime(recruitment.start_time)} ~ {formatDateTime(recruitment.end_time)}
                     </Typography>
                     <Typography variant='body2'>
                       {recruitment.prefecture} - {recruitment.detail}
