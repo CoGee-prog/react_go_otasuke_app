@@ -49,10 +49,13 @@ func (oc *OpponentRecruitingController) Index() gin.HandlerFunc {
 }
 
 type OpponentRecruitingCreateRequest struct {
-	PrefectureId models.Prefecture `json:"prefecture_id" binding:"required"`
-	StartTime    time.Time         `json:"start_time" binding:"required"`
-	EndTime      time.Time         `json:"end_time" binding:"required"`
-	Detail       *string           `json:"detail"`
+	Title        string              `json:"title"`
+	HasGround    bool                `json:"has_ground"`
+	GroundName   string              `json:"ground_name"`
+	PrefectureId models.PrefectureId `json:"prefecture_id" binding:"required"`
+	StartTime    time.Time           `json:"start_time" binding:"required"`
+	EndTime      time.Time           `json:"end_time" binding:"required"`
+	Detail       string              `json:"detail"`
 }
 
 func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
@@ -119,9 +122,9 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 }
 
 type OpponentRecruitingUpdateRequest struct {
-	PrefectureId models.Prefecture `json:"prefecture_id" gorm:"type:int; not null"`
-	DateTime     time.Time         `json:"date_time"`
-	Detail       *string           `json:"detail" gorm:"type:text"`
+	PrefectureId models.PrefectureId `json:"prefecture_id"`
+	DateTime     time.Time           `json:"date_time"`
+	Detail       string              `json:"detail"`
 }
 
 func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {

@@ -6,11 +6,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type TeamLevel int
+type TeamLevelId int
 
 const (
 	// 地区レベル
-	LocalLevel TeamLevel = iota + 1
+	LocalLevel TeamLevelId = iota + 1
 	// 地区上位レベル
 	LocalEliteLevel
 	// 都道府県レベル
@@ -21,7 +21,7 @@ const (
 	NationalLevel
 )
 
-func (TL TeamLevel) ToString() string {
+func (TL TeamLevelId) ToString() string {
 	switch TL {
 	case LocalLevel:
 		return "地区レベル"
@@ -40,11 +40,12 @@ func (TL TeamLevel) ToString() string {
 
 type Team struct {
 	gorm.Model
-	Name        string    `json:"name" gorm:"type:text;not null"`
-	LevelId     TeamLevel `json:"level_id" gorm:"type:integer;not null"`
-	HomePageUrl *string   `json:"home_page_url" gorm:"type:text"`
-	Other       *string   `json:"other" gorm:"type:text"`
-	Users       []*User   `gorm:"many2many:user_teams"`
+	Name         string       `json:"name" gorm:"type:text;not null"`
+	PrefectureId PrefectureId `json:"prefecture_id" gorm:"type:int; not null"`
+	LevelId      TeamLevelId    `json:"level_id" gorm:"type:integer;not null"`
+	HomePageUrl  *string      `json:"home_page_url" gorm:"type:text"`
+	Other        *string      `json:"other" gorm:"type:text"`
+	Users        []*User      `gorm:"many2many:user_teams"`
 }
 
 // チームのバリデーション

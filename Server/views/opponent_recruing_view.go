@@ -8,10 +8,13 @@ import (
 type OpponentRecruitingView struct {
 	ID         uint      `json:"id"`
 	Team       *TeamView `json:"team"`
+	Title      string    `json:"title"`
+	HasGround  bool      `json:"has_ground"`
+	GroundName string    `json:"ground_name"`
 	StartTime  time.Time `json:"start_time"`
 	EndTime    time.Time `json:"end_time"`
 	Prefecture string    `json:"prefecture"`
-	Detail     *string   `json:"detail"`
+	Detail     string    `json:"detail"`
 }
 
 // 対戦相手募集の構造体から必要なキーのみ返す
@@ -21,6 +24,9 @@ func CreateOpponentRecruitingView(opponentRecruitings []*models.OpponentRecruiti
 		newArray[i] = &OpponentRecruitingView{
 			ID:         v.ID,
 			Team:       CreateTeamView(v.Team),
+			Title:      v.Title,
+			HasGround:  v.HasGround,
+			GroundName: v.GroundName,
 			StartTime:  v.StartTime,
 			EndTime:    v.EndTime,
 			Prefecture: v.PrefectureId.ToString(),
