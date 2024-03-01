@@ -15,6 +15,7 @@ type OpponentRecruitingView struct {
 	EndTime    time.Time `json:"end_time"`
 	Prefecture string    `json:"prefecture"`
 	Detail     string    `json:"detail"`
+	IsActive   bool      `json:"is_active"`
 }
 
 // 対戦相手募集の構造体から必要なキーのみ返す
@@ -31,6 +32,7 @@ func CreateOpponentRecruitingView(opponentRecruitings []*models.OpponentRecruiti
 			EndTime:    v.EndTime,
 			Prefecture: v.PrefectureId.ToString(),
 			Detail:     v.Detail,
+			IsActive:   v.IsActive,
 		}
 	}
 
