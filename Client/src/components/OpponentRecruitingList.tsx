@@ -1,5 +1,3 @@
-// pages/index.tsx
-
 import {
   Container,
   Grid,
@@ -8,7 +6,9 @@ import {
   Typography,
   CardActionArea,
   Pagination,
-  Box, // Boxコンポーネントをインポート
+  Box,
+  Chip,
+  Divider,
 } from '@mui/material'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
@@ -17,7 +17,7 @@ import { getOpponentRecruitingsApiResponse } from 'src/types/apiResponses'
 import { OpponentRecruiting } from 'src/types/opponentRecruiting'
 import fetchAPI from 'src/utils/fetchApi'
 import { useNavigateHome } from 'src/hooks/useNavigateHome'
-import formatDateTime from 'src/utils/formatDateTime'
+import { formatTimeRange } from 'src/utils/formatDateTime'
 
 interface OpponentRecruitingListProps {
   initialRecruitings: OpponentRecruiting[]
@@ -74,7 +74,6 @@ export const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
             key={recruitment.id}
             style={{ maxWidth: 500, width: '100%' }}
           >
-            {' '}
             <Link href={`/opponent_recruitings/${recruitment.id}`} passHref>
               <Card
                 sx={{
@@ -86,20 +85,98 @@ export const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
                     boxShadow: '0 16px 70px -12.125px rgba(0,0,0,0.3)',
                   },
                   borderRadius: 2,
+                  backgroundColor: recruitment.is_active ? 'white' : '#d0d0d0',
+                  position: 'relative',
                 }}
               >
                 <CardActionArea>
                   <CardContent>
-                    <Typography variant='h5' component='div'>
-                      {recruitment.team.name}
+                    <Box sx={{ maxWidth: '88%', wordWrap: 'break-word' }}>
+                      <Typography
+                        variant='h6'
+                        component='div'
+                        gutterBottom
+                        sx={{ fontWeight: 'bold' }}
+                      >
+                        {recruitment.title}
+                      </Typography>
+                    </Box>
+                    <Typography sx={{ fontWeight: 'bold', mb: 1.5 }}>
+                      {formatTimeRange(recruitment.start_time, recruitment.end_time)
+                        .text.split(' ')
+                        .map((part, index, array) => (
+                          <span
+                            key={index}
+                            style={{
+                              color:
+                                index === 1 || index === array.length - 2
+                                  ? index === 1
+                                    ? formatTimeRange(recruitment.start_time, recruitment.end_time)
+                                        .dayOfWeekColor
+                                    : formatTimeRange(recruitment.start_time, recruitment.end_time)
+                                        .endDayOfWeekColor
+                                  : 'inherit',
+                            }}
+                          >
+                            {part}{' '}
+                          </span>
+                        ))}
                     </Typography>
-                    <Typography sx={{ mb: 1.5 }} color='text.secondary'>
-                      {formatDateTime(recruitment.start_time)} ~ {formatDateTime(recruitment.end_time)}
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                      <Typography
+                        variant='body2'
+                        component='div'
+                        sx={{ fontWeight: 'bold', mr: 1 }}
+                      >
+                        エリア:
+                      </Typography>
+                      <Typography variant='body2' component='div'>
+                        {recruitment.prefecture}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                      <Typography
+                        variant='body2'
+                        component='div'
+                        sx={{ fontWeight: 'bold', mr: 1 }}
+                      >
+                        グラウンド有無:
+                      </Typography>
+                      <Chip
+                        label={recruitment.has_ground ? 'あり' : 'なし'}
+                        size='small'
+                        color={recruitment.has_ground ? 'success' : 'error'}
+                        sx={{ mr: 1 }}
+                      />
+                    </Box>
+                    {recruitment.has_ground && (
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                        <Typography
+                          variant='body2'
+                          component='div'
+                          sx={{ fontWeight: 'bold', mr: 1 }}
+                        >
+                          グラウンド名:
+                        </Typography>
+                        <Typography variant='body2' component='div'>
+                          {recruitment.ground_name}
+                        </Typography>
+                      </Box>
+                    )}
+                    <Divider sx={{ mb: 1 }} />
+                    <Typography variant='body2' component='div'>
+                      チーム: {recruitment.team.name}
                     </Typography>
-                    <Typography variant='body2'>
-                      {recruitment.prefecture} - {recruitment.detail}
+                    <Typography variant='body2' component='div'>
+                      レベル: {recruitment.team.level}
                     </Typography>
                   </CardContent>
+                  <Chip
+                    label={recruitment.is_active ? '募集中' : '募集終了'}
+                    size='small'
+                    color={recruitment.is_active ? 'primary' : 'default'}
+                    sx={{ position: 'absolute', top: 8, right: 8 }}
+                  />
                 </CardActionArea>
               </Card>
             </Link>
