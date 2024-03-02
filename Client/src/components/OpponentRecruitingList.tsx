@@ -61,7 +61,13 @@ export const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
   return (
     <Container maxWidth='lg'>
       <Box display='flex' justifyContent='center' marginTop={2}>
-        <Pagination count={totalPages} page={page} onChange={handleChangePage} />
+        <Pagination
+          count={totalPages}
+          page={page}
+          boundaryCount={1}
+          siblingCount={2}
+          onChange={handleChangePage}
+        />
       </Box>
       <Grid container spacing={2} direction='column' alignItems='center' justifyContent='center'>
         {opponentRecruitings.map((recruitment) => (
@@ -184,7 +190,13 @@ export const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
         ))}
       </Grid>
       <Box display='flex' justifyContent='center' marginTop={2}>
-        <Pagination count={totalPages} page={page} onChange={handleChangePage} />
+        <Pagination
+          count={totalPages}
+          page={page}
+          boundaryCount={1}
+          siblingCount={2}
+          onChange={handleChangePage}
+        />
       </Box>
     </Container>
   )
