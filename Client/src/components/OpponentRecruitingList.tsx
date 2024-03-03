@@ -18,6 +18,7 @@ import { OpponentRecruiting } from 'src/types/opponentRecruiting'
 import fetchAPI from 'src/utils/fetchApi'
 import { useNavigateHome } from 'src/hooks/useNavigateHome'
 import { formatTimeRange } from 'src/utils/formatDateTime'
+import PrimaryButton from './PrimaryButton'
 
 interface OpponentRecruitingListProps {
   initialRecruitings: OpponentRecruiting[]
@@ -54,12 +55,27 @@ export const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
       })
       .catch((error) => {
         console.error(error)
+        // ホームページに移動
         navigateHome()
       })
   }
 
   return (
     <Container maxWidth='lg'>
+      <Grid
+        container
+        spacing={2}
+        direction='column'
+        alignItems='center'
+        justifyContent='center'
+        marginTop={2}
+      >
+        <Grid xs={12} sm={6} md={4} lg={3} style={{ maxWidth: 500, width: '100%' }}>
+          <Link href='/opponent_recruitings/create' passHref>
+            <PrimaryButton>対戦相手募集作成</PrimaryButton>
+          </Link>
+        </Grid>
+      </Grid>
       <Box display='flex' justifyContent='center' marginTop={2}>
         <Pagination
           count={totalPages}
