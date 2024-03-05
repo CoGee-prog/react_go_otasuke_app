@@ -34,18 +34,40 @@ func (uc *UserController) Login() gin.HandlerFunc {
 		userAgent := c.GetHeader("User-Agent")
 		// 開発環境かつPostmanからのリクエストの場合はIDトークン検証をスキップしてユーザーを作成する
 		if config.Get().GetString("server.env") == "dev" && strings.Contains(userAgent, "PostmanRuntime") {
-			devUser := &models.User{
-				ID:   c.GetHeader("x-user-id"),
-				Name: "dev-user",
-			}
-			// ユーザーデータを作成
-			if err := uc.UserService.CreateUser(db, devUser); err != nil {
-				c.JSON(http.StatusBadRequest, utils.NewResponse(
-					http.StatusBadRequest,
+
+			// ユーザーデータを検索
+			devUser, err := uc.UserService.GetUser(db, c.GetHeader("x-user-id"))
+			if err != nil {
+				c.JSON(http.StatusServiceUnavailable, utils.NewResponse(
+					http.StatusServiceUnavailable,
 					err.Error(),
 					nil,
 				))
 				return
+			}
+			// ユーザーデータがなければ作成
+			if devUser == nil {
+				devUser := &models.User{
+					ID:   c.GetHeader("x-user-id"),
+					Name: "dev-user",
+				}
+				// ユーザーデータを作成
+				if err := uc.UserService.CreateUser(db, devUser); err != nil {
+					c.JSON(http.StatusBadRequest, utils.NewResponse(
+						http.StatusBadRequest,
+						err.Error(),
+						nil,
+					))
+					return
+				}
+			}
+
+			// ユーザーの現在のチームがあれば役割も取得する
+			if devUser.CurrentTeam != nil {
+				var userTeam models.UserTeam
+				if err := db.Where("user_id = ? AND team_id = ?", devUser.ID, devUser.CurrentTeamId).First(&userTeam).Error; err == nil {
+					devUser.CurrentTeamRole = userTeam.Role
+				}
 			}
 
 			c.JSON(http.StatusOK, utils.NewResponse(
@@ -106,6 +128,14 @@ func (uc *UserController) Login() gin.HandlerFunc {
 				nil,
 			))
 			return
+		}
+
+		// ユーザーの現在のチームがあれば役割も取得する
+		if user.CurrentTeam != nil {
+			var userTeam models.UserTeam
+			if err := db.Where("user_id = ? AND team_id = ?", user.ID, user.CurrentTeamId).First(&userTeam).Error; err == nil {
+				user.CurrentTeamRole = userTeam.Role
+			}
 		}
 
 		c.JSON(http.StatusOK, utils.NewResponse(
