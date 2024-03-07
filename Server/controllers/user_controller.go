@@ -34,7 +34,6 @@ func (uc *UserController) Login() gin.HandlerFunc {
 		userAgent := c.GetHeader("User-Agent")
 		// 開発環境かつPostmanからのリクエストの場合はIDトークン検証をスキップしてユーザーを作成する
 		if config.Get().GetString("server.env") == "dev" && strings.Contains(userAgent, "PostmanRuntime") {
-
 			// ユーザーデータを検索
 			devUser, err := uc.UserService.GetUser(db, c.GetHeader("x-user-id"))
 			if err != nil {
@@ -47,7 +46,7 @@ func (uc *UserController) Login() gin.HandlerFunc {
 			}
 			// ユーザーデータがなければ作成
 			if devUser == nil {
-				devUser := &models.User{
+				devUser = &models.User{
 					ID:   c.GetHeader("x-user-id"),
 					Name: "dev-user",
 				}
@@ -60,13 +59,13 @@ func (uc *UserController) Login() gin.HandlerFunc {
 					))
 					return
 				}
-			}
-
-			// ユーザーの現在のチームがあれば役割も取得する
-			if devUser.CurrentTeam != nil {
-				var userTeam models.UserTeam
-				if err := db.Where("user_id = ? AND team_id = ?", devUser.ID, devUser.CurrentTeamId).First(&userTeam).Error; err == nil {
-					devUser.CurrentTeamRole = userTeam.Role
+			} else {
+				// ユーザーデータがある場合はユーザーの現在のチームがあれば役割も設定する
+				if devUser.CurrentTeam != nil {
+					var userTeam models.UserTeam
+					if err := db.Where("user_id = ? AND team_id = ?", devUser.ID, devUser.CurrentTeamId).First(&userTeam).Error; err == nil {
+						devUser.CurrentTeamRole = &userTeam.Role
+					}
 				}
 			}
 
@@ -118,6 +117,13 @@ func (uc *UserController) Login() gin.HandlerFunc {
 				))
 				return
 			}
+		} else {
+			// ユーザーデータがある場合はユーザーの現在のチームがあれば役割も設定する
+			if user.CurrentTeam != nil {
+				if userTeam, err := uc.UserService.GetUserTeam(db, user.ID, *user.CurrentTeamId); err == nil {
+					user.CurrentTeamRole = &userTeam.Role
+				}
+			}
 		}
 
 		// セッションを作成
@@ -128,14 +134,6 @@ func (uc *UserController) Login() gin.HandlerFunc {
 				nil,
 			))
 			return
-		}
-
-		// ユーザーの現在のチームがあれば役割も取得する
-		if user.CurrentTeam != nil {
-			var userTeam models.UserTeam
-			if err := db.Where("user_id = ? AND team_id = ?", user.ID, user.CurrentTeamId).First(&userTeam).Error; err == nil {
-				user.CurrentTeamRole = userTeam.Role
-			}
 		}
 
 		c.JSON(http.StatusOK, utils.NewResponse(

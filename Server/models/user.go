@@ -10,6 +10,6 @@ type User struct {
 	Name            string     `gorm:"type:text"`
 	CurrentTeamId   *uint      `gorm:"type:int"`
 	CurrentTeam     *Team      `gorm:"foreignKey:CurrentTeamId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	CurrentTeamRole TeamRole   `gorm:"-"`
+	CurrentTeamRole *TeamRole  `gorm:"-"`
 	Teams           []*Team    `gorm:"many2many:user_teams;"`
 }

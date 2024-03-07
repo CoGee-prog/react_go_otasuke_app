@@ -24,8 +24,9 @@ func NewTeamController(userService *services.UserService, teamService *services.
 }
 
 type TeamCreateResponse struct {
-	CurrentTeamId uint
+	CurrentTeamId   uint
 	CurrentTeamName string
+	CurrentTeamRole models.TeamRole
 }
 
 func (tc *TeamController) Create() gin.HandlerFunc {
@@ -73,12 +74,16 @@ func (tc *TeamController) Create() gin.HandlerFunc {
 			return
 		}
 
+		// ユーザーチームを取得する
+		userTeam, _ := tc.UserService.GetUserTeam(db, userId, team.ID);
+
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,
 			"チームを作成しました",
 			&TeamCreateResponse{
-				CurrentTeamId: team.ID,
+				CurrentTeamId:   team.ID,
 				CurrentTeamName: team.Name,
+				CurrentTeamRole: userTeam.Role,
 			},
 		))
 	}

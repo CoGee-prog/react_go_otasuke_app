@@ -56,6 +56,7 @@ func AuthMiddleware(firebaseApp *firebase.App) gin.HandlerFunc {
 			))
 			return
 		}
+
 		// ユーザーサービスを取得する
 		userService := services.NewUserService()
 		userId := decoded.UID
@@ -81,7 +82,7 @@ func AuthMiddleware(firebaseApp *firebase.App) gin.HandlerFunc {
 		}
 
 		// ユーザーIDをセットする
-		c.Set("userId",userId)
+		c.Set("userId", userId)
 
 		// ユーザーが存在する場合はリクエストを続ける
 		c.Next()

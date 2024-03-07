@@ -44,6 +44,7 @@ func initFirebase() *firebase.App {
 		panic("Failed to initialize Firebase app: " + err.Error())
 	}
 	FirebaseApp = app
+
 	return FirebaseApp
 }
 
@@ -55,11 +56,9 @@ func VerifyIDToken(c *gin.Context) (*auth.Token, error) {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is required"})
 		return nil, errors.New("Authorization header is required")
 	}
-
+	var err error
 	// Firebase Admin SDKを使ってIDトークンを検証
-	client, err := FirebaseApp.Auth(c)
-	// サービスの変数に代入
-	firebaseClient = client
+	firebaseClient, err = FirebaseApp.Auth(c)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Error getting Auth client"})
 		return nil, errors.New("Error getting Auth client")
@@ -96,6 +95,13 @@ func CreateSessionCookie(c *gin.Context) error {
 
 // Firebaseのセッショントークンを無効化する
 func (us *UserService) RevokeRefreshTokens(c *gin.Context) error {
+	var err error
+	// Firebase Admin SDKを使ってIDトークンを検証
+	firebaseClient, err = FirebaseApp.Auth(c)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Error getting Auth client"})
+		return errors.New("Error getting Auth client")
+	}
 	return firebaseClient.RevokeRefreshTokens(c, c.MustGet("userId").(string))
 }
 
@@ -122,7 +128,7 @@ func (us *UserService) GetUser(db *gorm.DB, id string) (*models.User, error) {
 
 // 新規ユーザーを作成する
 func (us *UserService) CreateUser(db *gorm.DB, user *models.User) error {
-	if err:= db.Create(user).Error; err != nil {
+	if err := db.Create(user).Error; err != nil {
 		return errors.New("ユーザー作成に失敗しました")
 	}
 	return nil
@@ -141,4 +147,19 @@ func (us *UserService) UpdateCurrentTeam(db *gorm.DB, userId string, teamId uint
 		return errors.New("チーム切り替えに失敗しました")
 	}
 	return nil
+}
+
+// ユーザーチームを取得する
+func (us *UserService) GetUserTeam(db *gorm.DB, userId string, teamId uint) (*models.UserTeam, error) {
+	var userTeam models.UserTeam
+	result := db.Where("user_id = ? AND team_id = ?", userId, teamId).First(&userTeam)
+	// レコードが見つからない場合はnilを返す
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, nil
+		// その他のエラーの場合
+	} else if result.Error != nil {
+		return nil, result.Error
+	}
+	// レコードが見つかった場合
+	return &userTeam, nil
 }
