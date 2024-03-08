@@ -9,23 +9,29 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Button,
   SelectChangeEvent,
 } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import useApiWithFlashMessage from 'src/hooks/useApiWithFlashMessage'
-import { useNavigateOpponentRecruitingsCreate } from 'src/hooks/useNavigateOpponentRecrutingsCreate'
-import { useNavigateOpponentRecruitingsIndex } from 'src/hooks/useNavigateOpponentRecrutingsIndex'
+import { useNavigateOpponentRecruitingsCreate } from 'src/hooks/useNavigateOpponentRecruitingsCreate'
+import { useNavigateOpponentRecruitingsIndex } from 'src/hooks/useNavigateOpponentRecruitingsIndex'
 import { CreateOpponentRecruitingsApiRequest } from 'src/types/apiRequests'
 import { prefectures } from 'src/utils/prefectures'
 import PrimaryButton from './PrimaryButton'
-import DangerButton from './DangerButton'
+import { useRouter } from 'next/router'
+import { TeamRole } from 'src/types/teamRole'
+import { AuthContext } from 'src/contexts/AuthContext'
 
 type Errors = {
   [key in keyof CreateOpponentRecruitingsApiRequest]?: string
 }
 
 function OpponentRecruitingForm() {
+  const router = useRouter()
+  const { user } = useContext(AuthContext)
+  const navigateOpponentRecruitingsIndex = useNavigateOpponentRecruitingsIndex()
+  const [isAccessAllowed, setIsAccessAllowed] = useState(false)
+
   const [formData, setFormData] = useState<CreateOpponentRecruitingsApiRequest>({
     title: '',
     has_ground: false,
@@ -37,9 +43,25 @@ function OpponentRecruitingForm() {
   })
   const [errors, setErrors] = useState<Errors>({})
   const { request } = useApiWithFlashMessage<CreateOpponentRecruitingsApiRequest>()
-
-  const navigateOpponentRecruitingsIndex = useNavigateOpponentRecruitingsIndex()
   const navigateOpponentRecruitingsCreate = useNavigateOpponentRecruitingsCreate()
+
+  useEffect(() => {
+    // ユーザーの役割が管理者または副管理者であれば 、アクセス可能とする
+    if (
+      user &&
+      (user.current_team_role == TeamRole.ADMIN || user.current_team_role == TeamRole.SUB_ADMIN)
+    ) {
+      setIsAccessAllowed(true)
+    } else {
+      // 適切な権限がない場合、対戦相手募集リストにリダイレクト
+      navigateOpponentRecruitingsIndex()
+    }
+  }, [router])
+
+  if (!isAccessAllowed) {
+    // 認証されていない場合は、何も表示しない
+    return null
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target

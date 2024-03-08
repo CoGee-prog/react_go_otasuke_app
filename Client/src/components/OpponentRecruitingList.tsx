@@ -11,7 +11,7 @@ import {
   Divider,
 } from '@mui/material'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { Page } from 'src/types/page'
 import { getOpponentRecruitingsApiResponse } from 'src/types/apiResponses'
 import { OpponentRecruiting } from 'src/types/opponentRecruiting'
@@ -19,6 +19,8 @@ import fetchAPI from 'src/utils/fetchApi'
 import { useNavigateHome } from 'src/hooks/useNavigateHome'
 import { formatTimeRange } from 'src/utils/formatDateTime'
 import PrimaryButton from './PrimaryButton'
+import { TeamRole } from 'src/types/teamRole'
+import { AuthContext } from 'src/contexts/AuthContext'
 
 interface OpponentRecruitingListProps {
   initialRecruitings: OpponentRecruiting[]
@@ -33,6 +35,7 @@ export const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
     useState<OpponentRecruiting[]>(initialRecruitings)
   const [page, setPage] = useState<number>(initialPage.number)
   const [totalPages, setTotalPages] = useState<number>(initialPage.total_pages)
+  const { user } = useContext(AuthContext)
   const navigateHome = useNavigateHome()
 
   useEffect(() => {
@@ -70,10 +73,22 @@ export const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
         justifyContent='center'
         marginTop={2}
       >
-        <Grid xs={12} sm={6} md={4} lg={3} style={{ maxWidth: 500, width: '100%' }}>
-          <Link href='/opponent_recruitings/create' passHref>
-            <PrimaryButton>対戦相手募集作成</PrimaryButton>
-          </Link>
+        <Grid
+          xs={12}
+          sm={6}
+          md={4}
+          lg={3}
+          style={{ maxWidth: 500, width: '100%', textAlign: 'center' }}
+        >
+          {user &&
+          (user.current_team_role === TeamRole.ADMIN ||
+            user.current_team_role === TeamRole.SUB_ADMIN) ? (
+            <Link href='/opponent_recruitings/create' passHref>
+              <PrimaryButton>対戦相手募集作成</PrimaryButton>
+            </Link>
+          ) : (
+            <p>チームの管理者か副管理者のみ対戦相手募集を作成できます</p>
+          )}
         </Grid>
       </Grid>
       <Box display='flex' justifyContent='center' marginTop={2}>

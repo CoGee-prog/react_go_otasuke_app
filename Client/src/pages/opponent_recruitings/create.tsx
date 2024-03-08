@@ -1,7 +1,7 @@
 import React from 'react'
 import OpponentRecruitingForm from '../../components/OpponentRecruitingForm'
 
-const CreateOpponentRecruitingPage = () => {
+export const CreateOpponentRecruitingPage = () => {
   return (
     <div>
       <OpponentRecruitingForm />
