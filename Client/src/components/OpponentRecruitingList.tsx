@@ -64,7 +64,7 @@ export const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
   }
 
   return (
-    <Container maxWidth='lg'>
+    <Container maxWidth='lg' sx={{ marginBottom: 2 }}>
       <Grid
         container
         spacing={2}
@@ -91,16 +91,29 @@ export const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
           )}
         </Grid>
       </Grid>
-      <Box display='flex' justifyContent='center' marginTop={2}>
-        <Pagination
-          count={totalPages}
-          page={page}
-          boundaryCount={1}
-          siblingCount={2}
-          onChange={handleChangePage}
-        />
-      </Box>
-      <Grid container spacing={2} direction='column' alignItems='center' justifyContent='center'>
+      {totalPages > 0 ? (
+        <Box display='flex' justifyContent='center' marginTop={2}>
+          <Pagination
+            count={totalPages}
+            page={page}
+            boundaryCount={1}
+            siblingCount={2}
+            onChange={handleChangePage}
+          />
+        </Box>
+      ) : (
+        <Typography variant='h6' component='p' sx={{ marginTop: 2, textAlign: 'center' }}>
+          対戦相手募集がありません
+        </Typography>
+      )}
+      <Grid
+        container
+        spacing={2}
+        direction='column'
+        alignItems='center'
+        justifyContent='center'
+        sx={{ marginTop: 0.5, marginBottom: 1 }}
+      >
         {opponentRecruitings.map((recruitment) => (
           <Grid
             item
@@ -220,15 +233,17 @@ export const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
           </Grid>
         ))}
       </Grid>
-      <Box display='flex' justifyContent='center' marginTop={2}>
-        <Pagination
-          count={totalPages}
-          page={page}
-          boundaryCount={1}
-          siblingCount={2}
-          onChange={handleChangePage}
-        />
-      </Box>
+      {totalPages > 0 ? (
+        <Box display='flex' justifyContent='center' marginTop={2}>
+          <Pagination
+            count={totalPages}
+            page={page}
+            boundaryCount={1}
+            siblingCount={2}
+            onChange={handleChangePage}
+          />
+        </Box>
+      ) : null}
     </Container>
   )
 }
