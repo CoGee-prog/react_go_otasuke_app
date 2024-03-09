@@ -14,6 +14,7 @@ import ChangeCircleIcon from '@mui/icons-material/ChangeCircle'
 import GroupAddIcon from '@mui/icons-material/GroupAdd'
 import { useContext } from 'react'
 import { AuthContext } from 'src/contexts/AuthContext'
+import Link from 'next/link'
 
 export default function AccountMenu() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
@@ -94,12 +95,14 @@ export default function AccountMenu() {
           </ListItemIcon>
           チーム切り替え
         </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <ListItemIcon>
-            <GroupAddIcon fontSize='small' />
-          </ListItemIcon>
-          チーム作成
-        </MenuItem>
+        <Link href='/teams/create' passHref>
+          <MenuItem onClick={handleClose}>
+            <ListItemIcon>
+              <GroupAddIcon fontSize='small' />
+            </ListItemIcon>
+            チーム作成
+          </MenuItem>
+        </Link>
         <MenuItem onClick={handleClose}>
           <ListItemIcon>
             <Settings fontSize='small' />

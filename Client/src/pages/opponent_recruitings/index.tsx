@@ -21,7 +21,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   }
 }
 
-const Home: NextPage<{ initialRecruitings: OpponentRecruiting[]; initialPage: Page }> = ({
+const OpponentRecruitingListPage: NextPage<{ initialRecruitings: OpponentRecruiting[]; initialPage: Page }> = ({
   initialRecruitings,
   initialPage,
 }) => {
@@ -30,4 +30,4 @@ const Home: NextPage<{ initialRecruitings: OpponentRecruiting[]; initialPage: Pa
   )
 }
 
-export default Home
+export default OpponentRecruitingListPage
