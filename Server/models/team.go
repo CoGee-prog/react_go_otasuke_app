@@ -42,7 +42,7 @@ type Team struct {
 	gorm.Model
 	Name         string       `json:"name" gorm:"type:text;not null"`
 	PrefectureId PrefectureId `json:"prefecture_id" gorm:"type:int; not null"`
-	LevelId      TeamLevelId    `json:"level_id" gorm:"type:integer;not null"`
+	LevelId      TeamLevelId  `json:"level_id" gorm:"type:integer;not null"`
 	HomePageUrl  *string      `json:"home_page_url" gorm:"type:text"`
 	Other        *string      `json:"other" gorm:"type:text"`
 	Users        []*User      `gorm:"many2many:user_teams"`
@@ -52,6 +52,9 @@ type Team struct {
 func (t *Team) Validate() error {
 	if t.Name == "" {
 		return errors.New("チーム名が入力されていません")
+	}
+		if t.PrefectureId < Hokkaido || t.PrefectureId > Okinawa {
+		return errors.New("不正な活動拠点です")
 	}
 	if t.LevelId < LocalLevel || t.LevelId > NationalLevel {
 		return errors.New("不正なチームレベルです")
