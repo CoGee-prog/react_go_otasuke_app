@@ -70,6 +70,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       showFlashMessage({ message: responseData.message, type: 'success' })
       setIsLoggedIn(false)
       setUser(null)
+      // ホーム画面に戻す
+      navigateHome()
     })
   }
 

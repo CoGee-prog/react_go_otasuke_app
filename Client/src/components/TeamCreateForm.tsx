@@ -10,12 +10,13 @@ import {
   Select,
   MenuItem,
   SelectChangeEvent,
-	FormHelperText,
+  FormHelperText,
 } from '@mui/material'
 import { teamLevels } from 'src/utils/teamLevel'
 import { CreateTeamsApiRequest } from 'src/types/apiRequests'
 import useApiWithFlashMessage from 'src/hooks/useApiWithFlashMessage'
 import { prefectures } from 'src/utils/prefectures'
+import { useNavigateOpponentRecruitingsIndex } from 'src/hooks/useNavigateOpponentRecruitingsIndex'
 
 type Errors = {
   [key in keyof CreateTeamsApiRequest]?: string
@@ -24,13 +25,14 @@ type Errors = {
 function TeamCreateForm() {
   const [formData, setFormData] = useState<CreateTeamsApiRequest>({
     name: '',
-		prefecture_id: '',
+    prefecture_id: '',
     level_id: '',
     home_page_url: '',
     other: '',
   })
   const [errors, setErrors] = useState<Errors>({})
-	const { request } = useApiWithFlashMessage<CreateTeamsApiRequest>()
+  const { request } = useApiWithFlashMessage<CreateTeamsApiRequest>()
+	const navigateOpponentRecruitingsIndex = useNavigateOpponentRecruitingsIndex()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -53,21 +55,24 @@ function TeamCreateForm() {
     const validationErrors = validateForm()
     if (Object.keys(validationErrors).length === 0) {
       try {
-				const options: RequestInit = {
+        const options: RequestInit = {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(formData),
+          credentials: 'include',
         }
         await request('/teams', options)
         setFormData({
           name: '',
-					prefecture_id: '',
+          prefecture_id: '',
           level_id: '',
           home_page_url: '',
           other: '',
         })
+				// 対戦相手募集リストに移動
+				navigateOpponentRecruitingsIndex()
       } catch (error) {
         console.error('チーム作成に失敗しました。', error)
       }
@@ -80,7 +85,7 @@ function TeamCreateForm() {
     const errors: Errors = {}
     if (!formData.name) errors.name = 'チーム名は必須です。'
     if (formData.name.length > 32) errors.name = 'チーム名は32文字以内でなければなりません。'
-		if (!formData.prefecture_id) errors.prefecture_id = '活動拠点は必須です。'
+    if (!formData.prefecture_id) errors.prefecture_id = '活動拠点は必須です。'
     if (!formData.level_id) errors.level_id = 'チームレベルは必須です。'
     if (formData.other.length > 500) errors.other = 'その他は500文字以内でなければなりません。'
     return errors
@@ -207,8 +212,6 @@ function TeamCreateForm() {
       </form>
     </Container>
   )
-
-
 }
 
 export default TeamCreateForm
