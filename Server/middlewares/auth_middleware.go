@@ -29,7 +29,7 @@ func AuthMiddleware(firebaseApp *firebase.App) gin.HandlerFunc {
 			// セッションCookieが利用できない場合、認証エラー
 			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.NewResponse(
 				http.StatusUnauthorized,
-				err.Error(),
+				"認証に失敗しました",
 				nil,
 			))
 			return
@@ -39,7 +39,7 @@ func AuthMiddleware(firebaseApp *firebase.App) gin.HandlerFunc {
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.NewResponse(
 				http.StatusUnauthorized,
-				err.Error(),
+				"認証に失敗しました",
 				nil,
 			))
 			return
@@ -51,7 +51,7 @@ func AuthMiddleware(firebaseApp *firebase.App) gin.HandlerFunc {
 			// セッションCookieが無効な場合、認証エラー
 			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.NewResponse(
 				http.StatusUnauthorized,
-				err.Error(),
+				"認証に失敗しました",
 				nil,
 			))
 			return
