@@ -71,14 +71,15 @@ export const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
         direction='column'
         alignItems='center'
         justifyContent='center'
-        marginTop={2}
+        style={{ marginTop: '16px' }}
       >
         <Grid
+          container
           xs={12}
           sm={6}
           md={4}
           lg={3}
-          style={{ maxWidth: 500, width: '100%', textAlign: 'center' }}
+          sx={{ maxWidth: 500, width: '100%', textAlign: 'center' }}
         >
           {user &&
           (user.current_team_role === TeamRole.ADMIN ||
