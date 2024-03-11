@@ -10,6 +10,7 @@ import {
   Select,
   MenuItem,
   SelectChangeEvent,
+  FormHelperText,
 } from '@mui/material'
 import React, { useContext, useEffect, useState } from 'react'
 import useApiWithFlashMessage from 'src/hooks/useApiWithFlashMessage'
@@ -23,7 +24,18 @@ import { TeamRole } from 'src/types/teamRole'
 import { AuthContext } from 'src/contexts/AuthContext'
 
 type Errors = {
-  [key in keyof CreateOpponentRecruitingsApiRequest]?: string
+  [key in keyof CreateOpponentRecruitingsFormData]?: string
+}
+
+interface CreateOpponentRecruitingsFormData {
+  title: string
+  has_ground: boolean
+  ground_name: string
+  prefecture_id: string
+  date: string
+  start_time: string
+  end_time: string
+  detail: string
 }
 
 function OpponentRecruitingForm() {
@@ -32,11 +44,12 @@ function OpponentRecruitingForm() {
   const navigateOpponentRecruitingsIndex = useNavigateOpponentRecruitingsIndex()
   const [isAccessAllowed, setIsAccessAllowed] = useState(false)
 
-  const [formData, setFormData] = useState<CreateOpponentRecruitingsApiRequest>({
+  const [formData, setFormData] = useState<CreateOpponentRecruitingsFormData>({
     title: '',
     has_ground: false,
     ground_name: '',
     prefecture_id: '',
+    date: '',
     start_time: '',
     end_time: '',
     detail: '',
@@ -94,10 +107,9 @@ function OpponentRecruitingForm() {
     if (Object.keys(validationErrors).length === 0) {
       try {
         // 開始日時と終了日時をフォーマット
-        const formattedStartTime = `${formData.start_time}:00+09:00`
-        const formattedEndTime = `${formData.start_time.split('T')[0]}T${
-          formData.end_time
-        }:00+09:00`
+        // 日付と時間を結合してフォーマット
+        const formattedStartTime = `${formData.date}T${formData.start_time}:00+09:00`
+        const formattedEndTime = `${formData.date}T${formData.end_time}:00+09:00`
         const requestData = {
           ...formData,
           start_time: formattedStartTime,
@@ -119,6 +131,7 @@ function OpponentRecruitingForm() {
           has_ground: false,
           ground_name: '',
           prefecture_id: '',
+          date: '',
           start_time: '',
           end_time: '',
           detail: '',
@@ -140,8 +153,12 @@ function OpponentRecruitingForm() {
     if (!formData.title) errors.title = 'タイトルは必須です。'
     if (formData.title.length > 50) errors.title = 'タイトルは50文字以内でなければなりません。'
     if (!formData.prefecture_id) errors.prefecture_id = '都道府県の選択は必須です。'
-    if (!formData.start_time) errors.start_time = '開始日時の選択は必須です。'
-    if (!formData.end_time) errors.end_time = '終了日時の選択は必須です。'
+    if (!formData.date) errors.date = '日付は必須です。'
+    if (!formData.start_time) errors.start_time = '開始時間は必須です。'
+    if (!formData.end_time) errors.end_time = '終了時間は必須です。'
+    if (formData.start_time && formData.end_time && formData.end_time < formData.start_time) {
+      errors.end_time = '終了時間は開始時間より後でなければなりません。'
+    }
     if (formData.has_ground && !formData.ground_name)
       errors.ground_name = 'グラウンド名の入力は必須です。'
     if (!formData.ground_name && formData.ground_name.length > 50)
@@ -254,38 +271,69 @@ function OpponentRecruitingForm() {
           </Grid>
           <Grid item xs={12}>
             <TextField
-              label='開始日時'
-              type='datetime-local'
-              name='start_time'
-              value={formData.start_time}
+              label='日付'
+              type='date'
+              name='date'
+              value={formData.date}
               onChange={handleInputChange}
               fullWidth
               InputLabelProps={{
                 shrink: true,
               }}
               inputProps={{
-                // 開始日時の最小値を現在の日付に設定
+                // 日付の最小値を現在の日付に設定
                 min: currentDate,
               }}
-              error={Boolean(errors.start_time)}
-              helperText={errors.start_time}
+              error={Boolean(errors.date)}
+              helperText={errors.date}
             />
           </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label='終了日時'
-              type='time'
-              name='end_time'
-              value={formData.end_time}
-              onChange={handleInputChange}
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-              error={Boolean(errors.end_time)}
-              helperText={errors.end_time}
-            />
+          <Grid
+            item
+            xs={12}
+            container
+            alignItems='flex-start'
+            justifyContent='space-between'
+            spacing={2}
+          >
+            <Grid item xs={5}>
+              <TextField
+                label='開始時間'
+                type='time'
+                name='start_time'
+                value={formData.start_time}
+                onChange={handleInputChange}
+                fullWidth
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                error={Boolean(errors.start_time)}
+                helperText={errors.start_time || ' '} // 空白を追加して高さを保持
+              />
+            </Grid>
+            <Grid item xs={1} container justifyContent='center'>
+              <Typography variant='h6' sx={{ my: 2 }}>
+                ~
+              </Typography>{' '}
+              {/* 上下のマージンを追加 */}
+            </Grid>
+            <Grid item xs={5}>
+              <TextField
+                label='終了時間'
+                type='time'
+                name='end_time'
+                value={formData.end_time}
+                onChange={handleInputChange}
+                fullWidth
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                error={Boolean(errors.end_time)}
+                helperText={errors.end_time || ' '} // 空白を追加して高さを保持
+              />
+            </Grid>
           </Grid>
+
           <Grid item xs={12}>
             <TextField
               label='詳細'
