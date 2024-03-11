@@ -93,12 +93,23 @@ function OpponentRecruitingForm() {
     const validationErrors = validateForm()
     if (Object.keys(validationErrors).length === 0) {
       try {
+        // 開始日時と終了日時をフォーマット
+        const formattedStartTime = `${formData.start_time}:00+09:00`
+        const formattedEndTime = `${formData.start_time.split('T')[0]}T${
+          formData.end_time
+        }:00+09:00`
+        const requestData = {
+          ...formData,
+          start_time: formattedStartTime,
+          end_time: formattedEndTime,
+        }
         const options: RequestInit = {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(requestData),
+          credentials: 'include',
         }
         await request('/opponent_recruitings', options)
 
@@ -127,13 +138,19 @@ function OpponentRecruitingForm() {
   const validateForm = () => {
     const errors: Errors = {}
     if (!formData.title) errors.title = 'タイトルは必須です。'
+    if (formData.title.length > 50) errors.title = 'タイトルは50文字以内でなければなりません。'
     if (!formData.prefecture_id) errors.prefecture_id = '都道府県の選択は必須です。'
     if (!formData.start_time) errors.start_time = '開始日時の選択は必須です。'
     if (!formData.end_time) errors.end_time = '終了日時の選択は必須です。'
     if (formData.has_ground && !formData.ground_name)
       errors.ground_name = 'グラウンド名の入力は必須です。'
+    if (!formData.ground_name && formData.ground_name.length > 50)
+      errors.ground_name = 'グラウンド名は50文字以内でなければなりません。'
+    if (formData.detail.length > 1000) errors.detail = '詳細は1000文字以内でなければなりません。'
     return errors
   }
+
+  const currentDate = new Date(new Date().getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 16)
 
   return (
     <Container maxWidth='sm'>
@@ -149,8 +166,22 @@ function OpponentRecruitingForm() {
               value={formData.title}
               onChange={handleInputChange}
               fullWidth
-              error={Boolean(errors.title)}
-              helperText={errors.title}
+              error={Boolean(errors.title) || formData.title.length > 50}
+              helperText={
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span
+                    style={{
+                      color: errors.title || formData.title.length > 50 ? 'error' : 'inherit',
+                    }}
+                  >
+                    {errors.title ||
+                      (formData.title.length > 50
+                        ? 'タイトルは50文字以内でなければなりません。'
+                        : '')}
+                  </span>
+                  <span>{formData.title.length}/50</span>
+                </div>
+              }
             />
           </Grid>
           <Grid item xs={12}>
@@ -173,8 +204,25 @@ function OpponentRecruitingForm() {
                 value={formData.ground_name}
                 onChange={handleInputChange}
                 fullWidth
-                error={Boolean(errors.ground_name)}
-                helperText={errors.ground_name}
+                error={Boolean(errors.ground_name) || formData.ground_name.length > 50}
+                helperText={
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span
+                      style={{
+                        color:
+                          errors.ground_name || formData.ground_name.length > 50
+                            ? 'error'
+                            : 'inherit',
+                      }}
+                    >
+                      {errors.ground_name ||
+                        (formData.ground_name.length > 50
+                          ? 'グラウンド名は50文字以内でなければなりません。'
+                          : '')}
+                    </span>
+                    <span>{formData.ground_name.length}/50</span>
+                  </div>
+                }
               />
             </Grid>
           )}
@@ -215,6 +263,10 @@ function OpponentRecruitingForm() {
               InputLabelProps={{
                 shrink: true,
               }}
+              inputProps={{
+                // 開始日時の最小値を現在の日付に設定
+                min: currentDate,
+              }}
               error={Boolean(errors.start_time)}
               helperText={errors.start_time}
             />
@@ -243,6 +295,22 @@ function OpponentRecruitingForm() {
               fullWidth
               multiline
               rows={4}
+              error={Boolean(errors.detail) || formData.detail.length > 1000}
+              helperText={
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span
+                    style={{
+                      color: errors.detail || formData.detail.length > 1000 ? 'error' : 'inherit',
+                    }}
+                  >
+                    {errors.detail ||
+                      (formData.detail.length > 1000
+                        ? '詳細は1000文字以内でなければなりません。'
+                        : '')}
+                  </span>
+                  <span>{formData.detail.length}/1000</span>
+                </div>
+              }
             />
           </Grid>
           <Grid item xs={12}>

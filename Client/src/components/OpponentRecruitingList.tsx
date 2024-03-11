@@ -84,7 +84,7 @@ export const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
           (user.current_team_role === TeamRole.ADMIN ||
             user.current_team_role === TeamRole.SUB_ADMIN) ? (
             <Link href='/opponent_recruitings/create' passHref>
-              <PrimaryButton>対戦相手募集作成</PrimaryButton>
+              <PrimaryButton>対戦相手を募集する</PrimaryButton>
             </Link>
           ) : (
             <p>チームの管理者か副管理者のみ対戦相手募集を作成できます</p>
