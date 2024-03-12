@@ -10,7 +10,6 @@ import {
   Select,
   MenuItem,
   SelectChangeEvent,
-  FormHelperText,
 } from '@mui/material'
 import React, { useContext, useEffect, useState } from 'react'
 import useApiWithFlashMessage from 'src/hooks/useApiWithFlashMessage'
@@ -167,7 +166,9 @@ function OpponentRecruitingForm() {
     return errors
   }
 
-  const currentDate = new Date(new Date().getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 16)
+  const currentDate = new Date(new Date().getTime() + 9 * 60 * 60 * 1000)
+    .toISOString()
+    .split('T')[0]
 
   return (
     <Container maxWidth='sm'>
@@ -307,6 +308,10 @@ function OpponentRecruitingForm() {
                 InputLabelProps={{
                   shrink: true,
                 }}
+                inputProps={{
+                  // 5分刻み
+                  step: 300,
+                }}
                 error={Boolean(errors.start_time)}
                 helperText={errors.start_time || ' '} // 空白を追加して高さを保持
               />
@@ -315,7 +320,6 @@ function OpponentRecruitingForm() {
               <Typography variant='h6' sx={{ my: 2 }}>
                 ~
               </Typography>{' '}
-              {/* 上下のマージンを追加 */}
             </Grid>
             <Grid item xs={5}>
               <TextField
@@ -327,6 +331,10 @@ function OpponentRecruitingForm() {
                 fullWidth
                 InputLabelProps={{
                   shrink: true,
+                }}
+                inputProps={{
+                  // 5分刻み
+                  step: 300,
                 }}
                 error={Boolean(errors.end_time)}
                 helperText={errors.end_time || ' '} // 空白を追加して高さを保持
