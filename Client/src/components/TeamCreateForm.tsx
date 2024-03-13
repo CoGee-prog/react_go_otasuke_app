@@ -17,6 +17,7 @@ import { CreateTeamsApiRequest } from 'src/types/apiRequests'
 import useApiWithFlashMessage from 'src/hooks/useApiWithFlashMessage'
 import { prefectures } from 'src/utils/prefectures'
 import { useNavigateOpponentRecruitingsIndex } from 'src/hooks/useNavigateOpponentRecruitingsIndex'
+import PrimaryButton from './PrimaryButton'
 
 type Errors = {
   [key in keyof CreateTeamsApiRequest]?: string
@@ -203,10 +204,8 @@ function TeamCreateForm() {
               }
             />
           </Grid>
-          <Grid item xs={12}>
-            <Button type='submit' variant='contained' color='primary' fullWidth>
-              チーム作成
-            </Button>
+          <Grid item xs={12} style={{ marginBottom: '20px' }}>
+            <PrimaryButton>作成</PrimaryButton>
           </Grid>
         </Grid>
       </form>

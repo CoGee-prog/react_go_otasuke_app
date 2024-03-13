@@ -369,7 +369,7 @@ function OpponentRecruitingForm() {
               }
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} style={{ marginBottom: '20px' }}>
             <PrimaryButton>作成</PrimaryButton>
           </Grid>
         </Grid>
