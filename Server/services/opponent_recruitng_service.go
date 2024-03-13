@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"math"
+	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/models"
 	"strconv"
 
@@ -96,7 +97,7 @@ func (ors *OpponentRecruitingService) DeleteOpponentRecruiting(db *gorm.DB, user
 
 
 // 対戦相手募集のリストとページ情報を返す
-func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context) ([]*models.OpponentRecruiting, *models.Page) {
+func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context) ([]*models.OpponentRecruiting, *database.Page) {
 	// リスト表示時の1ページあたりの要素数
 	var pageSize int = 10
 
@@ -126,14 +127,14 @@ func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context) 
 		pageNumber = totalPages
 	}
 
-	page := &models.Page{
+	page := &database.Page{
 		Number:        pageNumber,
 		Size:          pageSize,
 		TotalElements: int(totalElements),
 		TotalPages:    totalPages,
 	}
 
-	sort := &models.Sort{
+	sort := &database.Sort{
 		IsDesc:  true,
 		OrderBy: "created_at",
 	}

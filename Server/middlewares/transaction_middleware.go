@@ -29,7 +29,7 @@ func Transaction(db *gorm.DB) gin.HandlerFunc {
 		c.Next()
 
 		// レスポンスが2xx系以外ならロールバック
-		statusCode := c.Writer.Status() 
+		statusCode := c.Writer.Status()
 		if statusCode < 200 || statusCode >= 300 {
 			tx.Rollback()
 			return

@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"net/http"
+	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/models"
 	"react_go_otasuke_app/services"
 	"react_go_otasuke_app/utils"
@@ -29,7 +30,7 @@ func NewOpponentRecruitingController(opponentRecruitingService *services.Opponen
 
 type OpponentRecruitingIndexResponse struct {
 	OpponentRecruitings []*views.OpponentRecruitingView `json:"opponent_recruitings"`
-	Page                *models.Page                    `json:"page"`
+	Page                *database.Page                  `json:"page"`
 }
 
 func (oc *OpponentRecruitingController) Index() gin.HandlerFunc {
