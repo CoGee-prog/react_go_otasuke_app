@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 	"time"
+	"unicode/utf8"
 
 	"gorm.io/gorm"
 )
@@ -11,9 +12,9 @@ type OpponentRecruiting struct {
 	gorm.Model
 	TeamId       uint         `json:"team_id" gorm:"type:int; not null"`
 	Team         Team         `gorm:"foreignKey:TeamId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Title        string       `json:"title" gorm:"type:text; not null"`
+	Title        string       `json:"title" gorm:"type:varchar(255); not null"`
 	HasGround    bool         `json:"has_ground" gorm:"not null; default:false"`
-	GroundName   string       `json:"ground_name" gorm:"type:text"`
+	GroundName   string       `json:"ground_name" gorm:"type:varchar(255)"`
 	PrefectureId PrefectureId `json:"prefecture_id" gorm:"type:int; not null"`
 	StartTime    time.Time    `json:"start_time" gorm:"not null"`
 	EndTime      time.Time    `json:"end_time" gorm:"not null"`
@@ -28,6 +29,9 @@ func (or *OpponentRecruiting) Validate() error {
 	}
 	if or.Title == "" {
 		return errors.New("タイトルは必須です")
+	}
+	if utf8.RuneCountInString(or.Title) > 50 {
+		return errors.New("タイトルは50文字以下でなければなりません")
 	}
 	if or.PrefectureId < Hokkaido || or.PrefectureId > Okinawa {
 		return errors.New("不正な都道府県です")
@@ -49,6 +53,12 @@ func (or *OpponentRecruiting) Validate() error {
 	// グラウンド無の場合、グラウンド名がないか確認
 	if !or.HasGround && or.GroundName != "" {
 		return errors.New("グラウンド無の場合、グラウンド名は不要です")
+	}
+	if utf8.RuneCountInString(or.GroundName) > 50 {
+		return errors.New("グラウンド名は50文字以下でなければなりません")
+	}
+	if utf8.RuneCountInString(or.Detail) > 1000 {
+		return errors.New("詳細は1000文字以下でなければなりません")
 	}
 	return nil
 }

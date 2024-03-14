@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"unicode/utf8"
 
 	"gorm.io/gorm"
 )
@@ -53,11 +54,20 @@ func (t *Team) Validate() error {
 	if t.Name == "" {
 		return errors.New("チーム名が入力されていません")
 	}
-		if t.PrefectureId < Hokkaido || t.PrefectureId > Okinawa {
+	if utf8.RuneCountInString(t.Name) > 32 {
+		return errors.New("チーム名は32文字以下でなければなりません")
+	}
+	if t.PrefectureId < Hokkaido || t.PrefectureId > Okinawa {
 		return errors.New("不正な活動拠点です")
 	}
 	if t.LevelId < LocalLevel || t.LevelId > NationalLevel {
 		return errors.New("不正なチームレベルです")
+	}
+	if utf8.RuneCountInString(*t.HomePageUrl) > 500 {
+		return errors.New("ホームページリンクは500文字以下でなければなりません")
+	}
+	if utf8.RuneCountInString(*t.Other) > 500 {
+		return errors.New("その他は500文字以下でなければなりません")
 	}
 	return nil
 }
