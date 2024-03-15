@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {
   Container,
   Typography,
@@ -18,6 +18,9 @@ import useApiWithFlashMessage from 'src/hooks/useApiWithFlashMessage'
 import { prefectures } from 'src/utils/prefectures'
 import { useNavigateOpponentRecruitingsIndex } from 'src/hooks/useNavigateOpponentRecruitingsIndex'
 import PrimaryButton from './PrimaryButton'
+import { AuthContext } from 'src/contexts/AuthContext'
+import { User } from 'src/types/user'
+import { CreateTeamsApiResponse } from 'src/types/apiResponses'
 
 type Errors = {
   [key in keyof CreateTeamsApiRequest]?: string
@@ -32,8 +35,9 @@ function TeamCreateForm() {
     other: '',
   })
   const [errors, setErrors] = useState<Errors>({})
-  const { request } = useApiWithFlashMessage<CreateTeamsApiRequest>()
-	const navigateOpponentRecruitingsIndex = useNavigateOpponentRecruitingsIndex()
+  const { request, data } = useApiWithFlashMessage<CreateTeamsApiResponse>()
+  const { user, setUser } = useContext(AuthContext)
+  const navigateOpponentRecruitingsIndex = useNavigateOpponentRecruitingsIndex()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -65,15 +69,6 @@ function TeamCreateForm() {
           credentials: 'include',
         }
         await request('/teams', options)
-        setFormData({
-          name: '',
-          prefecture_id: '',
-          level_id: '',
-          home_page_url: '',
-          other: '',
-        })
-				// 対戦相手募集リストに移動
-				navigateOpponentRecruitingsIndex()
       } catch (error) {
         console.error('チーム作成に失敗しました。', error)
       }
@@ -81,6 +76,27 @@ function TeamCreateForm() {
       setErrors(validationErrors)
     }
   }
+
+  useEffect(() => {
+    if (data) {
+      setFormData({
+        name: '',
+        prefecture_id: '',
+        level_id: '',
+        home_page_url: '',
+        other: '',
+      })
+      const userData: User = {
+        name: user?.name,
+        current_team_id: data.current_team_id,
+        current_team_name: data.current_team_name,
+        current_team_role: data.current_team_role,
+      }
+      setUser(userData)
+      // 対戦相手募集リストに移動
+      navigateOpponentRecruitingsIndex()
+    }
+  }, [data])
 
   const validateForm = () => {
     const errors: Errors = {}
