@@ -92,6 +92,8 @@ function TeamCreateForm() {
         current_team_name: data.current_team_name,
         current_team_role: data.current_team_role,
       }
+      // ユーザー情報をローカルストレージにキャッシュ
+      localStorage.setItem('user', JSON.stringify(userData))
       setUser(userData)
       // 対戦相手募集リストに移動
       navigateOpponentRecruitingsIndex()
