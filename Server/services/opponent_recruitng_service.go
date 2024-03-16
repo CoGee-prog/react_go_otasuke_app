@@ -95,7 +95,6 @@ func (ors *OpponentRecruitingService) DeleteOpponentRecruiting(db *gorm.DB, user
 	return nil
 }
 
-
 // 対戦相手募集のリストとページ情報を返す
 func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context) ([]*models.OpponentRecruiting, *database.Page) {
 	// リスト表示時の1ページあたりの要素数
@@ -104,6 +103,36 @@ func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context) 
 	// 対戦相手募集の構造体の配列
 	var opponentRecruitings []*models.OpponentRecruiting
 	db := c.MustGet("tx").(*gorm.DB)
+
+	// クエリパラメータからフィルタリング条件を取得
+	hasGroundQuery := c.Query("has_ground")
+	prefectureId, _ := strconv.Atoi(c.Query("prefecture_id"))
+	isActive := c.Query("is_active") == "true"
+	date := c.Query("date")
+	day := c.Query("day")
+
+	// グラウンドの有無でフィルタリング
+	if hasGroundQuery != "" {
+		hasGround, err := strconv.ParseBool(hasGroundQuery)
+		if err == nil {
+			db = db.Where("has_ground = ?", hasGround)
+		}
+	}
+	// 都道府県でフィルタリング
+	if prefectureId > 0 {
+		db = db.Where("prefecture_id = ?", prefectureId)
+	}
+	// 募集中かどうか
+	if isActive {
+		db = db.Where("is_active = ?", true)
+	}
+	// 日付でフィルタリング
+	if date != "" && day == "" {
+		db = db.Where("DATE(start_time) = ?", date)
+		// 曜日でフィルタリング
+	} else if day != "" && date == "" {
+		db = db.Where("DAYNAME(start_time) = ?", day)
+	}
 
 	// 合計要素数
 	var totalElements int64
