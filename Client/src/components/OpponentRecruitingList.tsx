@@ -21,6 +21,7 @@ import { formatTimeRange } from 'src/utils/formatDateTime'
 import PrimaryButton from './PrimaryButton'
 import { TeamRole } from 'src/types/teamRole'
 import { AuthContext } from 'src/contexts/AuthContext'
+import SearchForm from './OpponentRecruitingSearchForm'
 
 interface OpponentRecruitingListProps {
   initialRecruitings: OpponentRecruiting[]
@@ -36,12 +37,13 @@ export const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
   const [page, setPage] = useState<number>(initialPage.number)
   const [totalPages, setTotalPages] = useState<number>(initialPage.total_pages)
   const { user } = useContext(AuthContext)
+  const [queryParams, setQueryParams] = useState<string>('')
   const navigateHome = useNavigateHome()
 
   useEffect(() => {
     // ページが変更されるたびに、新しいデータを取得して状態を更新する
     handleChangePage(null, page)
-  }, [])
+  }, [page, queryParams])
 
   const handleChangePage = async (event: React.ChangeEvent<unknown> | null, value: number) => {
     const options: RequestInit = {
@@ -50,7 +52,10 @@ export const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
         'Content-Type': 'application/json',
       },
     }
-    fetchAPI<getOpponentRecruitingsApiResponse>(`/opponent_recruitings?page=${value}`, options)
+    fetchAPI<getOpponentRecruitingsApiResponse>(
+      `/opponent_recruitings?page=${value}&${queryParams}`,
+      options,
+    )
       .then((responseData) => {
         setOpponentRecruitings(responseData.result.opponent_recruitings)
         setPage(responseData.result.page.number)
@@ -90,6 +95,11 @@ export const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
           ) : (
             <p>チームの管理者か副管理者のみ対戦相手募集を作成できます</p>
           )}
+        </Grid>
+      </Grid>
+      <Grid container justifyContent='center'>
+        <Grid item xs={12} md={8} lg={6}>
+          <SearchForm onSearch={(params) => setQueryParams(params)} />
         </Grid>
       </Grid>
       {totalPages > 0 ? (
