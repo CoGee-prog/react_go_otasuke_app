@@ -8,7 +8,7 @@ const DangerButton: React.FC<ButtonProps> = (props) => {
       sx={{
         backgroundColor: '#e53935',
         color: '#fff',
-        padding: '10px 0',
+        padding: '10px 10px',
         fontSize: '16px',
         fontWeight: 'bold',
         boxShadow: '0 3px 5px rgba(0, 0, 0, 0.2)',
