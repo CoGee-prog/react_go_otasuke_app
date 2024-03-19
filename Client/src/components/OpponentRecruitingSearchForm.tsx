@@ -22,7 +22,7 @@ interface SearchFormProps {
 
 const daysOfWeek = ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日']
 
-const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
+const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
   const [hasGround, setHasGround] = useState<string>('')
   const [prefectureId, setPrefectureId] = useState<string>('')
   const [isActive, setIsActive] = useState<boolean>(false)
@@ -59,6 +59,8 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
             borderRadius: 2,
             maxWidth: 500,
             marginTop: 2,
+            marginLeft: 'auto',
+            marginRight: 'auto',
           }}
         >
           <form onSubmit={handleSubmit}>
@@ -131,13 +133,12 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
                   検索
                 </Button>
               </Grid>
-            </Grid> 
+            </Grid>
           </form>
         </Box>
       </Grid>
     </Grid>
   )
-
 }
 
-export default SearchForm
+export default OpponentRecruitingSearchForm

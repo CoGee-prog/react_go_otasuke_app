@@ -21,7 +21,7 @@ import { formatTimeRange } from 'src/utils/formatDateTime'
 import PrimaryButton from './PrimaryButton'
 import { TeamRole } from 'src/types/teamRole'
 import { AuthContext } from 'src/contexts/AuthContext'
-import SearchForm from './OpponentRecruitingSearchForm'
+import OpponentRecruitingSearchForm from './OpponentRecruitingSearchForm'
 
 interface OpponentRecruitingListProps {
   initialRecruitings: OpponentRecruiting[]
@@ -78,28 +78,25 @@ export const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
         justifyContent='center'
         style={{ marginTop: '16px' }}
       >
-        <Grid
-          container
-          xs={12}
-          sm={6}
-          md={4}
-          lg={3}
-          sx={{ maxWidth: 500, width: '100%', textAlign: 'center' }}
-        >
-          {user &&
-          (user.current_team_role === TeamRole.ADMIN ||
-            user.current_team_role === TeamRole.SUB_ADMIN) ? (
-            <Link href='/opponent_recruitings/create' passHref>
-              <PrimaryButton>対戦相手を募集する</PrimaryButton>
-            </Link>
-          ) : (
-            <p>チームの管理者か副管理者のみ対戦相手募集を作成できます</p>
-          )}
+        <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
+          <Box sx={{ maxWidth: 500, width: '100%', textAlign: 'center' }}>
+            {user &&
+            (user.current_team_role === TeamRole.ADMIN ||
+              user.current_team_role === TeamRole.SUB_ADMIN) ? (
+              <Link href='/opponent_recruitings/create' passHref>
+                <PrimaryButton>対戦相手を募集する</PrimaryButton>
+              </Link>
+            ) : (
+              <p>チームの管理者か副管理者のみ対戦相手募集を作成できます</p>
+            )}
+          </Box>
         </Grid>
       </Grid>
       <Grid container justifyContent='center'>
-        <Grid item xs={12} md={8} lg={6}>
-          <SearchForm onSearch={(params) => setQueryParams(params)} />
+        <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
+          <Box sx={{ maxWidth: 'md', width: '100%' }}>
+            <OpponentRecruitingSearchForm onSearch={(params) => setQueryParams(params)} />
+          </Box>
         </Grid>
       </Grid>
       {totalPages > 0 ? (
