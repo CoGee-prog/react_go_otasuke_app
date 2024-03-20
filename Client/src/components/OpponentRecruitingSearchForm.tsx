@@ -9,12 +9,11 @@ import {
   Grid,
   MenuItem,
   Box,
-  TextFieldProps,
+  Typography,
 } from '@mui/material'
 import { prefectures } from 'src/utils/prefectures'
-import DatePicker from '@mui/lab/DatePicker'
-import AdapterDateFns from '@mui/lab/AdapterDateFns'
-import LocalizationProvider from '@mui/lab/LocalizationProvider'
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers-pro'
+import CustomDatePicker from './CustomDatePicker'
 
 interface SearchFormProps {
   onSearch: (params: string) => void
@@ -66,9 +65,11 @@ const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) =
           <form onSubmit={handleSubmit}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
+                <Typography variant='subtitle1'>グラウンドの有無</Typography>
                 <RadioGroup row value={hasGround} onChange={handleHasGroundChange}>
                   <FormControlLabel value='true' control={<Radio />} label='有り' />
                   <FormControlLabel value='false' control={<Radio />} label='無し' />
+                  <FormControlLabel value='' control={<Radio />} label='選択なし' />{' '}
                 </RadioGroup>
               </Grid>
               <Grid item xs={12}>
@@ -102,16 +103,7 @@ const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) =
               </Grid>
               <Grid item xs={12}>
                 {dateOrDay === 'date' ? (
-                  <LocalizationProvider dateAdapter={AdapterDateFns}>
-                    <DatePicker
-                      label='日付'
-                      value={date}
-                      onChange={(newValue: Date | null) => {
-                        setDate(newValue)
-                      }}
-                      renderInput={(params: TextFieldProps) => <TextField {...params} fullWidth />}
-                    />
-                  </LocalizationProvider>
+                  <CustomDatePicker value={date} onChange={setDate} />
                 ) : (
                   <TextField
                     select
