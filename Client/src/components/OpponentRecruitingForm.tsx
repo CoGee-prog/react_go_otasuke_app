@@ -139,6 +139,8 @@ function OpponentRecruitingForm() {
         }
         await request('/opponent_recruitings', options)
 
+        // 対戦相手募集リストに移動
+        navigateOpponentRecruitingsIndex()
         // フォームをクリアする
         setFormData({
           title: '',
@@ -150,8 +152,6 @@ function OpponentRecruitingForm() {
           end_time: '',
           detail: '',
         })
-        // 対戦相手募集リストに移動
-        navigateOpponentRecruitingsIndex()
       } catch (error) {
         console.error('対戦相手募集の作成に失敗しました。', error)
       }

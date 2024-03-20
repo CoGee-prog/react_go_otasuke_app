@@ -149,7 +149,7 @@ export const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
               >
                 <CardActionArea>
                   <CardContent>
-                    <Box sx={{ maxWidth: '88%', wordWrap: 'break-word' }}>
+                    <Box sx={{ maxWidth: '85%', wordWrap: 'break-word' }}>
                       <Typography
                         variant='h6'
                         component='div'
