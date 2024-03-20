@@ -275,7 +275,11 @@ function OpponentRecruitingForm() {
                 ))}
               </Select>
               {errors.prefecture_id && (
-                <Typography variant='caption' color='error'>
+                <Typography
+                  variant='caption'
+                  color='error'
+                  sx={{ display: 'block', marginTop: '4px', marginLeft: '14px' }}
+                >
                   {errors.prefecture_id}
                 </Typography>
               )}
