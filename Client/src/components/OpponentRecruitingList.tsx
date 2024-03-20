@@ -76,7 +76,7 @@ export const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
         direction='column'
         alignItems='center'
         justifyContent='center'
-        style={{ marginTop: '16px' }}
+        style={{ marginTop: '3px' }}
       >
         <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
           <Box sx={{ maxWidth: 500, width: '100%', textAlign: 'center' }}>

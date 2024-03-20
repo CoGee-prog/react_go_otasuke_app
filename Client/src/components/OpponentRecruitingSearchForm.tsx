@@ -53,33 +53,30 @@ const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) =
       <Grid item xs={12} sm={10} md={8} lg={6}>
         <Box
           sx={{
-            backgroundColor: '#f0f0f0',
+            backgroundColor: '#f5f5f5',
             padding: 2,
             borderRadius: 2,
             maxWidth: 500,
             marginTop: 2,
             marginLeft: 'auto',
             marginRight: 'auto',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
           }}
         >
           <form onSubmit={handleSubmit}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <Typography variant='subtitle1'>グラウンドの有無</Typography>
-                <RadioGroup row value={hasGround} onChange={handleHasGroundChange}>
-                  <FormControlLabel value='true' control={<Radio />} label='有り' />
-                  <FormControlLabel value='false' control={<Radio />} label='無し' />
-                  <FormControlLabel value='' control={<Radio />} label='選択なし' />{' '}
-                </RadioGroup>
-              </Grid>
-              <Grid item xs={12}>
                 <TextField
                   select
-                  label='都道府県'
+                  label='エリア'
                   value={prefectureId}
                   onChange={(e) => setPrefectureId(e.target.value)}
                   fullWidth
+                  sx={{ '& .MuiInputBase-root': { color: '#333' } }}
                 >
+                  <MenuItem value=''>
+                    <em>選択してください</em>
+                  </MenuItem>
                   {prefectures.map((prefecture) => (
                     <MenuItem key={prefecture.id} value={prefecture.id}>
                       {prefecture.name}
@@ -88,18 +85,13 @@ const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) =
                 </TextField>
               </Grid>
               <Grid item xs={12}>
-                <FormControlLabel
-                  control={
-                    <Checkbox checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
-                  }
-                  label='募集中'
-                />
-              </Grid>
-              <Grid item xs={12}>
+                <Typography variant='subtitle1' sx={{ fontWeight: 'bold', color: '#333' }}>
+                  日程
+                </Typography>
                 <RadioGroup row value={dateOrDay} onChange={(e) => setDateOrDay(e.target.value)}>
+                  <FormControlLabel value='none' control={<Radio />} label='選択しない' />
                   <FormControlLabel value='date' control={<Radio />} label='日付' />
                   <FormControlLabel value='day' control={<Radio />} label='曜日' />
-                  <FormControlLabel value='none' control={<Radio />} label='選択しない' />
                 </RadioGroup>
               </Grid>
               <Grid item xs={12}>
@@ -112,6 +104,7 @@ const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) =
                     value={day}
                     onChange={(e) => setDay(e.target.value)}
                     fullWidth
+                    sx={{ '& .MuiInputBase-root': { color: '#333' } }}
                   >
                     {daysOfWeek.map((day, index) => (
                       <MenuItem key={index} value={day}>
@@ -122,7 +115,34 @@ const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) =
                 ) : null}
               </Grid>
               <Grid item xs={12}>
-                <Button type='submit' variant='contained' color='primary' fullWidth>
+                <Typography variant='subtitle1' sx={{ fontWeight: 'bold', color: '#333' }}>
+                  グラウンドの有無
+                </Typography>
+                <RadioGroup row value={hasGround} onChange={handleHasGroundChange}>
+                  <FormControlLabel value='' control={<Radio />} label='選択しない' />
+                  <FormControlLabel value='true' control={<Radio />} label='有' />
+                  <FormControlLabel value='false' control={<Radio />} label='無' />
+                </RadioGroup>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={
+                    <Checkbox checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
+                  }
+                  label='募集中に絞る'
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Button
+                  type='submit'
+                  variant='contained'
+                  sx={{
+                    backgroundColor: '#4CAF50',
+                    '&:hover': { backgroundColor: '#388E3C' },
+                    color: '#fff',
+                  }}
+                  fullWidth
+                >
                   検索
                 </Button>
               </Grid>
