@@ -73,9 +73,9 @@ func AuthMiddleware(firebaseApp *firebase.App) gin.HandlerFunc {
 		}
 		// ユーザーが見つからなければエラー
 		if user == nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, utils.NewResponse(
-				http.StatusBadRequest,
-				err.Error(),
+			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.NewResponse(
+				http.StatusUnauthorized,
+				"ユーザーが見つかりません",
 				nil,
 			))
 			return
