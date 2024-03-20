@@ -21,6 +21,7 @@ import PrimaryButton from './PrimaryButton'
 import { useRouter } from 'next/router'
 import { TeamRole } from 'src/types/teamRole'
 import { AuthContext } from 'src/contexts/AuthContext'
+import CustomDatePicker from './CustomDatePicker'
 
 type Errors = {
   [key in keyof CreateOpponentRecruitingsFormData]?: string
@@ -90,6 +91,20 @@ function OpponentRecruitingForm() {
       ...formData,
       [name]: value,
     })
+  }
+	
+	const handleDateChange = (newValue: Date | null) => {
+    if (newValue && !isNaN(newValue.getTime())) {
+      setFormData({
+        ...formData,
+        date: newValue.toISOString().split('T')[0],
+      })
+    } else {
+      setFormData({
+        ...formData,
+        date: '',
+      })
+    }
   }
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -165,10 +180,6 @@ function OpponentRecruitingForm() {
     if (formData.detail.length > 1000) errors.detail = '詳細は1000文字以内でなければなりません。'
     return errors
   }
-
-  const currentDate = new Date(new Date().getTime() + 9 * 60 * 60 * 1000)
-    .toISOString()
-    .split('T')[0]
 
   return (
     <Container maxWidth='sm'>
@@ -271,20 +282,9 @@ function OpponentRecruitingForm() {
             </FormControl>
           </Grid>
           <Grid item xs={12}>
-            <TextField
-              label='日付'
-              type='date'
-              name='date'
-              value={formData.date}
-              onChange={handleInputChange}
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-              inputProps={{
-                // 日付の最小値を現在の日付に設定
-                min: currentDate,
-              }}
+            <CustomDatePicker
+              value={formData.date ? new Date(formData.date) : null}
+              onChange={handleDateChange}
               error={Boolean(errors.date)}
               helperText={errors.date}
             />

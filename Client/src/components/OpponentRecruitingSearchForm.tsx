@@ -99,12 +99,13 @@ const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) =
                 <RadioGroup row value={dateOrDay} onChange={(e) => setDateOrDay(e.target.value)}>
                   <FormControlLabel value='date' control={<Radio />} label='日付' />
                   <FormControlLabel value='day' control={<Radio />} label='曜日' />
+                  <FormControlLabel value='none' control={<Radio />} label='選択しない' />
                 </RadioGroup>
               </Grid>
               <Grid item xs={12}>
                 {dateOrDay === 'date' ? (
                   <CustomDatePicker value={date} onChange={setDate} />
-                ) : (
+                ) : dateOrDay === 'day' ? (
                   <TextField
                     select
                     label='曜日'
@@ -118,7 +119,7 @@ const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) =
                       </MenuItem>
                     ))}
                   </TextField>
-                )}
+                ) : null}
               </Grid>
               <Grid item xs={12}>
                 <Button type='submit' variant='contained' color='primary' fullWidth>

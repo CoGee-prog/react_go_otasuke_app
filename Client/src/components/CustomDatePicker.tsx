@@ -12,9 +12,16 @@ import ja from 'date-fns/locale/ja'
 interface CustomDatePickerProps {
   value: Date | null
   onChange: (newValue: Date | null) => void
+  error?: boolean
+  helperText?: string
 }
 
-const CustomDatePicker: React.FC<CustomDatePickerProps> = ({ value, onChange }) => {
+const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
+  value,
+  onChange,
+  error,
+  helperText,
+}) => {
   const styles = {
     mobiledialogprops: {
       '.MuiDatePickerToolbar-title': {
@@ -69,22 +76,31 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({ value, onChange }) 
         okButtonLabel: '選択',
       }}
     >
-      <Box sx={{ m: 2 }}>
+      <Box
+        sx={{
+          borderRadius: 2,
+          marginLeft: 'auto',
+          marginRight: 'auto',
+        }}
+      >
         <DatePicker
           label='日付'
-          minDate={new Date()}
+          minDate={new Date(new Date().getTime() + 9 * 60 * 60 * 1000)}
           value={value}
           onChange={onChange}
-          inputFormat='yyyy年MM月dd日'
+          inputFormat='yyyy/MM/dd'
           mask='____年__月__日'
           toolbarFormat='yyyy年MM月dd日'
           renderInput={(params) => (
             <TextField
               {...params}
+              fullWidth
               inputProps={{
                 ...params.inputProps,
-                placeholder: '****年**月**日',
+                placeholder: '年/月/日',
               }}
+              error={error}
+              helperText={helperText}
             />
           )}
           DialogProps={{ sx: styles.mobiledialogprops }}
