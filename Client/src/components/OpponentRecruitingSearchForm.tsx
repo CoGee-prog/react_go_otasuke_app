@@ -129,7 +129,7 @@ const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) =
                   control={
                     <Checkbox checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
                   }
-                  label='募集中に絞る'
+                  label='募集中のみ'
                 />
               </Grid>
               <Grid item xs={12}>
@@ -140,6 +140,8 @@ const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) =
                     backgroundColor: '#4CAF50',
                     '&:hover': { backgroundColor: '#388E3C' },
                     color: '#fff',
+                    fontWeight: 'bold',
+										fontSize: '16px'
                   }}
                   fullWidth
                 >
