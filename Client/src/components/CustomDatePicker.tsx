@@ -43,6 +43,16 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
       },
     },
   }
+  const handleDateChange = (newValue: Date | null) => {
+    if (newValue) {
+      // 日本時刻に変換
+      const japanTime = new Date(newValue.getTime() + 9 * 60 * 60 * 1000)
+      onChange(japanTime)
+    } else {
+      onChange(newValue)
+    }
+  }
+
   const renderWeekEndPickerDay = (
     date: Date,
     _selectedDates: Array<Date | null>,
@@ -87,7 +97,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
           label='日付'
           minDate={new Date(new Date().getTime() + 9 * 60 * 60 * 1000)}
           value={value}
-          onChange={onChange}
+          onChange={handleDateChange}
           inputFormat='yyyy/MM/dd'
           mask='____年__月__日'
           toolbarFormat='yyyy年MM月dd日'
