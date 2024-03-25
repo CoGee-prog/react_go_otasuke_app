@@ -21,6 +21,7 @@ import PrimaryButton from './PrimaryButton'
 import { AuthContext } from 'src/contexts/AuthContext'
 import { User } from 'src/types/user'
 import { CreateTeamsApiResponse } from 'src/types/apiResponses'
+import { saveDataWithExpiry } from 'src/utils/localStrageHelper'
 
 type Errors = {
   [key in keyof CreateTeamsApiRequest]?: string
@@ -93,7 +94,7 @@ function TeamCreateForm() {
         current_team_role: data.current_team_role,
       }
       // ユーザー情報をローカルストレージにキャッシュ
-      localStorage.setItem('user', JSON.stringify(userData))
+      saveDataWithExpiry<User>('user', userData, 3600)
       setUser(userData)
       // 対戦相手募集リストに移動
       navigateOpponentRecruitingsIndex()

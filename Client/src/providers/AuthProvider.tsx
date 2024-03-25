@@ -7,6 +7,7 @@ import { loginApiResponse } from 'src/types/apiResponses'
 import { useNavigateHome } from 'src/hooks/useNavigateHome'
 import firebaseApp from 'config/firebaseApp'
 import { useFlashMessage } from 'src/contexts/FlashMessageContext'
+import { loadDataWithExpiry, saveDataWithExpiry } from 'src/utils/localStrageHelper'
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -19,10 +20,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const unregisterAuthObserver = onAuthStateChanged(firebaseAuth, (user) => {
       if (user && !isLoggedIn) {
-				// キャッシュしたデータがあればそれを返す
-        const cachedUser = localStorage.getItem('user')
+        // キャッシュしたデータがあればそれを返す
+        const cachedUser = loadDataWithExpiry<User>('user')
         if (cachedUser) {
-          login(JSON.parse(cachedUser))
+          login(cachedUser)
           return
         }
 
@@ -40,7 +41,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           fetchAPI<loginApiResponse>('/login', options)
             .then((responseData) => {
               // ユーザー情報をローカルストレージにキャッシュ
-              localStorage.setItem('user', JSON.stringify(responseData.result.user))
+              saveDataWithExpiry<User>('user', responseData.result.user, 3600)
               login(responseData.result.user)
               showFlashMessage({ message: responseData.message, type: 'success' })
             })
@@ -77,7 +78,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
     fetchAPI('/logout', options).then((responseData) => {
       showFlashMessage({ message: responseData.message, type: 'success' })
-			localStorage.removeItem('user')
+      localStorage.removeItem('user')
       setIsLoggedIn(false)
       setUser(null)
       // ホーム画面に戻す
