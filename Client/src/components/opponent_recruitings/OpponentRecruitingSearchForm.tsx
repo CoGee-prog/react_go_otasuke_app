@@ -13,7 +13,7 @@ import {
 } from '@mui/material'
 import { prefectures } from 'src/utils/prefectures'
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers-pro'
-import CustomDatePicker from './CustomDatePicker'
+import CustomDatePicker from '../commons/CustomDatePicker'
 
 interface SearchFormProps {
   onSearch: (params: string) => void
@@ -141,7 +141,7 @@ const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) =
                     '&:hover': { backgroundColor: '#388E3C' },
                     color: '#fff',
                     fontWeight: 'bold',
-										fontSize: '16px'
+                    fontSize: '16px',
                   }}
                   fullWidth
                 >

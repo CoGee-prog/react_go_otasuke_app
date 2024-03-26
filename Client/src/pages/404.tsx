@@ -1,5 +1,5 @@
 // pages/404.js
-import Header from 'src/components/Header'
+import Header from 'src/components/layouts/Header'
 import styles from '../styles/custom404.module.css'
 
 export default function Custom404() {

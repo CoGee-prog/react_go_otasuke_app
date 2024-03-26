@@ -1,5 +1,5 @@
 import React from 'react'
-import TeamCreateForm from 'src/components/TeamCreateForm'
+import TeamCreateForm from 'src/components/teams/TeamCreateForm'
 
 export const CreateTeamsPage = () => {
   return (

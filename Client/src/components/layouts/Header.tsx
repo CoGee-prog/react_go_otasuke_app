@@ -6,7 +6,7 @@ import React, { useContext } from 'react'
 import SignInBackdrop from './SignInBackdrop'
 import { AuthContext } from 'src/contexts/AuthContext'
 import AccountMenu from './AccountMenu'
-import LoadingScreen from './LoadingScreen'
+import LoadingScreen from '../commons/LoadingScreen'
 import { FlashMessageContext } from 'src/contexts/FlashMessageContext'
 import { useNavigateHome } from 'src/hooks/useNavigateHome'
 

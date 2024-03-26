@@ -1,5 +1,5 @@
 import React from 'react'
-import OpponentRecruitingForm from '../../components/OpponentRecruitingForm'
+import OpponentRecruitingForm from '../../components/opponent_recruitings/OpponentRecruitingForm'
 
 export const CreateOpponentRecruitingPage = () => {
   return (

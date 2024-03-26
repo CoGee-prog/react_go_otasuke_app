@@ -1,4 +1,4 @@
-import MainLayout from 'src/components/MainLayout'
+import MainLayout from 'src/components/layouts/MainLayout'
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'

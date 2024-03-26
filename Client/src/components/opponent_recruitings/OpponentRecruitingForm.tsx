@@ -17,11 +17,11 @@ import { useNavigateOpponentRecruitingsCreate } from 'src/hooks/useNavigateOppon
 import { useNavigateOpponentRecruitingsIndex } from 'src/hooks/useNavigateOpponentRecruitingsIndex'
 import { CreateOpponentRecruitingsApiRequest } from 'src/types/apiRequests'
 import { prefectures } from 'src/utils/prefectures'
-import PrimaryButton from './PrimaryButton'
+import PrimaryButton from '../commons/PrimaryButton'
 import { useRouter } from 'next/router'
 import { TeamRole } from 'src/types/teamRole'
 import { AuthContext } from 'src/contexts/AuthContext'
-import CustomDatePicker from './CustomDatePicker'
+import CustomDatePicker from '../commons/CustomDatePicker'
 
 type Errors = {
   [key in keyof CreateOpponentRecruitingsFormData]?: string
@@ -92,8 +92,8 @@ function OpponentRecruitingForm() {
       [name]: value,
     })
   }
-	
-	const handleDateChange = (newValue: Date | null) => {
+
+  const handleDateChange = (newValue: Date | null) => {
     if (newValue && !isNaN(newValue.getTime())) {
       setFormData({
         ...formData,
