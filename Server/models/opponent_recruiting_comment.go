@@ -1,0 +1,43 @@
+package models
+
+import (
+	"errors"
+
+	"gorm.io/gorm"
+)
+
+type OpponentRecruitingComment struct {
+	gorm.Model
+	OpponentRecruitingID uint               `json:"opponent_recruiting_id" gorm:"index"`
+	UserID               *uint              `json:"user_id" gorm:"index"`
+	User                 *User              `gorm:"foreignKey:UserID;constraint:OnDelete:SET NULL;"`
+	TeamID               *uint              `json:"team_id"`
+	Team                 *Team              `gorm:"foreignKey:TeamID;constraint:OnDelete:SET NULL;"`
+	Content              string             `json:"content"`
+	OpponentRecruiting   OpponentRecruiting `gorm:"foreignKey:OpponentRecruitingID;constraint:OnDelete:CASCADE;"`
+}
+
+// 対戦相手募集のコメントのバリデーション
+func (orc *OpponentRecruitingComment) Validate() error {
+	// コメント内容が空の場合はエラー
+	if orc.Content == "" {
+		return errors.New("コメントが空です")
+	}
+
+	// コメント内容の文字数制限
+	if len(orc.Content) > 1000 {
+		return errors.New("コメントは1000文字以内でなければなりません")
+	}
+
+	// OpponentRecruitingIDが0の場合はエラー
+	if orc.OpponentRecruitingID == 0 {
+		return errors.New("対戦相手募集IDは必須です")
+	}
+
+	// UserIDがnilまたは0の場合はエラー
+	if orc.UserID == nil || *orc.UserID == 0 {
+		return errors.New("ユーザーIDは必須です")
+	}
+
+	return nil
+}

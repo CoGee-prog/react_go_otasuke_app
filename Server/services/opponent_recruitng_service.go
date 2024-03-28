@@ -70,6 +70,16 @@ func (ors *OpponentRecruitingService) FindOpponentRecruiting(db *gorm.DB, id uin
 	return &opponentRecruiting, nil
 }
 
+// 対戦相手募集をコメントも含めて取得する(なければエラー)
+func (ors *OpponentRecruitingService) FindOpponentRecruitingWithComment(db *gorm.DB, id uint) (*models.OpponentRecruiting, error) {
+	var opponentRecruiting models.OpponentRecruiting
+	result := db.Preload("Comments").First(&opponentRecruiting, id)
+	if result.Error != nil {
+		return nil, errors.New("データ取得に失敗しました")
+	}
+	return &opponentRecruiting, nil
+}
+
 // 対戦相手募集を削除する
 func (ors *OpponentRecruitingService) DeleteOpponentRecruiting(db *gorm.DB, userId string, id uint) error {
 	// 削除する対戦相手募集を取得する

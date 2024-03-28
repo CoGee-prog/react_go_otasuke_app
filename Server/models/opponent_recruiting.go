@@ -10,16 +10,17 @@ import (
 
 type OpponentRecruiting struct {
 	gorm.Model
-	TeamId       uint         `json:"team_id" gorm:"type:int; not null"`
-	Team         Team         `gorm:"foreignKey:TeamId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Title        string       `json:"title" gorm:"type:varchar(255); not null"`
-	HasGround    bool         `json:"has_ground" gorm:"not null; default:false"`
-	GroundName   string       `json:"ground_name" gorm:"type:varchar(255)"`
-	PrefectureId PrefectureId `json:"prefecture_id" gorm:"type:int; not null"`
-	StartTime    time.Time    `json:"start_time" gorm:"not null"`
-	EndTime      time.Time    `json:"end_time" gorm:"not null"`
-	Detail       string       `json:"detail" gorm:"type:text"`
-	IsActive     bool         `json:"is_active" gorm:"not null; default:true"`
+	TeamId       uint                        `json:"team_id" gorm:"type:int; not null"`
+	Team         Team                        `gorm:"foreignKey:TeamId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Title        string                      `json:"title" gorm:"type:varchar(255); not null"`
+	HasGround    bool                        `json:"has_ground" gorm:"not null; default:false"`
+	GroundName   string                      `json:"ground_name" gorm:"type:varchar(255)"`
+	PrefectureId PrefectureId                `json:"prefecture_id" gorm:"type:int; not null"`
+	StartTime    time.Time                   `json:"start_time" gorm:"not null"`
+	EndTime      time.Time                   `json:"end_time" gorm:"not null"`
+	Detail       string                      `json:"detail" gorm:"type:text"`
+	IsActive     bool                        `json:"is_active" gorm:"not null; default:true"`
+	Comments     []OpponentRecruitingComment `json:"comments" gorm:"foreignKey:OpponentRecruitingID"`
 }
 
 // 対戦相手募集のバリデーション

@@ -29,8 +29,8 @@ func NewOpponentRecruitingController(opponentRecruitingService *services.Opponen
 }
 
 type OpponentRecruitingIndexResponse struct {
-	OpponentRecruitings []*views.OpponentRecruitingView `json:"opponent_recruitings"`
-	Page                *database.Page                  `json:"page"`
+	OpponentRecruitings []*views.OpponentRecruitingIndexView `json:"opponent_recruitings"`
+	Page                *database.Page                       `json:"page"`
 }
 
 func (oc *OpponentRecruitingController) Index() gin.HandlerFunc {
@@ -42,8 +42,37 @@ func (oc *OpponentRecruitingController) Index() gin.HandlerFunc {
 			http.StatusOK,
 			http.StatusText(http.StatusOK),
 			&OpponentRecruitingIndexResponse{
-				OpponentRecruitings: views.CreateOpponentRecruitingView(opponentRecruitings),
+				OpponentRecruitings: views.CreateOpponentRecruitingIndexView(opponentRecruitings),
 				Page:                page,
+			},
+		))
+	}
+}
+
+type OpponentRecruitingGetResponse struct {
+	OpponentRecruiting *models.OpponentRecruiting `json:"opponent_recruiting"`
+}
+
+func (oc *OpponentRecruitingController) Get() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id, _ := strconv.Atoi(c.Param("id"))
+		db := c.MustGet("tx").(*gorm.DB)
+		// データを取得する
+		opponentRecruiting, err := oc.OpponentRecruitingService.FindOpponentRecruitingWithComment(db, uint(id))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, utils.NewResponse(
+				http.StatusBadRequest,
+				err.Error(),
+				nil,
+			))
+			return
+		}
+
+		c.JSON(http.StatusOK, utils.NewResponse(
+			http.StatusOK,
+			"",
+			&OpponentRecruitingGetResponse{
+					OpponentRecruiting: opponentRecruiting,
 			},
 		))
 	}

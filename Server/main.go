@@ -20,10 +20,11 @@ func main() {
 	// データベースの設定
 	database.Init()
 	models := []interface{}{
-		&models.OpponentRecruiting{},
 		&models.Team{},
 		&models.User{},
 		&models.UserTeam{},
+		&models.OpponentRecruiting{},
+		&models.OpponentRecruitingComment{},
 	}
 	database.Migration(models...)
 	defer database.Close()

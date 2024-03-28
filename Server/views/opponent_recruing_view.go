@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type OpponentRecruitingView struct {
+type OpponentRecruitingIndexView struct {
 	ID         uint      `json:"id"`
 	Team       *TeamView `json:"team"`
 	Title      string    `json:"title"`
@@ -18,11 +18,11 @@ type OpponentRecruitingView struct {
 	IsActive   bool      `json:"is_active"`
 }
 
-// 対戦相手募集の構造体から必要なキーのみ返す
-func CreateOpponentRecruitingView(opponentRecruitings []*models.OpponentRecruiting) []*OpponentRecruitingView {
-	newArray := make([]*OpponentRecruitingView, len(opponentRecruitings))
+// 対戦相手募集の構造体から対戦相手募集一覧表示に必要なキーのみ返す
+func CreateOpponentRecruitingIndexView(opponentRecruitings []*models.OpponentRecruiting) []*OpponentRecruitingIndexView {
+	newArray := make([]*OpponentRecruitingIndexView, len(opponentRecruitings))
 	for i, v := range opponentRecruitings {
-		newArray[i] = &OpponentRecruitingView{
+		newArray[i] = &OpponentRecruitingIndexView{
 			ID:         v.ID,
 			Team:       CreateTeamView(v.Team),
 			Title:      v.Title,
@@ -38,3 +38,4 @@ func CreateOpponentRecruitingView(opponentRecruitings []*models.OpponentRecruiti
 
 	return newArray
 }
+
