@@ -31,7 +31,7 @@ func (ors *OpponentRecruitingService) CreateOpponentRecruiting(db *gorm.DB, user
 	// 対戦相手募集を作成する
 	result := db.Create(opponentRecruiting)
 	if result.Error != nil {
-		return result.Error
+		return errors.New("対戦相手募集の作成に失敗しました")
 	}
 	return nil
 }
@@ -182,4 +182,18 @@ func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context) 
 	db = db.Scopes(page.Paginate(), sort.Sort()).Preload("Team").Find(&opponentRecruitings)
 
 	return opponentRecruitings, page
+}
+
+// 対戦相手募集のコメントを作成する
+func (ors *OpponentRecruitingService) CreateOpponentRecruitingComment(db *gorm.DB, opponentRecruitingComment *models.OpponentRecruitingComment) error {
+	// チームの管理者または副管理者でなければエラー
+	if !ors.userTeamService.IsAdminOrSubAdmin(db, *opponentRecruitingComment.UserID, *opponentRecruitingComment.TeamID) {
+		return errors.New("管理者または副管理者のみ対戦相手募集にコメントできます")
+	}
+	// 対戦相手募集のコメントを作成する
+	result := db.Create(opponentRecruitingComment)
+	if result.Error != nil {
+		return errors.New("対戦相手募集のコメントに失敗しました")
+	}
+	return nil
 }

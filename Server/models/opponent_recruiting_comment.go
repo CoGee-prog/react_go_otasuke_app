@@ -9,12 +9,12 @@ import (
 type OpponentRecruitingComment struct {
 	gorm.Model
 	OpponentRecruitingID uint               `json:"opponent_recruiting_id" gorm:"index"`
-	UserID               *uint              `json:"user_id" gorm:"index"`
+	OpponentRecruiting   OpponentRecruiting `gorm:"foreignKey:OpponentRecruitingID;constraint:OnDelete:CASCADE;"`
+	UserID               *string            `json:"user_id" gorm:"index"`
 	User                 *User              `gorm:"foreignKey:UserID;constraint:OnDelete:SET NULL;"`
 	TeamID               *uint              `json:"team_id"`
 	Team                 *Team              `gorm:"foreignKey:TeamID;constraint:OnDelete:SET NULL;"`
 	Content              string             `json:"content"`
-	OpponentRecruiting   OpponentRecruiting `gorm:"foreignKey:OpponentRecruitingID;constraint:OnDelete:CASCADE;"`
 }
 
 // 対戦相手募集のコメントのバリデーション
@@ -34,8 +34,8 @@ func (orc *OpponentRecruitingComment) Validate() error {
 		return errors.New("対戦相手募集IDは必須です")
 	}
 
-	// UserIDがnilまたは0の場合はエラー
-	if orc.UserID == nil || *orc.UserID == 0 {
+	// UserIDがnilの場合はエラー
+	if orc.UserID == nil {
 		return errors.New("ユーザーIDは必須です")
 	}
 

@@ -26,6 +26,7 @@ func NewRouter() (*gin.Engine, error) {
 	userController := controllers.NewUserController(userService)
 	teamController := controllers.NewTeamController(userService, teamService)
 	opponentRecruitingController := controllers.NewOpponentRecruitingController(opponentRecruitingService, userService)
+	opponentRecruitingCommentController := controllers.NewOpponentRecruitingCommentController(opponentRecruitingService, userService)
 
 	// CORSを設定
 	setCors(router)
@@ -48,6 +49,7 @@ func NewRouter() (*gin.Engine, error) {
 		authRequired.POST("/opponent_recruitings", opponentRecruitingController.Create())
 		authRequired.PATCH("/opponent_recruitings/:id", opponentRecruitingController.Update())
 		authRequired.DELETE("/opponent_recruitings/:id", opponentRecruitingController.Delete())
+		authRequired.POST("/opponent_recruitings/:opponent_recruiting_id/comments", opponentRecruitingCommentController.Create())
 	}
 
 	return router, nil
