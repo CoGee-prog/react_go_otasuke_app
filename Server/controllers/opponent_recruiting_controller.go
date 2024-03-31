@@ -50,7 +50,7 @@ func (oc *OpponentRecruitingController) Index() gin.HandlerFunc {
 }
 
 type OpponentRecruitingGetResponse struct {
-	OpponentRecruiting *models.OpponentRecruiting `json:"opponent_recruiting"`
+	OpponentRecruiting *views.OpponentRecruitingGetView `json:"opponent_recruiting"`
 }
 
 func (oc *OpponentRecruitingController) Get() gin.HandlerFunc {
@@ -72,7 +72,7 @@ func (oc *OpponentRecruitingController) Get() gin.HandlerFunc {
 			http.StatusOK,
 			"",
 			&OpponentRecruitingGetResponse{
-					OpponentRecruiting: opponentRecruiting,
+					OpponentRecruiting: views.CreateOpponentRecruitingGetView(opponentRecruiting),
 			},
 		))
 	}

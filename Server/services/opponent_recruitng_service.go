@@ -73,7 +73,7 @@ func (ors *OpponentRecruitingService) FindOpponentRecruiting(db *gorm.DB, id uin
 // 対戦相手募集をコメントも含めて取得する(なければエラー)
 func (ors *OpponentRecruitingService) FindOpponentRecruitingWithComment(db *gorm.DB, id uint) (*models.OpponentRecruiting, error) {
 	var opponentRecruiting models.OpponentRecruiting
-	result := db.Preload("Comments").First(&opponentRecruiting, id)
+	result := db.Preload("Team").Preload("Comments.User").Preload("Comments.Team").First(&opponentRecruiting, id)
 	if result.Error != nil {
 		return nil, errors.New("データ取得に失敗しました")
 	}
