@@ -72,7 +72,7 @@ func (oc *OpponentRecruitingController) Get() gin.HandlerFunc {
 			http.StatusOK,
 			"",
 			&OpponentRecruitingGetResponse{
-					OpponentRecruiting: views.CreateOpponentRecruitingGetView(opponentRecruiting),
+				OpponentRecruiting: views.CreateOpponentRecruitingGetView(opponentRecruiting),
 			},
 		))
 	}
@@ -82,7 +82,7 @@ type OpponentRecruitingCreateRequest struct {
 	Title        string              `json:"title"`
 	HasGround    bool                `json:"has_ground"`
 	GroundName   string              `json:"ground_name"`
-	PrefectureId models.PrefectureId `json:"prefecture_id" binding:"required"`
+	PrefectureId models.PrefectureID `json:"prefecture_id" binding:"required"`
 	StartTime    time.Time           `json:"start_time" binding:"required"`
 	EndTime      time.Time           `json:"end_time" binding:"required"`
 	Detail       string              `json:"detail"`
@@ -119,8 +119,8 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 			Title:        request.Title,
 			HasGround:    request.HasGround,
 			GroundName:   request.GroundName,
-			TeamId:       *user.CurrentTeamId,
-			PrefectureId: request.PrefectureId,
+			TeamID:       *user.CurrentTeamId,
+			PrefectureID: request.PrefectureId,
 			StartTime:    request.StartTime,
 			EndTime:      request.EndTime,
 			Detail:       request.Detail,
@@ -155,7 +155,7 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 }
 
 type OpponentRecruitingUpdateRequest struct {
-	PrefectureId models.PrefectureId `json:"prefecture_id"`
+	PrefectureId models.PrefectureID `json:"prefecture_id"`
 	DateTime     time.Time           `json:"date_time"`
 	Detail       string              `json:"detail"`
 }
@@ -176,7 +176,7 @@ func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {
 
 		// 対戦相手募集の構造体を作成
 		opponentRecruiting := &models.OpponentRecruiting{
-			PrefectureId: request.PrefectureId,
+			PrefectureID: request.PrefectureId,
 			StartTime:    request.DateTime,
 			Detail:       request.Detail,
 		}

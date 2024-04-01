@@ -25,7 +25,7 @@ func NewOpponentRecruitingService(uts *UserTeamService) *OpponentRecruitingServi
 // 対戦相手募集を作成する
 func (ors *OpponentRecruitingService) CreateOpponentRecruiting(db *gorm.DB, userId string, opponentRecruiting *models.OpponentRecruiting) error {
 	// チームの管理者または副管理者でなければエラー
-	if !ors.userTeamService.IsAdminOrSubAdmin(db, userId, opponentRecruiting.TeamId) {
+	if !ors.userTeamService.IsAdminOrSubAdmin(db, userId, opponentRecruiting.TeamID) {
 		return errors.New("管理者または副管理者のみ対戦相手募集を作成できます")
 	}
 	// 対戦相手募集を作成する
@@ -44,7 +44,7 @@ func (ors *OpponentRecruitingService) UpdateOpponentRecruiting(db *gorm.DB, user
 		return err
 	}
 	// チームの管理者または副管理者でなければエラー
-	if !ors.userTeamService.IsAdminOrSubAdmin(db, userId, originalOpponentRecruiting.TeamId) {
+	if !ors.userTeamService.IsAdminOrSubAdmin(db, userId, originalOpponentRecruiting.TeamID) {
 		return errors.New("管理者または副管理者のみ対戦相手募集を変更できます")
 	}
 
@@ -88,7 +88,7 @@ func (ors *OpponentRecruitingService) DeleteOpponentRecruiting(db *gorm.DB, user
 		return err
 	}
 	// チームの管理者または副管理者でなければエラー
-	if !ors.userTeamService.IsAdminOrSubAdmin(db, userId, opponentRecruiting.TeamId) {
+	if !ors.userTeamService.IsAdminOrSubAdmin(db, userId, opponentRecruiting.TeamID) {
 		return errors.New("管理者または副管理者のみ対戦相手募集を削除できます")
 	}
 
@@ -196,4 +196,47 @@ func (ors *OpponentRecruitingService) CreateOpponentRecruitingComment(db *gorm.D
 		return errors.New("対戦相手募集のコメントに失敗しました")
 	}
 	return nil
+}
+
+// 対戦相手募集のコメントを変更する
+func (ors *OpponentRecruitingService) UpdateOpponentRecruitingComment(db *gorm.DB, userId string, opponentRecruitingComment *models.OpponentRecruitingComment) error {
+	// 変更する対戦相手募集のコメントを取得する
+	originalOpponentRecruitingComment, err := ors.findOpponentRecruitingComment(db, opponentRecruitingComment.ID)
+	if err != nil {
+		return err
+	}
+	// そのユーザーのコメントでなければエラー
+	if !ors.isUserOpponentRecruitingComment(*originalOpponentRecruitingComment, userId) {
+		return errors.New("自分のコメントしか変更できません")
+	}
+
+	// データを更新する
+	result := db.Model(&models.OpponentRecruitingComment{}).Updates(opponentRecruitingComment)
+	if result.Error != nil {
+		return result.Error
+	}
+	// 更新したデータが0件の場合はエラー
+	if result.RowsAffected == 0 {
+		return errors.New("更新対象のデータがありません")
+	}
+	return nil
+}
+
+// 対戦相手募集のコメントを取得する
+func (ors *OpponentRecruitingService) findOpponentRecruitingComment(db *gorm.DB, id uint) (*models.OpponentRecruitingComment, error) {
+	var opponentRecruitingComment models.OpponentRecruitingComment
+	result := db.First(&opponentRecruitingComment, id)
+	if result.Error != nil {
+		return nil, errors.New("データ取得に失敗しました")
+	}
+	return &opponentRecruitingComment, nil
+}
+
+// そのユーザーの対戦相手募集のコメントかどうか
+func (ors *OpponentRecruitingService) isUserOpponentRecruitingComment(opponentRecruitingComment models.OpponentRecruitingComment, userId string) bool {
+	// コメントがそのユーザーのものでなければfalse
+	if *opponentRecruitingComment.UserID != userId {
+		return false
+	}
+	return true
 }

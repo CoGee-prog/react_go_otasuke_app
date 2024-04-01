@@ -10,12 +10,12 @@ import (
 
 type OpponentRecruiting struct {
 	gorm.Model
-	TeamId       uint                         `json:"team_id" gorm:"type:int; not null"`
-	Team         Team                         `gorm:"foreignKey:TeamId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	TeamID       uint                         `json:"team_id" gorm:"type:int; not null"`
+	Team         Team                         `gorm:"foreignKey:TeamID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Title        string                       `json:"title" gorm:"type:varchar(255); not null"`
 	HasGround    bool                         `json:"has_ground" gorm:"not null; default:false"`
 	GroundName   string                       `json:"ground_name" gorm:"type:varchar(255)"`
-	PrefectureId PrefectureId                 `json:"prefecture_id" gorm:"type:int; not null"`
+	PrefectureID PrefectureID                 `json:"prefecture_id" gorm:"type:int; not null"`
 	StartTime    time.Time                    `json:"start_time" gorm:"not null"`
 	EndTime      time.Time                    `json:"end_time" gorm:"not null"`
 	Detail       string                       `json:"detail" gorm:"type:text"`
@@ -25,7 +25,7 @@ type OpponentRecruiting struct {
 
 // 対戦相手募集のバリデーション
 func (or *OpponentRecruiting) Validate() error {
-	if or.TeamId == 0 {
+	if or.TeamID == 0 {
 		return errors.New("チームが選択されていません")
 	}
 	if or.Title == "" {
@@ -34,7 +34,7 @@ func (or *OpponentRecruiting) Validate() error {
 	if utf8.RuneCountInString(or.Title) > 50 {
 		return errors.New("タイトルは50文字以下でなければなりません")
 	}
-	if or.PrefectureId < Hokkaido || or.PrefectureId > Okinawa {
+	if or.PrefectureID < Hokkaido || or.PrefectureID > Okinawa {
 		return errors.New("不正な都道府県です")
 	}
 	if or.StartTime.Before(time.Now()) {

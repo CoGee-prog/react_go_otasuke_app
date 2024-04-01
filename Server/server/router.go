@@ -50,6 +50,7 @@ func NewRouter() (*gin.Engine, error) {
 		authRequired.PATCH("/opponent_recruitings/:id", opponentRecruitingController.Update())
 		authRequired.DELETE("/opponent_recruitings/:id", opponentRecruitingController.Delete())
 		authRequired.POST("/opponent_recruitings/:opponent_recruiting_id/comments", opponentRecruitingCommentController.Create())
+		authRequired.PATCH("/opponent_recruitings/comments/:opponent_recruiting_comment_id", opponentRecruitingCommentController.Update())
 	}
 
 	return router, nil

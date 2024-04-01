@@ -34,10 +34,5 @@ func (orc *OpponentRecruitingComment) Validate() error {
 		return errors.New("対戦相手募集IDは必須です")
 	}
 
-	// UserIDがnilの場合はエラー
-	if orc.UserID == nil {
-		return errors.New("ユーザーIDは必須です")
-	}
-
 	return nil
 }

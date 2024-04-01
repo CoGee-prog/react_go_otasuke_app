@@ -1,10 +1,10 @@
 package models
 
-type PrefectureId int
+type PrefectureID int
 
 // 都道府県
 const (
-	Hokkaido PrefectureId = iota + 1
+	Hokkaido PrefectureID = iota + 1
 	Aomori
 	Iwate
 	Miyagi
@@ -53,7 +53,7 @@ const (
 	Okinawa
 )
 
-func (p PrefectureId) ToString() string {
+func (p PrefectureID) ToString() string {
 	switch p {
 	case Hokkaido:
 		return "北海道"

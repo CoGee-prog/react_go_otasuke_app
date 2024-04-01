@@ -30,7 +30,7 @@ func CreateOpponentRecruitingIndexView(opponentRecruitings []*models.OpponentRec
 			GroundName: v.GroundName,
 			StartTime:  v.StartTime,
 			EndTime:    v.EndTime,
-			Prefecture: v.PrefectureId.ToString(),
+			Prefecture: v.PrefectureID.ToString(),
 			Detail:     v.Detail,
 			IsActive:   v.IsActive,
 		}
@@ -63,7 +63,7 @@ func CreateOpponentRecruitingGetView(opponentRecruiting *models.OpponentRecruiti
 		GroundName: opponentRecruiting.GroundName,
 		StartTime:  opponentRecruiting.StartTime,
 		EndTime:    opponentRecruiting.EndTime,
-		Prefecture: opponentRecruiting.PrefectureId.ToString(),
+		Prefecture: opponentRecruiting.PrefectureID.ToString(),
 		Detail:     opponentRecruiting.Detail,
 		IsActive:   opponentRecruiting.IsActive,
 		Comments:   CreateOpponentRecruitingCommentView(opponentRecruiting.Comments),

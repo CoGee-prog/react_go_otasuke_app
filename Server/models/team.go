@@ -41,12 +41,12 @@ func (TL TeamLevelId) ToString() string {
 
 type Team struct {
 	gorm.Model
-	Name                string               `json:"name" gorm:"type:text;not null"`
-	PrefectureId        PrefectureId         `json:"prefecture_id" gorm:"type:int; not null"`
-	LevelId             TeamLevelId          `json:"level_id" gorm:"type:integer;not null"`
-	HomePageUrl         *string              `json:"home_page_url" gorm:"type:text"`
-	Other               *string              `json:"other" gorm:"type:text"`
-	Users               []*User              `gorm:"many2many:user_teams"`
+	Name                string                `json:"name" gorm:"type:text;not null"`
+	PrefectureId        PrefectureID          `json:"prefecture_id" gorm:"type:int; not null"`
+	LevelId             TeamLevelId           `json:"level_id" gorm:"type:integer;not null"`
+	HomePageUrl         *string               `json:"home_page_url" gorm:"type:text"`
+	Other               *string               `json:"other" gorm:"type:text"`
+	Users               []*User               `gorm:"many2many:user_teams"`
 	OpponentRecruitings []*OpponentRecruiting `json:"opponent_recruitings"`
 }
 

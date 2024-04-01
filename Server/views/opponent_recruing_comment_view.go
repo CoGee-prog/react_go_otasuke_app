@@ -19,11 +19,11 @@ func CreateOpponentRecruitingCommentView(opponentRecruitingComments []*models.Op
 	for i, v := range opponentRecruitingComments {
 		newArray[i] = &OpponentRecruitingCommentView{
 			OpponentRecruitingID: v.ID,
-			UserID: v.UserID,
-			UserName: &v.User.Name,
-			TeamID: v.TeamID,
-			TeamName: &v.Team.Name,
-			Content: v.Content,
+			UserID:               v.UserID,
+			UserName:             &v.User.Name,
+			TeamID:               v.TeamID,
+			TeamName:             &v.Team.Name,
+			Content:              v.Content,
 		}
 	}
 
