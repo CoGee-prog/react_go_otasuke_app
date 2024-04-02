@@ -66,7 +66,7 @@ func (oc *OpponentRecruitingCommentController) Create() gin.HandlerFunc {
 		}
 
 		// リクエストのバリデーションチェック
-		if err := opponentRecruitingComment.Validate(); err != nil {
+		if err := opponentRecruitingComment.ValidateCreate(); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				err.Error(),
@@ -114,11 +114,12 @@ func (oc *OpponentRecruitingCommentController) Update() gin.HandlerFunc {
 		// 対戦相手募集のコメントの構造体を作成
 		opponent_recruiting_comment_id, _ := strconv.Atoi(c.Param("opponent_recruiting_comment_id"))
 		opponentRecruitingComment := &models.OpponentRecruitingComment{
-			ID: uint(opponent_recruiting_comment_id),
 			Content: request.Content,
 		}
+		opponentRecruitingComment.ID = uint(opponent_recruiting_comment_id)
+
 		// リクエストのバリデーションチェック
-		if err := opponentRecruitingComment.Validate(); err != nil {
+		if err := opponentRecruitingComment.ValidateUpdate(); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				err.Error(),

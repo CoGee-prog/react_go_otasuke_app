@@ -17,8 +17,8 @@ type OpponentRecruitingComment struct {
 	Content              string             `json:"content"`
 }
 
-// 対戦相手募集のコメントのバリデーション
-func (orc *OpponentRecruitingComment) Validate() error {
+// 対戦相手募集のコメント作成時のバリデーション
+func (orc *OpponentRecruitingComment) ValidateCreate() error {
 	// コメント内容が空の場合はエラー
 	if orc.Content == "" {
 		return errors.New("コメントが空です")
@@ -32,6 +32,25 @@ func (orc *OpponentRecruitingComment) Validate() error {
 	// OpponentRecruitingIDが0の場合はエラー
 	if orc.OpponentRecruitingID == 0 {
 		return errors.New("対戦相手募集IDは必須です")
+	}
+
+	// UserIDがnilの場合はエラー
+	if orc.UserID == nil {
+		return errors.New("ユーザーIDは必須です")
+	}
+
+	return nil
+}
+
+func (orc *OpponentRecruitingComment) ValidateUpdate() error {
+	// コメント内容が空の場合はエラー
+	if orc.Content == "" {
+		return errors.New("コメントが空です")
+	}
+
+	// コメント内容の文字数制限
+	if len(orc.Content) > 1000 {
+		return errors.New("コメントは1000文字以内でなければなりません")
 	}
 
 	return nil

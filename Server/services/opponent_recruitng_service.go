@@ -211,9 +211,9 @@ func (ors *OpponentRecruitingService) UpdateOpponentRecruitingComment(db *gorm.D
 	}
 
 	// データを更新する
-	result := db.Model(&models.OpponentRecruitingComment{}).Updates(opponentRecruitingComment)
+	result := db.Model(&models.OpponentRecruitingComment{}).Where("id = ?", originalOpponentRecruitingComment.ID).Updates(opponentRecruitingComment)
 	if result.Error != nil {
-		return result.Error
+		return errors.New("更新に失敗しました")
 	}
 	// 更新したデータが0件の場合はエラー
 	if result.RowsAffected == 0 {
