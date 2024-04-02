@@ -56,7 +56,7 @@ func (oc *OpponentRecruitingCommentController) Create() gin.HandlerFunc {
 		}
 
 		// 対戦相手募集のIDを取得
-		opponentRecruitingId, _ := strconv.Atoi(c.Param("opponent_recruiting_id"))
+		opponentRecruitingId, _ := strconv.Atoi(c.Param("id"))
 		// 対戦相手募集のコメントの構造体を作成
 		opponentRecruitingComment := &models.OpponentRecruitingComment{
 			OpponentRecruitingID: uint(opponentRecruitingId),
@@ -87,7 +87,7 @@ func (oc *OpponentRecruitingCommentController) Create() gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,
-			"対戦相手募集のコメントを作成しました",
+			"コメントを作成しました",
 			nil,
 		))
 	}
@@ -112,11 +112,11 @@ func (oc *OpponentRecruitingCommentController) Update() gin.HandlerFunc {
 		}
 
 		// 対戦相手募集のコメントの構造体を作成
-		opponent_recruiting_comment_id, _ := strconv.Atoi(c.Param("opponent_recruiting_comment_id"))
+		id, _ := strconv.Atoi(c.Param("id"))
 		opponentRecruitingComment := &models.OpponentRecruitingComment{
 			Content: request.Content,
 		}
-		opponentRecruitingComment.ID = uint(opponent_recruiting_comment_id)
+		opponentRecruitingComment.ID = uint(id)
 
 		// リクエストのバリデーションチェック
 		if err := opponentRecruitingComment.ValidateUpdate(); err != nil {
@@ -142,7 +142,7 @@ func (oc *OpponentRecruitingCommentController) Update() gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,
-			"対戦相手募集を更新しました",
+			"コメントを更新しました",
 			nil,
 		))
 	}
@@ -154,7 +154,7 @@ func (oc *OpponentRecruitingCommentController) Delete() gin.HandlerFunc {
 		db := c.MustGet("tx").(*gorm.DB)
 		userId := c.MustGet("userId").(string)
 		// データを削除する
-		if err := oc.OpponentRecruitingService.DeleteOpponentRecruiting(db, userId, uint(id)); err != nil {
+		if err := oc.OpponentRecruitingService.DeleteOpponentRecruitingComment(db, userId, uint(id)); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				err.Error(),
@@ -165,7 +165,7 @@ func (oc *OpponentRecruitingCommentController) Delete() gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,
-			"対戦相手募集を削除しました",
+			"コメントを削除しました",
 			nil,
 		))
 	}

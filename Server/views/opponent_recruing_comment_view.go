@@ -12,6 +12,7 @@ type OpponentRecruitingCommentView struct {
 	TeamName             *string `json:"team_name"`
 	Content              string  `json:"content"`
 	Edited               bool    `json:"edited"`
+	Deleted              bool    `json:"deleted"`
 }
 
 // 対戦相手募集のコメント構造体から必要なキーのみ返す
@@ -25,8 +26,8 @@ func CreateOpponentRecruitingCommentView(opponentRecruitingComments []*models.Op
 			TeamID:               v.TeamID,
 			TeamName:             &v.Team.Name,
 			Content:              v.Content,
-			// 作成日時と更新日時が違う場合は編集済みのコメント
-			Edited: v.CreatedAt != v.UpdatedAt,
+			Edited:               v.CreatedAt != v.UpdatedAt, // 作成日時と更新日時が違う場合は編集済みのコメント
+			Deleted:              v.Deleted,
 		}
 	}
 

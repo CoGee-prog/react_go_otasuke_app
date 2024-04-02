@@ -15,6 +15,7 @@ type OpponentRecruitingComment struct {
 	TeamID               *uint              `json:"team_id"`
 	Team                 *Team              `gorm:"foreignKey:TeamID;constraint:OnDelete:SET NULL;"`
 	Content              string             `json:"content"`
+	Deleted              bool               `json:"deleted" gorm:"not null; default:false"`
 }
 
 // 対戦相手募集のコメント作成時のバリデーション

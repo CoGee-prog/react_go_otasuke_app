@@ -240,3 +240,42 @@ func (ors *OpponentRecruitingService) isUserOpponentRecruitingComment(opponentRe
 	}
 	return true
 }
+
+// 対戦相手募集のコメントを削除する
+func (ors *OpponentRecruitingService) DeleteOpponentRecruitingComment(db *gorm.DB, userId string, id uint) error {
+	// 削除する対戦相手募集を取得する
+	opponentRecruitingComment, err := ors.findOpponentRecruitingComment(db, id)
+	if err != nil {
+		return err
+	}
+
+	// そのユーザーのコメントでなければエラー
+	if !ors.isUserOpponentRecruitingComment(*opponentRecruitingComment, userId) {
+		return errors.New("自分のコメントしか削除できません")
+	}
+
+	// 対戦相手募集を削除済みにする
+	if err = ors.softDeleteOpponentRecruitingComment(db, opponentRecruitingComment); err != nil {
+		return err
+	}
+	return nil
+}
+
+// 対戦相手募集コメントの削除済みフラグを立てて内容を削除する
+func (ors *OpponentRecruitingService) softDeleteOpponentRecruitingComment(db *gorm.DB, opponentRecruitingComment *models.OpponentRecruitingComment) error {
+	// コメントの内容を更新し、削除済みフラグを立てる
+	deleteOpponentRecruitingComment := &models.OpponentRecruitingComment{
+		Content: "削除済みコメント",
+		Deleted: true,
+	}
+	// データを更新する
+	result := db.Model(&models.OpponentRecruitingComment{}).Where("id = ?", opponentRecruitingComment.ID).Updates(deleteOpponentRecruitingComment)
+	if result.Error != nil {
+		return errors.New("削除に失敗しました")
+	}
+	// 更新したデータが0件の場合はエラー
+	if result.RowsAffected == 0 {
+		return errors.New("削除対象のデータがありません")
+	}
+	return nil
+}
