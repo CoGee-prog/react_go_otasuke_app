@@ -28,7 +28,7 @@ interface OpponentRecruitingListProps {
   initialPage: Page
 }
 
-export const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
+const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
   initialRecruitings,
   initialPage,
 }) => {
@@ -255,3 +255,5 @@ export const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
     </Container>
   )
 }
+
+export default OpponentRecruitingList

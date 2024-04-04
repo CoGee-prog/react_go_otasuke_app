@@ -1,4 +1,4 @@
-import { OpponentRecruiting } from "./opponentRecruiting";
+import { OpponentRecruiting, OpponentRecruitingWithComments } from "./opponentRecruiting";
 import { Page } from "./page";
 import { User } from "./user";
 
@@ -12,8 +12,12 @@ export interface getOpponentRecruitingsApiResponse {
 }
 
 // チーム作成のレスポンス
-export interface CreateTeamsApiResponse {
+export interface createTeamsApiResponse {
   current_team_id: number
 	current_team_name: string
 	current_team_role: number
+}
+
+export interface getOpponentRecruitingApiResponse { 
+	opponent_recruiting: OpponentRecruitingWithComments
 }

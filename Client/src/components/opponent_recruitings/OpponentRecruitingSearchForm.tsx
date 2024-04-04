@@ -12,7 +12,6 @@ import {
   Typography,
 } from '@mui/material'
 import { prefectures } from 'src/utils/prefectures'
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers-pro'
 import CustomDatePicker from '../commons/CustomDatePicker'
 
 interface SearchFormProps {

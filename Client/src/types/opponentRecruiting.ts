@@ -12,3 +12,18 @@ export interface OpponentRecruiting {
 	detail: string;
 	is_active: boolean;
 }	
+
+export interface OpponentRecruitingWithComments extends OpponentRecruiting {
+	comments: OpponentRecruitingComment[]
+}
+
+export interface OpponentRecruitingComment {
+  opponent_recruiting_id: string;
+  user_id: string;
+  user_name: string;
+  team_id: string;
+  team_name: string;
+  content: string;
+  edited: boolean;
+  deleted: boolean; 
+}
