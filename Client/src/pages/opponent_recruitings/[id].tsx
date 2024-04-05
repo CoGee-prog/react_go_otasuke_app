@@ -1,10 +1,12 @@
-import { GetServerSideProps, GetServerSidePropsContext, NextPage } from "next"
-import OpponentRecruitingDetail from "src/components/opponent_recruitings/OpponentRecruitingDetail"
-import { getOpponentRecruitingApiResponse} from "src/types/apiResponses"
-import { OpponentRecruitingWithComments } from "src/types/opponentRecruiting"
-import fetchAPI from "src/utils/fetchApi"
+import { GetServerSideProps, GetServerSidePropsContext, NextPage } from 'next'
+import OpponentRecruitingDetail from 'src/components/opponent_recruitings/OpponentRecruitingDetail'
+import { GetOpponentRecruitingApiResponse } from 'src/types/apiResponses'
+import { OpponentRecruitingWithComments } from 'src/types/opponentRecruiting'
+import fetchAPI from 'src/utils/fetchApi'
 
-export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext,
+) => {
   const options: RequestInit = {
     method: 'GET',
     headers: {
@@ -12,7 +14,7 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     },
   }
   const { id } = context.params as { id: string }
-  const response = await fetchAPI<getOpponentRecruitingApiResponse>(
+  const response = await fetchAPI<GetOpponentRecruitingApiResponse>(
     `/opponent_recruitings/${id}`,
     options,
   )

@@ -20,7 +20,7 @@ import { useNavigateOpponentRecruitingsIndex } from 'src/hooks/useNavigateOppone
 import PrimaryButton from '../commons/PrimaryButton'
 import { AuthContext } from 'src/contexts/AuthContext'
 import { User } from 'src/types/user'
-import { createTeamsApiResponse } from 'src/types/apiResponses'
+import { CreateTeamsApiResponse } from 'src/types/apiResponses'
 import { saveDataWithExpiry } from 'src/utils/localStrageHelper'
 
 type Errors = {
@@ -36,7 +36,7 @@ function TeamCreateForm() {
     other: '',
   })
   const [errors, setErrors] = useState<Errors>({})
-  const { request, data } = useApiWithFlashMessage<createTeamsApiResponse>()
+  const { request, data } = useApiWithFlashMessage<CreateTeamsApiResponse>()
   const { user, setUser } = useContext(AuthContext)
   const navigateOpponentRecruitingsIndex = useNavigateOpponentRecruitingsIndex()
 

@@ -13,7 +13,7 @@ import {
 import Link from 'next/link'
 import { useState, useEffect, useContext } from 'react'
 import { Page } from 'src/types/page'
-import { getOpponentRecruitingsApiResponse } from 'src/types/apiResponses'
+import { GetOpponentRecruitingsApiResponse } from 'src/types/apiResponses'
 import { OpponentRecruiting } from 'src/types/opponentRecruiting'
 import fetchAPI from 'src/utils/fetchApi'
 import { useNavigateHome } from 'src/hooks/useNavigateHome'
@@ -52,7 +52,7 @@ const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
         'Content-Type': 'application/json',
       },
     }
-    fetchAPI<getOpponentRecruitingsApiResponse>(
+    fetchAPI<GetOpponentRecruitingsApiResponse>(
       `/opponent_recruitings?page=${value}&${queryParams}`,
       options,
     )

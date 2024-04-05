@@ -3,7 +3,7 @@ import { AuthContext } from 'src/contexts/AuthContext'
 import fetchAPI from 'src/utils/fetchApi'
 import { User } from 'src/types/user'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { loginApiResponse } from 'src/types/apiResponses'
+import { LoginApiResponse } from 'src/types/apiResponses'
 import { useNavigateHome } from 'src/hooks/useNavigateHome'
 import firebaseApp from 'config/firebaseApp'
 import { useFlashMessage } from 'src/contexts/FlashMessageContext'
@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             credentials: 'include',
           }
           // APIサーバーにトークンを送信
-          fetchAPI<loginApiResponse>('/login', options)
+          fetchAPI<LoginApiResponse>('/login', options)
             .then((responseData) => {
               // ユーザー情報をローカルストレージにキャッシュ
               saveDataWithExpiry<User>('user', responseData.result.user, 3600)
