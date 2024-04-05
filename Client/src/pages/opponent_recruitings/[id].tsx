@@ -21,14 +21,16 @@ export const getServerSideProps: GetServerSideProps = async (
   return {
     props: {
       initialRecruitings: response.result.opponent_recruiting,
+      id: id,
     },
   }
 }
 
 const OpponentRecruitingListPage: NextPage<{
   initialRecruitings: OpponentRecruitingWithComments
-}> = ({ initialRecruitings }) => {
-  return <OpponentRecruitingDetail opponentRecruitingWithComments={initialRecruitings} />
+  id: string
+}> = ({ initialRecruitings, id }) => {
+  return <OpponentRecruitingDetail opponentRecruitingWithComments={initialRecruitings} id={id} />
 }
 
 export default OpponentRecruitingListPage

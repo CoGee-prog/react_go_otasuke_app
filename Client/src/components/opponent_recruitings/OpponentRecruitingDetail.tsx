@@ -5,25 +5,43 @@ import { OpponentRecruitingWithComments } from 'src/types/opponentRecruiting'
 import PrimaryButton from '../commons/PrimaryButton'
 import { formatTimeRange } from 'src/utils/formatDateTime'
 import { AuthContext } from 'src/contexts/AuthContext'
+import useApiWithFlashMessage from 'src/hooks/useApiWithFlashMessage'
+import { useNavigateOpponentRecruitingDetail } from 'src/hooks/useNavigateOpponentRecruitingDetail'
 
 interface OpponentRecruitingDetailProps {
   opponentRecruitingWithComments: OpponentRecruitingWithComments
+	id: string
 }
 
 const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
   opponentRecruitingWithComments,
+	id
 }) => {
   const [newComment, setNewComment] = useState('')
   const [error, setError] = useState(false)
+	const { request} = useApiWithFlashMessage<[]>()
+	const navigateOpponentRecruitingDetail = useNavigateOpponentRecruitingDetail(id)
   const handlePostComment = async () => {
     if (newComment.length > 1000) {
       setError(true)
       return
     }
-    // APIリクエストを送る処理
-    // ...
+    try {
+      const options: RequestInit = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({content: newComment}),
+        credentials: 'include',
+      }
+      await request(`/opponent_recruitings/${id}/comments`, options)
+			setNewComment("")
+    } catch (error) {
+      console.error('コメントに失敗しました', error)
+    }
     // コメントを投稿後、ページを再読み込み
-    window.location.reload()
+    navigateOpponentRecruitingDetail()
   }
 
   const { user } = useContext(AuthContext)
@@ -98,29 +116,44 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
       </Typography>
       {opponentRecruitingWithComments.comments.map((comment, index) => (
         <Box key={index} sx={{ my: 2 }}>
-          <Card variant='outlined'>
-            <CardContent>
-              <Typography variant='body2' gutterBottom>
-                チーム: {comment.team_name}
-              </Typography>
-              <Typography variant='body2' gutterBottom>
-                投稿者: {comment.user_name}
-              </Typography>
-              <Typography
-                variant='body1'
+          <Card variant='outlined' sx={{ position: 'relative' }}>
+            {comment.team_id === opponentRecruitingWithComments.team.id && (
+              <Chip
+                label='募集チーム'
+                size='small'
                 sx={{
-                  mt: 1,
-                  fontStyle: comment.deleted ? 'italic' : 'normal',
-                  color: comment.deleted ? 'grey.600' : 'inherit',
+                  bgcolor: 'primary.main',
+                  color: 'white',
+                  position: 'absolute',
+                  top: 8,
+                  right: 8,
                 }}
-              >
-                {comment.content}
-                {!comment.deleted && comment.edited && (
-                  <Typography component='span' sx={{ color: 'grey.600', ml: 1 }}>
-                    (編集済み)
-                  </Typography>
-                )}
-              </Typography>
+              />
+            )}
+            <CardContent>
+              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Typography variant='body2' gutterBottom>
+                  チーム: {comment.team_name}
+                </Typography>
+                <Typography variant='body2' gutterBottom>
+                  投稿者: {comment.user_name}
+                </Typography>
+                <Typography
+                  variant='body1'
+                  sx={{
+                    mt: 1,
+                    fontStyle: comment.deleted ? 'italic' : 'normal',
+                    color: comment.deleted ? 'grey.600' : 'inherit',
+                  }}
+                >
+                  {comment.content}
+                  {!comment.deleted && comment.edited && (
+                    <Typography component='span' sx={{ color: 'grey.600', ml: 1 }}>
+                      (編集済み)
+                    </Typography>
+                  )}
+                </Typography>
+              </Box>
             </CardContent>
           </Card>
           {index < opponentRecruitingWithComments.comments.length - 1 && <Divider />}

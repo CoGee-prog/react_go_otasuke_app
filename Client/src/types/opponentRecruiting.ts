@@ -21,7 +21,7 @@ export interface OpponentRecruitingComment {
   opponent_recruiting_id: string;
   user_id: string;
   user_name: string;
-  team_id: string;
+  team_id: number;
   team_name: string;
   content: string;
   edited: boolean;
