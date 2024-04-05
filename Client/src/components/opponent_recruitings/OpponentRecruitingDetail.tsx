@@ -1,13 +1,5 @@
 import React, { useContext, useState } from 'react'
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  Divider,
-  TextField,
-} from '@mui/material'
+import { Box, Card, CardContent, Typography, Chip, Divider, TextField } from '@mui/material'
 import { format } from 'date-fns'
 import { OpponentRecruitingWithComments } from 'src/types/opponentRecruiting'
 import PrimaryButton from '../commons/PrimaryButton'
@@ -34,7 +26,7 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
     window.location.reload()
   }
 
-	const { user } = useContext(AuthContext)
+  const { user } = useContext(AuthContext)
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setNewComment(e.target.value)
@@ -84,9 +76,9 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
               ))}
           </Typography>
           {[
+            { label: '都道府県', value: opponentRecruitingWithComments.prefecture },
             { label: 'チーム', value: opponentRecruitingWithComments.team.name },
             { label: 'レベル', value: opponentRecruitingWithComments.team.level },
-            { label: '都道府県', value: opponentRecruitingWithComments.prefecture },
             { label: '詳細', value: opponentRecruitingWithComments.detail },
           ].map((item, index, arr) => (
             <Box key={index} sx={{ my: 1 }}>
@@ -108,19 +100,25 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
         <Box key={index} sx={{ my: 2 }}>
           <Card variant='outlined'>
             <CardContent>
-              <Typography variant='body1' gutterBottom>
+              <Typography variant='body2' gutterBottom>
                 チーム: {comment.team_name}
               </Typography>
-              <Typography variant='body1' gutterBottom>
+              <Typography variant='body2' gutterBottom>
                 投稿者: {comment.user_name}
               </Typography>
-              <Typography variant='body2'>
+              <Typography
+                variant='body1'
+                sx={{
+                  mt: 1,
+                  fontStyle: comment.deleted ? 'italic' : 'normal',
+                  color: comment.deleted ? 'grey.600' : 'inherit',
+                }}
+              >
                 {comment.content}
-                {comment.edited && (
-                  <Chip label='編集済み' size='small' sx={{ ml: 1, bgcolor: 'grey.300' }} />
-                )}
-                {comment.deleted && (
-                  <Chip label='削除済み' size='small' sx={{ ml: 1, bgcolor: 'grey.300' }} />
+                {!comment.deleted && comment.edited && (
+                  <Typography component='span' sx={{ color: 'grey.600', ml: 1 }}>
+                    (編集済み)
+                  </Typography>
                 )}
               </Typography>
             </CardContent>
@@ -128,34 +126,56 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
           {index < opponentRecruitingWithComments.comments.length - 1 && <Divider />}
         </Box>
       ))}
-      <Box sx={{ my: 2 }}>
-        <Typography variant='body1' gutterBottom>
-          チーム: {user?.current_team_name}
-        </Typography>
-        <Typography variant='body1' gutterBottom>
-          投稿者: {user?.name}
-        </Typography>
-        <TextField
-          label='コメント'
-          variant='outlined'
-          fullWidth
-          multiline
-          rows={4}
-          value={newComment}
-          onChange={handleCommentChange}
-          error={error}
-          helperText={
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              {error ? 'コメントは1000文字以内で入力してください。' : <span>&nbsp;</span>}
-              <span>{`${newComment.length}/1000`}</span>
-            </Box>
-          }
-          sx={{ my: 1 }}
-        />
-        <PrimaryButton variant='contained' color='primary' onClick={handlePostComment}>
-          コメントを投稿
-        </PrimaryButton>
-      </Box>
+      <Card variant='outlined'>
+        <CardContent>
+          <Box
+            sx={{
+              my: 2,
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <TextField
+              label='チーム'
+              variant='filled'
+              value={user?.current_team_name}
+              InputProps={{ readOnly: true }}
+              sx={{ width: '48%' }}
+              InputLabelProps={{ shrink: true }}
+            />
+            <TextField
+              label='投稿者'
+              variant='filled'
+              value={user?.name}
+              InputProps={{ readOnly: true }}
+              sx={{ width: '48%' }}
+              InputLabelProps={{ shrink: true }}
+            />
+          </Box>
+          <TextField
+            label='コメント'
+            variant='outlined'
+            fullWidth
+            multiline
+            rows={4}
+            value={newComment}
+            onChange={handleCommentChange}
+            error={error}
+            helperText={
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                {error ? 'コメントは1000文字以内で入力してください。' : <span>&nbsp;</span>}
+                <span>{`${newComment.length}/1000`}</span>
+              </Box>
+            }
+            sx={{ my: 1 }}
+          />
+          <PrimaryButton variant='contained' color='primary' onClick={handlePostComment}>
+            コメントを投稿
+          </PrimaryButton>
+        </CardContent>
+      </Card>
     </Box>
   )
 }
