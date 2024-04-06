@@ -30,7 +30,9 @@ const OpponentRecruitingListPage: NextPage<{
   initialRecruitings: OpponentRecruitingWithComments
   id: string
 }> = ({ initialRecruitings, id }) => {
-  return <OpponentRecruitingDetail opponentRecruitingWithComments={initialRecruitings} id={id} />
+  return (
+    <OpponentRecruitingDetail initialOpponentRecruitingWithComments={initialRecruitings} id={id} />
+  )
 }
 
 export default OpponentRecruitingListPage

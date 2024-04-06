@@ -1,26 +1,35 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Box, Card, CardContent, Typography, Chip, Divider, TextField } from '@mui/material'
-import { format } from 'date-fns'
 import { OpponentRecruitingWithComments } from 'src/types/opponentRecruiting'
 import PrimaryButton from '../commons/PrimaryButton'
 import { formatTimeRange } from 'src/utils/formatDateTime'
 import { AuthContext } from 'src/contexts/AuthContext'
 import useApiWithFlashMessage from 'src/hooks/useApiWithFlashMessage'
 import { useNavigateOpponentRecruitingDetail } from 'src/hooks/useNavigateOpponentRecruitingDetail'
+import { GetOpponentRecruitingApiResponse } from 'src/types/apiResponses'
 
 interface OpponentRecruitingDetailProps {
-  opponentRecruitingWithComments: OpponentRecruitingWithComments
-	id: string
+  initialOpponentRecruitingWithComments: OpponentRecruitingWithComments
+  id: string
 }
 
 const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
-  opponentRecruitingWithComments,
-	id
+  initialOpponentRecruitingWithComments,
+  id,
 }) => {
   const [newComment, setNewComment] = useState('')
   const [error, setError] = useState(false)
-	const { request} = useApiWithFlashMessage<[]>()
-	const navigateOpponentRecruitingDetail = useNavigateOpponentRecruitingDetail(id)
+  const { request, data } = useApiWithFlashMessage<GetOpponentRecruitingApiResponse>()
+  const [opponentRecruitingWithComments, setOpponentRecruitingWithComments] = useState(
+    initialOpponentRecruitingWithComments,
+  )
+  useEffect(() => {
+    if (data) {
+      // APIからのレスポンスで状態を更新
+      setOpponentRecruitingWithComments(data.opponent_recruiting)
+    }
+  }, [data])
+	
   const handlePostComment = async () => {
     if (newComment.length > 1000) {
       setError(true)
@@ -32,16 +41,14 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({content: newComment}),
+        body: JSON.stringify({ content: newComment }),
         credentials: 'include',
       }
       await request(`/opponent_recruitings/${id}/comments`, options)
-			setNewComment("")
+      setNewComment('')
     } catch (error) {
       console.error('コメントに失敗しました', error)
     }
-    // コメントを投稿後、ページを再読み込み
-    navigateOpponentRecruitingDetail()
   }
 
   const { user } = useContext(AuthContext)
