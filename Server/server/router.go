@@ -47,11 +47,11 @@ func NewRouter() (*gin.Engine, error) {
 		authRequired.POST("/logout", userController.Logout())
 		authRequired.POST("/teams", teamController.Create())
 		authRequired.POST("/opponent_recruitings", opponentRecruitingController.Create())
-		authRequired.PATCH("/opponent_recruitings/:id", opponentRecruitingController.Update())
-		authRequired.DELETE("/opponent_recruitings/:id", opponentRecruitingController.Delete())
-		authRequired.POST("/opponent_recruitings/:id/comments", opponentRecruitingCommentController.Create())
-		authRequired.PATCH("/opponent_recruitings/comments/:id", opponentRecruitingCommentController.Update())
-		authRequired.DELETE("/opponent_recruitings/comments/:id", opponentRecruitingCommentController.Delete())
+		authRequired.PATCH("/opponent_recruitings/:opponent_recruiting_id", opponentRecruitingController.Update())
+		authRequired.DELETE("/opponent_recruitings/:opponent_recruiting_id", opponentRecruitingController.Delete())
+		authRequired.POST("/opponent_recruitings/:opponent_recruiting_id/comments", opponentRecruitingCommentController.Create())
+		authRequired.PATCH("/opponent_recruitings/:opponent_recruiting_id/comments/:comment_id", opponentRecruitingCommentController.Update())
+		authRequired.DELETE("/opponent_recruitings/:opponent_recruiting_id/comments/:comment_id", opponentRecruitingCommentController.Delete())
 	}
 
 	return router, nil

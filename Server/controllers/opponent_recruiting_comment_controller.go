@@ -6,6 +6,7 @@ import (
 	"react_go_otasuke_app/models"
 	"react_go_otasuke_app/services"
 	"react_go_otasuke_app/utils"
+	"react_go_otasuke_app/views"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -56,7 +57,7 @@ func (oc *OpponentRecruitingCommentController) Create() gin.HandlerFunc {
 		}
 
 		// 対戦相手募集のIDを取得
-		opponentRecruitingId, _ := strconv.Atoi(c.Param("id"))
+		opponentRecruitingId, _ := strconv.Atoi(c.Param("opponent_recruiting_id"))
 		// 対戦相手募集のコメントの構造体を作成
 		opponentRecruitingComment := &models.OpponentRecruitingComment{
 			OpponentRecruitingID: uint(opponentRecruitingId),
@@ -85,10 +86,23 @@ func (oc *OpponentRecruitingCommentController) Create() gin.HandlerFunc {
 			return
 		}
 
+		// 対戦相手募集のデータを取得する
+		opponentRecruiting, err := oc.OpponentRecruitingService.FindOpponentRecruitingWithComment(db, uint(opponentRecruitingId))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, utils.NewResponse(
+				http.StatusBadRequest,
+				err.Error(),
+				nil,
+			))
+			return
+		}
+
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,
 			"コメントを作成しました",
-			nil,
+			&OpponentRecruitingGetResponse{
+				OpponentRecruiting: views.CreateOpponentRecruitingGetView(opponentRecruiting),
+			},
 		))
 	}
 }
@@ -112,11 +126,11 @@ func (oc *OpponentRecruitingCommentController) Update() gin.HandlerFunc {
 		}
 
 		// 対戦相手募集のコメントの構造体を作成
-		id, _ := strconv.Atoi(c.Param("id"))
+		commentId, _ := strconv.Atoi(c.Param("comment_id"))
 		opponentRecruitingComment := &models.OpponentRecruitingComment{
 			Content: request.Content,
 		}
-		opponentRecruitingComment.ID = uint(id)
+		opponentRecruitingComment.ID = uint(commentId)
 
 		// リクエストのバリデーションチェック
 		if err := opponentRecruitingComment.ValidateUpdate(); err != nil {
@@ -140,21 +154,49 @@ func (oc *OpponentRecruitingCommentController) Update() gin.HandlerFunc {
 			return
 		}
 
+		// 対戦相手募集のIDを取得
+		opponentRecruitingId, _ := strconv.Atoi(c.Param("opponent_recruiting_id"))
+		// データを取得する
+		opponentRecruiting, err := oc.OpponentRecruitingService.FindOpponentRecruitingWithComment(db, uint(opponentRecruitingId))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, utils.NewResponse(
+				http.StatusBadRequest,
+				err.Error(),
+				nil,
+			))
+			return
+		}
+
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,
 			"コメントを更新しました",
-			nil,
+			&OpponentRecruitingGetResponse{
+				OpponentRecruiting: views.CreateOpponentRecruitingGetView(opponentRecruiting),
+			},
 		))
 	}
 }
 
 func (oc *OpponentRecruitingCommentController) Delete() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		id, _ := strconv.Atoi(c.Param("id"))
+		commentId, _ := strconv.Atoi(c.Param("comment_id"))
 		db := c.MustGet("tx").(*gorm.DB)
 		userId := c.MustGet("userId").(string)
 		// データを削除する
-		if err := oc.OpponentRecruitingService.DeleteOpponentRecruitingComment(db, userId, uint(id)); err != nil {
+		if err := oc.OpponentRecruitingService.DeleteOpponentRecruitingComment(db, userId, uint(commentId)); err != nil {
+			c.JSON(http.StatusBadRequest, utils.NewResponse(
+				http.StatusBadRequest,
+				err.Error(),
+				nil,
+			))
+			return
+		}
+
+		// 対戦相手募集のIDを取得
+		opponentRecruitingId, _ := strconv.Atoi(c.Param("opponent_recruiting_id"))
+		// データを取得する
+		opponentRecruiting, err := oc.OpponentRecruitingService.FindOpponentRecruitingWithComment(db, uint(opponentRecruitingId))
+		if err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				err.Error(),
@@ -166,7 +208,9 @@ func (oc *OpponentRecruitingCommentController) Delete() gin.HandlerFunc {
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,
 			"コメントを削除しました",
-			nil,
+			&OpponentRecruitingGetResponse{
+				OpponentRecruiting: views.CreateOpponentRecruitingGetView(opponentRecruiting),
+			},
 		))
 	}
 }

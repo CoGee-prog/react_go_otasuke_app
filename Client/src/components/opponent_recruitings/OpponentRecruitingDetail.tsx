@@ -56,7 +56,7 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
   }
 
   return (
-    <Box sx={{ maxWidth: 600, mx: 'auto', my: 4 }}>
+    <Box sx={{ maxWidth: 600, mx: 'auto', my: 4, px: 2 }}>
       <Typography variant='h4' component='h2' gutterBottom marginTop={2}>
         対戦相手募集詳細
       </Typography>
