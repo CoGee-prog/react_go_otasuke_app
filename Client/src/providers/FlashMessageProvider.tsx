@@ -6,7 +6,7 @@ export const FlashMessageProvider: React.FC = ({ children }) => {
 
 	  const showFlashMessage = (flashMessage: FlashMessage) => {
       setFlashMessage(flashMessage)
-      // 数秒後にメッセージを消去
+      // 5秒後にメッセージを消去
       const timer = setTimeout(() => setFlashMessage({ message: '', type: 'success' }), 5000)
 
       // クリーンアップ関数でタイマーをクリア

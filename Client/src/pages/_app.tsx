@@ -5,6 +5,7 @@ import Head from 'next/head'
 import { AuthProvider } from 'src/providers/AuthProvider'
 import { FlashMessageProvider } from 'src/providers/FlashMessageProvider'
 import { useRouter } from 'next/router'
+import FlashMessage from 'src/components/commons/FlashMessage'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -25,6 +26,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <Component {...pageProps} />
       ) : (
         <FlashMessageProvider>
+          <FlashMessage />
           <AuthProvider>
             <MainLayout>
               <Component {...pageProps} />
