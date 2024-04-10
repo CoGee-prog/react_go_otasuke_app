@@ -5,6 +5,7 @@ import (
 )
 
 type OpponentRecruitingCommentView struct {
+	ID                   uint    `json:"id"`
 	OpponentRecruitingID uint    `json:"opponent_recruiting_id"`
 	UserID               *string `json:"user_id"`
 	UserName             *string `json:"user_name"`
@@ -20,7 +21,8 @@ func CreateOpponentRecruitingCommentView(opponentRecruitingComments []*models.Op
 	newArray := make([]*OpponentRecruitingCommentView, len(opponentRecruitingComments))
 	for i, v := range opponentRecruitingComments {
 		newArray[i] = &OpponentRecruitingCommentView{
-			OpponentRecruitingID: v.ID,
+			ID:                   v.ID,
+			OpponentRecruitingID: v.OpponentRecruitingID,
 			UserID:               v.UserID,
 			UserName:             &v.User.Name,
 			TeamID:               v.TeamID,
