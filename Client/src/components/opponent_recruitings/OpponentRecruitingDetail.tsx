@@ -5,8 +5,8 @@ import PrimaryButton from '../commons/PrimaryButton'
 import { formatTimeRange } from 'src/utils/formatDateTime'
 import { AuthContext } from 'src/contexts/AuthContext'
 import useApiWithFlashMessage from 'src/hooks/useApiWithFlashMessage'
-import { useNavigateOpponentRecruitingDetail } from 'src/hooks/useNavigateOpponentRecruitingDetail'
 import { GetOpponentRecruitingApiResponse } from 'src/types/apiResponses'
+import OpponentRecruitingComment from './OpponentRecruitingComment'
 
 interface OpponentRecruitingDetailProps {
   initialOpponentRecruitingWithComments: OpponentRecruitingWithComments
@@ -23,13 +23,24 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
   const [opponentRecruitingWithComments, setOpponentRecruitingWithComments] = useState(
     initialOpponentRecruitingWithComments,
   )
+  const [editingCommentId, setEditingCommentId] = useState<number | null>(null)
+  // コメントの更新と削除の処理を追加
+  const handleUpdateComment = async (commentId: number, updatedContent: string) => {
+    setEditingCommentId(null)
+    // コメント更新APIを叩く
+  }
+
+  const handleDeleteComment = async (commentId: number) => {
+    // コメント削除APIを叩く
+  }
+
   useEffect(() => {
     if (data) {
       // APIからのレスポンスで状態を更新
       setOpponentRecruitingWithComments(data.opponent_recruiting)
     }
   }, [data])
-	
+
   const handlePostComment = async () => {
     if (newComment.length > 1000) {
       setError(true)
@@ -123,46 +134,14 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
       </Typography>
       {opponentRecruitingWithComments.comments.map((comment, index) => (
         <Box key={index} sx={{ my: 2 }}>
-          <Card variant='outlined' sx={{ position: 'relative' }}>
-            {comment.team_id === opponentRecruitingWithComments.team.id && (
-              <Chip
-                label='募集チーム'
-                size='small'
-                sx={{
-                  bgcolor: 'primary.main',
-                  color: 'white',
-                  position: 'absolute',
-                  top: 8,
-                  right: 8,
-                }}
-              />
-            )}
-            <CardContent>
-              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                <Typography variant='body2' gutterBottom>
-                  チーム: {comment.team_name}
-                </Typography>
-                <Typography variant='body2' gutterBottom>
-                  投稿者: {comment.user_name}
-                </Typography>
-                <Typography
-                  variant='body1'
-                  sx={{
-                    mt: 1,
-                    fontStyle: comment.deleted ? 'italic' : 'normal',
-                    color: comment.deleted ? 'grey.600' : 'inherit',
-                  }}
-                >
-                  {comment.content}
-                  {!comment.deleted && comment.edited && (
-                    <Typography component='span' sx={{ color: 'grey.600', ml: 1 }}>
-                      (編集済み)
-                    </Typography>
-                  )}
-                </Typography>
-              </Box>
-            </CardContent>
-          </Card>
+          <OpponentRecruitingComment
+            comment={comment}
+            opponentRecruitingTeamId={opponentRecruitingWithComments.team.id}
+            isEditing={editingCommentId === comment.id}
+            onEdit={() => setEditingCommentId(comment.id)}
+            onUpdate={handleUpdateComment}
+            onDelete={handleDeleteComment}
+          />
           {index < opponentRecruitingWithComments.comments.length - 1 && <Divider />}
         </Box>
       ))}

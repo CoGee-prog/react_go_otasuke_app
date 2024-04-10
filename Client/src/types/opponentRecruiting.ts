@@ -18,7 +18,8 @@ export interface OpponentRecruitingWithComments extends OpponentRecruiting {
 }
 
 export interface OpponentRecruitingComment {
-  opponent_recruiting_id: string;
+	id: number
+  opponent_recruiting_id: number;
   user_id: string;
   user_name: string;
   team_id: number;
