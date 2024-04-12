@@ -63,6 +63,8 @@ const OpponentRecruitingComment: React.FC<OpponentRecruitingCommentProps> = ({
   const handleUpdate = () => {
     if (!error) {
       onUpdate(comment.id, editedContent)
+			comment.content = editedContent
+			setEditedContent('')
     }
   }
 
