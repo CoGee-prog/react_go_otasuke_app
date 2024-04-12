@@ -9,11 +9,15 @@ import {
   MenuItem,
   TextField,
   Box,
+	ListItemIcon,
+	ListItemText,
 } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import { OpponentRecruitingComment } from 'src/types/opponentRecruiting'
 import { AuthContext } from 'src/contexts/AuthContext'
 import PrimaryButton from '../commons/PrimaryButton'
+import EditIcon from '@mui/icons-material/Edit'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 interface OpponentRecruitingCommentProps {
   comment: OpponentRecruitingComment
@@ -130,8 +134,20 @@ const OpponentRecruitingComment: React.FC<OpponentRecruitingCommentProps> = ({
             open={Boolean(anchorEl)}
             onClose={handleCloseMenu}
           >
-            {!isEditing && <MenuItem onClick={handleEdit}>編集</MenuItem>}
-            <MenuItem onClick={handleDelete}>削除</MenuItem>
+            {!isEditing && (
+              <MenuItem onClick={handleEdit}>
+                <ListItemIcon>
+                  <EditIcon fontSize='small' />
+                </ListItemIcon>
+                <ListItemText>編集</ListItemText>
+              </MenuItem>
+            )}
+            <MenuItem onClick={handleDelete}>
+              <ListItemIcon>
+                <DeleteIcon fontSize='small' />
+              </ListItemIcon>
+              <ListItemText>削除</ListItemText>
+            </MenuItem>
           </Menu>
         </>
       )}

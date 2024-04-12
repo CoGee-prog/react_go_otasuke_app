@@ -24,14 +24,37 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
     initialOpponentRecruitingWithComments,
   )
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null)
-  // コメントの更新と削除の処理を追加
-  const handleUpdateComment = async (commentId: number, updatedContent: string) => {
+  const handleUpdateComment = async (commentId: number, updatedComment: string) => {
     setEditingCommentId(null)
-    // コメント更新APIを叩く
+    try {
+      const options: RequestInit = {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content: updatedComment }),
+        credentials: 'include',
+      }
+      await request(`/opponent_recruitings/${id}/comments/${commentId}`, options)
+    } catch (error) {
+      console.error('コメント更新に失敗しました', error)
+    }
   }
 
   const handleDeleteComment = async (commentId: number) => {
-    // コメント削除APIを叩く
+    setEditingCommentId(null)
+    try {
+      const options: RequestInit = {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      }
+      await request(`/opponent_recruitings/${id}/comments/${commentId}`, options)
+    } catch (error) {
+      console.error('コメント削除に失敗しました', error)
+    }
   }
 
   useEffect(() => {
