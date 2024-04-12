@@ -111,12 +111,23 @@ const OpponentRecruitingComment: React.FC<OpponentRecruitingCommentProps> = ({
             </PrimaryButton>
           </Box>
         ) : (
-          <Typography variant='body1' sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+          <Typography
+            variant='body1'
+            sx={{
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+              fontStyle: comment.deleted ? 'italic' : 'normal',
+              color: comment.deleted ? 'grey.600' : 'inherit',
+            }}
+          >
             {comment.content}
+            {comment.edited && !comment.deleted && (
+              <span style={{ color: 'grey', fontSize: '0.875em' }}> &lt;編集済み&gt; </span>
+            )}
           </Typography>
         )}
       </CardContent>
-      {user && user.current_team_id === comment.team_id && (
+      {!comment.deleted && user && user.current_team_id === comment.team_id && (
         <>
           <IconButton
             aria-label='more'
