@@ -129,7 +129,7 @@ const OpponentRecruitingComment: React.FC<OpponentRecruitingCommentProps> = ({
           </Typography>
         )}
       </CardContent>
-      {!comment.deleted && user && user.current_team_id === comment.team_id && (
+      {!comment.deleted && user && user.id === comment.user_id && (
         <>
           <IconButton
             aria-label='more'
