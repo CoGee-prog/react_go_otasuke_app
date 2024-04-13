@@ -5,6 +5,7 @@ import (
 )
 
 type UserView struct {
+	Id              string           `json:"id"`
 	Name            string           `json:"name"`
 	CurrentTeamId   *uint            `json:"current_team_id"`
 	CurrentTeamName string           `json:"current_team_name"`
@@ -14,6 +15,7 @@ type UserView struct {
 // Userの構造体から必要なキーのみ返す
 func CreateUserView(user *models.User) *UserView {
 	userView := &UserView{
+		Id:            user.ID,
 		Name:          user.Name,
 		CurrentTeamId: user.CurrentTeamId,
 	}
@@ -25,5 +27,4 @@ func CreateUserView(user *models.User) *UserView {
 	}
 
 	return userView
-
 }
