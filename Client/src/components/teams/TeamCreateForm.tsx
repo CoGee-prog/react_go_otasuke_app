@@ -88,6 +88,7 @@ function TeamCreateForm() {
         other: '',
       })
       const userData: User = {
+        id: user?.id,
         name: user?.name,
         current_team_id: data.current_team_id,
         current_team_name: data.current_team_name,

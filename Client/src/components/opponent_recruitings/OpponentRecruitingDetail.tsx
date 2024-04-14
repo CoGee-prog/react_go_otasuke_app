@@ -1,5 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Box, Card, CardContent, Typography, Chip, Divider, TextField } from '@mui/material'
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Chip,
+  Divider,
+  TextField,
+  Link,
+  Grid,
+} from '@mui/material'
 import { OpponentRecruitingWithComments } from 'src/types/opponentRecruiting'
 import PrimaryButton from '../commons/PrimaryButton'
 import { formatTimeRange } from 'src/utils/formatDateTime'
@@ -7,6 +17,7 @@ import { AuthContext } from 'src/contexts/AuthContext'
 import useApiWithFlashMessage from 'src/hooks/useApiWithFlashMessage'
 import { GetOpponentRecruitingApiResponse } from 'src/types/apiResponses'
 import OpponentRecruitingComment from './OpponentRecruitingComment'
+import { TeamRole } from 'src/types/teamRole'
 
 interface OpponentRecruitingDetailProps {
   initialOpponentRecruitingWithComments: OpponentRecruitingWithComments
@@ -24,6 +35,7 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
     initialOpponentRecruitingWithComments,
   )
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null)
+  const { user } = useContext(AuthContext)
   const handleUpdateComment = async (commentId: number, updatedComment: string) => {
     setEditingCommentId(null)
     try {
@@ -84,8 +96,6 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
       console.error('コメントに失敗しました', error)
     }
   }
-
-  const { user } = useContext(AuthContext)
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setNewComment(e.target.value)
@@ -168,56 +178,69 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
           {index < opponentRecruitingWithComments.comments.length - 1 && <Divider />}
         </Box>
       ))}
-      <Card variant='outlined'>
-        <CardContent>
-          <Box
-            sx={{
-              my: 2,
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <TextField
-              label='チーム'
-              variant='filled'
-              value={user?.current_team_name}
-              InputProps={{ readOnly: true }}
-              sx={{ width: '48%' }}
-              InputLabelProps={{ shrink: true }}
-            />
-            <TextField
-              label='投稿者'
-              variant='filled'
-              value={user?.name}
-              InputProps={{ readOnly: true }}
-              sx={{ width: '48%' }}
-              InputLabelProps={{ shrink: true }}
-            />
-          </Box>
-          <TextField
-            label='コメント'
-            variant='outlined'
-            fullWidth
-            multiline
-            rows={4}
-            value={newComment}
-            onChange={handleCommentChange}
-            error={error}
-            helperText={
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                {error ? 'コメントは1000文字以内で入力してください。' : <span>&nbsp;</span>}
-                <span>{`${newComment.length}/1000`}</span>
+      {user ? (
+        user.current_team_role === TeamRole.ADMIN ||
+        user.current_team_role === TeamRole.SUB_ADMIN ? (
+          <Card variant='outlined'>
+            <CardContent>
+              <Box
+                sx={{
+                  my: 2,
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <TextField
+                  label='チーム'
+                  variant='filled'
+                  value={user?.current_team_name}
+                  InputProps={{ readOnly: true }}
+                  sx={{ width: '48%' }}
+                  InputLabelProps={{ shrink: true }}
+                />
+                <TextField
+                  label='投稿者'
+                  variant='filled'
+                  value={user?.name}
+                  InputProps={{ readOnly: true }}
+                  sx={{ width: '48%' }}
+                  InputLabelProps={{ shrink: true }}
+                />
               </Box>
-            }
-            sx={{ my: 1 }}
-          />
-          <PrimaryButton variant='contained' color='primary' onClick={handlePostComment}>
-            コメントを投稿
-          </PrimaryButton>
-        </CardContent>
-      </Card>
+              <TextField
+                label='コメント'
+                variant='outlined'
+                fullWidth
+                multiline
+                rows={4}
+                value={newComment}
+                onChange={handleCommentChange}
+                error={error}
+                helperText={
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    {error ? 'コメントは1000文字以内で入力してください。' : <span>&nbsp;</span>}
+                    <span>{`${newComment.length}/1000`}</span>
+                  </Box>
+                }
+                sx={{ my: 1 }}
+              />
+              <PrimaryButton variant='contained' color='primary' onClick={handlePostComment}>
+                コメントを投稿
+              </PrimaryButton>
+            </CardContent>
+          </Card>
+        ) : (
+          <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
+            <Box sx={{ maxWidth: 500, width: '100%', textAlign: 'center' }}>
+              <p>チームの管理者か副管理者のみコメントを作成できます</p>
+            </Box>
+          </Grid>
+        )
+      ) : (
+        <>ログインボタン</>
+      )}
     </Box>
   )
 }
