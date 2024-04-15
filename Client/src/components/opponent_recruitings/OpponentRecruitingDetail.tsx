@@ -4,10 +4,8 @@ import {
   Card,
   CardContent,
   Typography,
-  Chip,
   Divider,
   TextField,
-  Link,
   Grid,
 } from '@mui/material'
 import { OpponentRecruitingWithComments } from 'src/types/opponentRecruiting'
@@ -18,6 +16,7 @@ import useApiWithFlashMessage from 'src/hooks/useApiWithFlashMessage'
 import { GetOpponentRecruitingApiResponse } from 'src/types/apiResponses'
 import OpponentRecruitingComment from './OpponentRecruitingComment'
 import { TeamRole } from 'src/types/teamRole'
+import Link from 'next/link'
 
 interface OpponentRecruitingDetailProps {
   initialOpponentRecruitingWithComments: OpponentRecruitingWithComments
@@ -239,7 +238,9 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
           </Grid>
         )
       ) : (
-        <>ログインボタン</>
+        <Link href='/login' passHref>
+          <PrimaryButton color='inherit'>ログインしてコメントする</PrimaryButton>
+        </Link>
       )}
     </Box>
   )

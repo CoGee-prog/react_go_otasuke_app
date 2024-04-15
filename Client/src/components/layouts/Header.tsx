@@ -13,7 +13,7 @@ export default function Header() {
   const { isLoggedIn, isLoading } = useContext(AuthContext)
   const navigateHome = useNavigateHome()
 
-  const appBarColor = '#333' // ダークグレー
+  const appBarColor = '#333'
 
 	return (
     <Box sx={{ flexGrow: 1 }}>
