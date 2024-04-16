@@ -2,14 +2,12 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 // Import FirebaseAuth and firebase.
-import app from 'config/firebaseApp'
+import { auth } from 'config/firebaseApp'
 import { Box, Card, CardContent, Typography, useTheme } from '@mui/material'
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
 import { getAuth, EmailAuthProvider, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth'
 import { useRouter } from 'next/router'
 import React from 'react'
-
-const firebaseAuth = getAuth(app)
 
 interface SignInScreenProps {
   redirectPath?: string
@@ -76,7 +74,7 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ redirectPath }) => {
           >
             ログイン
           </Typography>
-          <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseAuth} />
+          <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} />
         </CardContent>
       </Card>
     </Box>
