@@ -17,6 +17,7 @@ import { GetOpponentRecruitingApiResponse } from 'src/types/apiResponses'
 import OpponentRecruitingComment from './OpponentRecruitingComment'
 import { TeamRole } from 'src/types/teamRole'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 interface OpponentRecruitingDetailProps {
   initialOpponentRecruitingWithComments: OpponentRecruitingWithComments
@@ -35,6 +36,7 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
   )
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null)
   const { user } = useContext(AuthContext)
+	const router = useRouter()
   const handleUpdateComment = async (commentId: number, updatedComment: string) => {
     setEditingCommentId(null)
     try {
@@ -238,7 +240,7 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
           </Grid>
         )
       ) : (
-        <Link href='/login' passHref>
+        <Link href={`/login?from=${encodeURIComponent(router.asPath)}`} passHref>
           <PrimaryButton color='inherit'>ログインしてコメントする</PrimaryButton>
         </Link>
       )}

@@ -2,27 +2,38 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 // Import FirebaseAuth and firebase.
-import firebaseApp from 'config/firebaseApp'
+import app from 'config/firebaseApp'
 import { Box, Card, CardContent, Typography, useTheme } from '@mui/material'
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
 import { getAuth, EmailAuthProvider, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth'
+import { useRouter } from 'next/router'
+import React from 'react'
 
-const firebaseAuth = getAuth(firebaseApp)
+const firebaseAuth = getAuth(app)
 
-const uiConfig = {
-  signInFlow: 'redirect',
-  signInOptions: [
-    GoogleAuthProvider.PROVIDER_ID,
-    FacebookAuthProvider.PROVIDER_ID,
-    EmailAuthProvider.PROVIDER_ID,
-  ],
-  callbacks: {
-    signInSuccessWithAuthResult: () => false,
-  },
+interface SignInScreenProps {
+  redirectPath?: string
 }
 
-function SignInScreen() {
+const SignInScreen: React.FC<SignInScreenProps> = ({ redirectPath }) => {
   const theme = useTheme()
+  const router = useRouter()
+
+  const uiConfig = {
+    signInFlow: 'redirect',
+    signInOptions: [
+      GoogleAuthProvider.PROVIDER_ID,
+      FacebookAuthProvider.PROVIDER_ID,
+      EmailAuthProvider.PROVIDER_ID,
+    ],
+    callbacks: {
+      signInSuccessWithAuthResult: () => {
+        console.log(redirectPath)
+        router.push(redirectPath || '/opponent_recruitings')
+        return false
+      },
+    },
+  }
 
   return (
     <Box
