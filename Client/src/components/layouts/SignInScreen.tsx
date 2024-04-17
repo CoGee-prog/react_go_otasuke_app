@@ -5,15 +5,11 @@
 import { auth } from 'config/firebaseApp'
 import { Box, Card, CardContent, Typography, useTheme } from '@mui/material'
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
-import { getAuth, EmailAuthProvider, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth'
+import { EmailAuthProvider, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth'
 import { useRouter } from 'next/router'
 import React from 'react'
 
-interface SignInScreenProps {
-  redirectPath?: string
-}
-
-const SignInScreen: React.FC<SignInScreenProps> = ({ redirectPath }) => {
+const SignInScreen: React.FC = () => {
   const theme = useTheme()
   const router = useRouter()
 
@@ -26,8 +22,9 @@ const SignInScreen: React.FC<SignInScreenProps> = ({ redirectPath }) => {
     ],
     callbacks: {
       signInSuccessWithAuthResult: () => {
-        console.log(redirectPath)
+        const redirectPath = sessionStorage.getItem('redirectPath')
         router.push(redirectPath || '/opponent_recruitings')
+        sessionStorage.removeItem('redirectPath')
         return false
       },
     },
