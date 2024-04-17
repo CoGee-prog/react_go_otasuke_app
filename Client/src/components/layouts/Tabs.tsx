@@ -9,14 +9,16 @@ import { useEffect, useState } from 'react'
 export default function Tabs() {
   const router = useRouter()
   // URLに基づいてタブの値を設定
-  const [value, setValue] = useState(router.pathname)
+  const [value, setValue] = useState('/')
 
   useEffect(() => {
-    // ルーターのパスが変更されたらタブの状態を更新
-    setValue(router.pathname)
+    const path = router.pathname.split('/')[1]
+    const basePath = `/${path}`
+    setValue(basePath)
   }, [router.pathname])
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    setValue(newValue)
     // 新しいURLにナビゲート
     router.push(newValue)
   }
