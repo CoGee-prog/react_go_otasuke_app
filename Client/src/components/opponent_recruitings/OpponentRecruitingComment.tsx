@@ -9,8 +9,8 @@ import {
   MenuItem,
   TextField,
   Box,
-	ListItemIcon,
-	ListItemText,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import { OpponentRecruitingComment } from 'src/types/opponentRecruiting'
@@ -63,13 +63,15 @@ const OpponentRecruitingComment: React.FC<OpponentRecruitingCommentProps> = ({
   const handleUpdate = () => {
     if (!error) {
       onUpdate(comment.id, editedContent)
-			comment.content = editedContent
-			setEditedContent('')
+      comment.content = editedContent
+      setEditedContent('')
     }
   }
 
   const handleDelete = () => {
-    onDelete(comment.id)
+    if (window.confirm('コメントを削除してよろしいですか？')) {
+      onDelete(comment.id)
+    }
     handleCloseMenu()
   }
 
