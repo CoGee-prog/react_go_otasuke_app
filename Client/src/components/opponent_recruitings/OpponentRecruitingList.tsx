@@ -46,6 +46,10 @@ const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
   }, [page, queryParams])
 
   const handleChangePage = async (event: React.ChangeEvent<unknown> | null, value: number) => {
+		// 同じページの場合は何もしない
+		if (page == value) {
+			return;
+		}
     const options: RequestInit = {
       method: 'GET',
       headers: {

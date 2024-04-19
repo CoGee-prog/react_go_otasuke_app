@@ -9,39 +9,24 @@ import { useEffect, useState } from 'react'
 export default function Tabs() {
   const router = useRouter()
   // URLに基づいてタブの値を設定
-  const [value, setValue] = useState('/')
+  const [basePath, setBasePath] = useState('/')
 
   useEffect(() => {
     const path = router.pathname.split('/')[1]
-    const basePath = `/${path}`
-    setValue(basePath)
+    const newBasePath = `/${path}`
+    setBasePath(newBasePath)
   }, [router.pathname])
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-    if (newValue !== value) {
-      router.push(newValue)
-    }
-  }
-
-  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    const target = event.target as HTMLElement
-    const tabValue = target.closest('[role="tab"]')?.getAttribute('value') // タブの値を取得
+  const handleTabClick = (nextPath: string) => {
     // 現在のパスと異なる場合に遷移
-    if (tabValue && tabValue !== value) {
-      router.push(tabValue)
+    if (router.pathname !== nextPath) {
+      router.push(nextPath)
     }
-  }
-
-  const handleTabClick = (path: string) => {
-    // 現在のパスと異なる場合に遷移
-    // if (value && value !== path) {
-    router.push(path)
-    // }
   }
 
   return (
     <Box sx={{ width: '100%', typography: 'body1' }}>
-      <TabContext value={value}>
+      <TabContext value={basePath}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider', justifyContent: 'center' }}>
           <TabList onChange={() => {}} aria-label='Tabs' centered>
             <Tab
@@ -56,8 +41,6 @@ export default function Tabs() {
             />
           </TabList>
         </Box>
-        <TabPanel value='/opponent_recruitings'>対戦相手募集</TabPanel>
-        <TabPanel value='/schedules'>スケジュール管理</TabPanel>
       </TabContext>
     </Box>
   )
