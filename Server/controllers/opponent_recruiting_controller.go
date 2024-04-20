@@ -79,8 +79,8 @@ func (oc *OpponentRecruitingController) Get() gin.HandlerFunc {
 }
 
 type OpponentRecruitingCreateRequest struct {
-	Title        string              `json:"title"`
-	HasGround    bool                `json:"has_ground"`
+	Title        string              `json:"title" binding:"required"`
+	HasGround    bool                `json:"has_ground" binding:"required"`
 	GroundName   string              `json:"ground_name"`
 	PrefectureId models.PrefectureID `json:"prefecture_id" binding:"required"`
 	StartTime    time.Time           `json:"start_time" binding:"required"`
@@ -233,4 +233,81 @@ func (oc *OpponentRecruitingController) Delete() gin.HandlerFunc {
 			nil,
 		))
 	}
+}
+
+type OpponentRecruitingChangeStatusRequest struct {
+	IsActive *bool `json:"is_active" binding:"required"`
+}
+
+func (oc *OpponentRecruitingController) ChangeStatus() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		request := &OpponentRecruitingChangeStatusRequest{}
+
+		// リクエストパラメーターをバインドする
+		if err := c.ShouldBindJSON(request); err != nil {
+			c.JSON(http.StatusBadRequest, utils.NewResponse(
+				http.StatusBadRequest,
+				"不正なリクエストです",
+				nil,
+			))
+			return
+		}
+
+		// isActiveがない場合はエラー
+		if request.IsActive == nil {
+			c.JSON(http.StatusBadRequest, utils.NewResponse(
+				http.StatusBadRequest,
+				"不正なリクエストです",
+				nil,
+			))
+			return
+		}
+
+		// 対戦相手募集の構造体を作成
+		opponentRecruiting := &models.OpponentRecruiting{
+			IsActive: *request.IsActive,
+		}
+
+		opponentRecruitingId, _ := strconv.Atoi(c.Param("opponent_recruiting_id"))
+
+		db := c.MustGet("tx").(*gorm.DB)
+		userId := c.MustGet("userId").(string)
+		// データを更新する
+		if err := oc.OpponentRecruitingService.UpdateStatusOpponentRecruiting(db, userId, opponentRecruiting, uint(opponentRecruitingId)); err != nil {
+			c.JSON(http.StatusBadRequest, utils.NewResponse(
+				http.StatusBadRequest,
+				err.Error(),
+				nil,
+			))
+			return
+		}
+
+		// レスポンスメッセージを設定
+		var message string
+		if *request.IsActive {
+			message = "対戦相手募集を再開しました"
+		} else {
+			message = "対戦相手募集を終了しました"
+		}
+
+		// データを取得する
+		opponentRecruiting, err := oc.OpponentRecruitingService.FindOpponentRecruitingWithComment(db, uint(opponentRecruitingId))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, utils.NewResponse(
+				http.StatusBadRequest,
+				err.Error(),
+				nil,
+			))
+			return
+		}
+
+		c.JSON(http.StatusOK, utils.NewResponse(
+			http.StatusOK,
+			message,
+			&OpponentRecruitingGetResponse{
+				OpponentRecruiting: views.CreateOpponentRecruitingGetView(opponentRecruiting),
+			},
+		))
+	}
+
 }

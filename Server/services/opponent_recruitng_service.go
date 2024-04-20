@@ -60,6 +60,30 @@ func (ors *OpponentRecruitingService) UpdateOpponentRecruiting(db *gorm.DB, user
 	return nil
 }
 
+// 対戦相手募集の状態(募集中かどうか)を変更する
+func (ors *OpponentRecruitingService) UpdateStatusOpponentRecruiting(db *gorm.DB, userId string, opponentRecruiting *models.OpponentRecruiting, id uint) error {
+	// 変更する対戦相手募集を取得する
+	originalOpponentRecruiting, err := ors.FindOpponentRecruiting(db, id)
+	if err != nil {
+		return err
+	}
+	// チームの管理者または副管理者でなければエラー
+	if !ors.userTeamService.IsAdminOrSubAdmin(db, userId, originalOpponentRecruiting.TeamID) {
+		return errors.New("管理者または副管理者のみ対戦相手募集を変更できます")
+	}
+
+	// データを更新する
+	result := db.Model(&models.OpponentRecruiting{}).Where("id = ?", id).Select("IsActive").Updates(opponentRecruiting)
+	if result.Error != nil {
+		return result.Error
+	}
+	// 更新したデータが0件の場合はエラー
+	if result.RowsAffected == 0 {
+		return errors.New("更新対象のデータがありません")
+	}
+	return nil
+}
+
 // 対戦相手募集を取得する(なければエラー)
 func (ors *OpponentRecruitingService) FindOpponentRecruiting(db *gorm.DB, id uint) (*models.OpponentRecruiting, error) {
 	var opponentRecruiting models.OpponentRecruiting
