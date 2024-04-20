@@ -1,13 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Divider,
-  TextField,
-  Grid,
-} from '@mui/material'
+import { Box, Card, CardContent, Typography, Divider, TextField, Grid } from '@mui/material'
 import { OpponentRecruitingWithComments } from 'src/types/opponentRecruiting'
 import PrimaryButton from '../commons/PrimaryButton'
 import { formatTimeRange } from 'src/utils/formatDateTime'
@@ -18,6 +10,7 @@ import OpponentRecruitingComment from './OpponentRecruitingComment'
 import { TeamRole } from 'src/types/teamRole'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import DangerButton from '../commons/DangerButton'
 
 interface OpponentRecruitingDetailProps {
   initialOpponentRecruitingWithComments: OpponentRecruitingWithComments
@@ -36,7 +29,24 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
   )
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null)
   const { user } = useContext(AuthContext)
-	const router = useRouter()
+  const router = useRouter()
+
+  const handleUpdateOpponentRecruitingStatus = async (isActive: boolean) => {
+    try {
+      const options: RequestInit = {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ is_active: isActive }),
+        credentials: 'include',
+      }
+      await request(`/opponent_recruitings/${id}/status`, options)
+    } catch (error) {
+      console.error('状態の更新に失敗しました', error)
+    }
+  }
+
   const handleUpdateComment = async (commentId: number, updatedComment: string) => {
     setEditingCommentId(null)
     try {
@@ -112,6 +122,32 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
       <Typography variant='h4' component='h2' gutterBottom marginTop={2}>
         対戦相手募集詳細
       </Typography>
+      <Grid
+        container
+        spacing={2}
+        direction='column'
+        alignItems='center'
+        justifyContent='center'
+        style={{ marginTop: '3px', marginBottom: '10px' }}
+      >
+        <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
+          <Box sx={{ maxWidth: 500, width: '100%', textAlign: 'center' }}>
+            {user &&
+            (user.current_team_role === TeamRole.ADMIN ||
+              user.current_team_role === TeamRole.SUB_ADMIN) ? (
+              opponentRecruitingWithComments.is_active ? (
+                <DangerButton onClick={() => handleUpdateOpponentRecruitingStatus(false)}>
+                  募集を終了する
+                </DangerButton>
+              ) : (
+                <PrimaryButton onClick={() => handleUpdateOpponentRecruitingStatus(true)}>
+                  募集を再開する
+                </PrimaryButton>
+              )
+            ) : null}
+          </Box>
+        </Grid>
+      </Grid>
       <Card sx={{ mb: 2 }}>
         <CardContent>
           <Typography variant='h5' gutterBottom>
