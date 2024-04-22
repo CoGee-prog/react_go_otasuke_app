@@ -26,6 +26,7 @@ interface OpponentRecruitingCommentProps {
   onEdit: () => void
   onUpdate: (commentId: number, updatedContent: string) => void
   onDelete: (commentId: number) => void
+  isActiveOpponentRecruiting: boolean
 }
 
 const OpponentRecruitingComment: React.FC<OpponentRecruitingCommentProps> = ({
@@ -35,6 +36,7 @@ const OpponentRecruitingComment: React.FC<OpponentRecruitingCommentProps> = ({
   onEdit,
   onUpdate,
   onDelete,
+  isActiveOpponentRecruiting
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [editedContent, setEditedContent] = useState(comment.content)
@@ -131,7 +133,7 @@ const OpponentRecruitingComment: React.FC<OpponentRecruitingCommentProps> = ({
           </Typography>
         )}
       </CardContent>
-      {!comment.deleted && user && user.id === comment.user_id && (
+      {isActiveOpponentRecruiting && !comment.deleted && user && user.id === comment.user_id&& ( 
         <>
           <IconButton
             aria-label='more'
