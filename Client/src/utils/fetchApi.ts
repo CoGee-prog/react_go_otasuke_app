@@ -10,9 +10,6 @@ async function fetchAPI<T>(endpoint: string, options: RequestInit = {}): Promise
   const response = await fetch(url, options)
 
   const responseData: ResponseData<T> = await response.json()
-  if (!response.ok) {
-    throw new Error(responseData.message)
-  }
   return responseData
 }
 

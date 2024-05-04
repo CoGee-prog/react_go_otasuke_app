@@ -2,23 +2,24 @@ import React, { useState, useEffect } from 'react'
 import { AuthContext } from 'src/contexts/AuthContext'
 import fetchAPI from 'src/utils/fetchApi'
 import { User } from 'src/types/user'
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { onAuthStateChanged } from 'firebase/auth'
 import { LoginApiResponse } from 'src/types/apiResponses'
 import { useNavigateHome } from 'src/hooks/useNavigateHome'
-import firebaseApp from 'config/firebaseApp'
+import { useNavigateLogin } from 'src/hooks/useNavigateLogin'
+import { auth } from 'config/firebaseApp'
 import { useFlashMessage } from 'src/contexts/FlashMessageContext'
 import { loadDataWithExpiry, saveDataWithExpiry } from 'src/utils/localStrageHelper'
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const firebaseAuth = getAuth(firebaseApp)
   const [user, setUser] = useState<User | null>(null)
   const { showFlashMessage } = useFlashMessage()
   const navigateHome = useNavigateHome()
+  const navigateLogin = useNavigateLogin()
 
   useEffect(() => {
-    const unregisterAuthObserver = onAuthStateChanged(firebaseAuth, (user) => {
+    const unregisterAuthObserver = onAuthStateChanged(auth, (user) => {
       if (user && !isLoggedIn) {
         // キャッシュしたデータがあればそれを返す
         const cachedUser = loadDataWithExpiry<User>('user')
@@ -68,7 +69,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   const logout = () => {
-    firebaseAuth.signOut()
+    auth.signOut()
     const options: RequestInit = {
       method: 'POST',
       headers: {
@@ -77,12 +78,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       credentials: 'include',
     }
     fetchAPI('/logout', options).then((responseData) => {
-      showFlashMessage({ message: responseData.message, type: 'success' })
+      // レスポンスステータスが200の場合
+      if (responseData.status === 200) {
+        showFlashMessage({ message: responseData.message, type: 'success' })
+        // ホーム画面に戻す
+        navigateHome()
+      } else {
+        showFlashMessage({ message: responseData.message, type: 'error' })
+        // 認証エラーの場合
+        if (responseData.status === 401) {
+          // ログイン画面に戻す
+          navigateLogin()
+        } else {
+          // ホーム画面に戻す
+          navigateHome()
+        }
+      }
       localStorage.removeItem('user')
       setIsLoggedIn(false)
       setUser(null)
-      // ホーム画面に戻す
-      navigateHome()
     })
   }
 
