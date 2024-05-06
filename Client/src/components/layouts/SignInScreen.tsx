@@ -7,11 +7,14 @@ import { Box, Card, CardContent, Typography, useTheme } from '@mui/material'
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
 import { EmailAuthProvider, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth'
 import { useRouter } from 'next/router'
-import React from 'react'
+import React, { useContext } from 'react'
+import { AuthContext } from 'src/contexts/AuthContext'
+import LoadingScreen from '../commons/LoadingScreen'
 
 const SignInScreen: React.FC = () => {
   const theme = useTheme()
   const router = useRouter()
+  const { isLoading } = useContext(AuthContext)
 
   const uiConfig = {
     signInFlow: 'redirect',
@@ -43,37 +46,41 @@ const SignInScreen: React.FC = () => {
         gap: 2,
       }}
     >
-      <Card
-        sx={{
-          width: '100%',
-          boxShadow: theme.shadows[3],
-          borderRadius: theme.shape.borderRadius,
-          overflow: 'hidden',
-          bgcolor: 'background.paper',
-        }}
-      >
-        <CardContent
+      {isLoading ? (
+        <LoadingScreen />
+      ) : (
+        <Card
           sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            p: 3,
+            width: '100%',
+            boxShadow: theme.shadows[3],
+            borderRadius: theme.shape.borderRadius,
+            overflow: 'hidden',
+            bgcolor: 'background.paper',
           }}
         >
-          <Typography
-            variant='h5'
-            component='h2'
-            gutterBottom
+          <CardContent
             sx={{
-              mb: 2,
-              fontWeight: 'bold',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              p: 3,
             }}
           >
-            ログイン
-          </Typography>
-          <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} />
-        </CardContent>
-      </Card>
+            <Typography
+              variant='h5'
+              component='h2'
+              gutterBottom
+              sx={{
+                mb: 2,
+                fontWeight: 'bold',
+              }}
+            >
+              ログイン
+            </Typography>
+            <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} />
+          </CardContent>
+        </Card>
+      )}
     </Box>
   )
 }
