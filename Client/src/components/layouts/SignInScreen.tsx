@@ -7,14 +7,21 @@ import { Box, Card, CardContent, Typography, useTheme } from '@mui/material'
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
 import { EmailAuthProvider, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth'
 import { useRouter } from 'next/router'
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { AuthContext } from 'src/contexts/AuthContext'
 import LoadingScreen from '../commons/LoadingScreen'
 
 const SignInScreen: React.FC = () => {
   const theme = useTheme()
   const router = useRouter()
-  const { isLoading } = useContext(AuthContext)
+  const { isLoggedIn, isLoading } = useContext(AuthContext)
+
+  useEffect(() => {
+    // ログイン状態であればホームページにリダイレクト
+    if (isLoggedIn) {
+      router.push('/')
+    }
+  }, [isLoggedIn, router])
 
   const uiConfig = {
     signInFlow: 'redirect',
