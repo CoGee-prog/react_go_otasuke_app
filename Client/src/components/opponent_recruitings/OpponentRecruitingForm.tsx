@@ -14,6 +14,7 @@ import {
 import React, { useContext, useEffect, useState } from 'react'
 import useApiWithFlashMessage from 'src/hooks/useApiWithFlashMessage'
 import { useNavigateOpponentRecruitingsCreate } from 'src/hooks/useNavigateOpponentRecruitingsCreate'
+import { useNavigateOpponentRecruitingsUpdate } from 'src/hooks/useNavigateOpponentRecruitingsUpdate'
 import { useNavigateOpponentRecruitingsIndex } from 'src/hooks/useNavigateOpponentRecruitingsIndex'
 import { CreateOpponentRecruitingsApiRequest } from 'src/types/apiRequests'
 import { prefectures } from 'src/utils/prefectures'
@@ -24,10 +25,10 @@ import { AuthContext } from 'src/contexts/AuthContext'
 import CustomDatePicker from '../commons/CustomDatePicker'
 
 type Errors = {
-  [key in keyof CreateOpponentRecruitingsFormData]?: string
+  [key in keyof OpponentRecruitingsFormData]?: string
 }
 
-interface CreateOpponentRecruitingsFormData {
+interface OpponentRecruitingsFormData {
   title: string
   has_ground: boolean
   ground_name: string
@@ -38,25 +39,38 @@ interface CreateOpponentRecruitingsFormData {
   detail: string
 }
 
-function OpponentRecruitingForm() {
+interface OpponentRecruitingFormProps {
+  isEditing: boolean
+  initialData?: OpponentRecruitingsFormData
+  id?: string
+}
+
+function OpponentRecruitingForm({
+  isEditing = false,
+  initialData,
+  id,
+}: OpponentRecruitingFormProps) {
   const router = useRouter()
   const { user } = useContext(AuthContext)
   const navigateOpponentRecruitingsIndex = useNavigateOpponentRecruitingsIndex()
   const [isAccessAllowed, setIsAccessAllowed] = useState(false)
 
-  const [formData, setFormData] = useState<CreateOpponentRecruitingsFormData>({
-    title: '',
-    has_ground: false,
-    ground_name: '',
-    prefecture_id: '',
-    date: '',
-    start_time: '',
-    end_time: '',
-    detail: '',
-  })
+  const [formData, setFormData] = useState<OpponentRecruitingsFormData>(
+    initialData || {
+      title: '',
+      has_ground: false,
+      ground_name: '',
+      prefecture_id: '',
+      date: '',
+      start_time: '',
+      end_time: '',
+      detail: '',
+    },
+  )
   const [errors, setErrors] = useState<Errors>({})
   const { request } = useApiWithFlashMessage<CreateOpponentRecruitingsApiRequest>()
   const navigateOpponentRecruitingsCreate = useNavigateOpponentRecruitingsCreate()
+  const navigateOpponentRecruitingsUpdate = useNavigateOpponentRecruitingsUpdate(id!)
 
   useEffect(() => {
     // ユーザーの役割が管理者または副管理者であれば 、アクセス可能とする
@@ -85,7 +99,7 @@ function OpponentRecruitingForm() {
   }
 
   const handleSelectChange = (e: SelectChangeEvent<string>) => {
-    const name = e.target.name as keyof FormData
+    const name = e.target.name as keyof OpponentRecruitingsFormData
     const value = e.target.value
     setFormData({
       ...formData,
@@ -130,14 +144,14 @@ function OpponentRecruitingForm() {
           end_time: formattedEndTime,
         }
         const options: RequestInit = {
-          method: 'POST',
+          method: isEditing ? 'PATCH' : 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(requestData),
           credentials: 'include',
         }
-        await request('/opponent_recruitings', options)
+        await request(isEditing ? `/opponent_recruitings/${id}` : '/opponent_recruitings', options)
 
         // 対戦相手募集リストに移動
         navigateOpponentRecruitingsIndex()
@@ -153,12 +167,21 @@ function OpponentRecruitingForm() {
           detail: '',
         })
       } catch (error) {
-        console.error('対戦相手募集の作成に失敗しました。', error)
+        if (isEditing) {
+          console.error('対戦相手募集の変更に失敗しました。', error)
+        } else {
+          console.error('対戦相手募集の作成に失敗しました。', error)
+        }
       }
     } else {
       setErrors(validationErrors)
-      // 対戦相手募集作成に移動
-      navigateOpponentRecruitingsCreate()
+      if (isEditing) {
+        // 対戦相手募集変更に移動
+        navigateOpponentRecruitingsUpdate()
+      } else {
+        // 対戦相手募集作成に移動
+        navigateOpponentRecruitingsCreate()
+      }
     }
   }
 
@@ -184,7 +207,7 @@ function OpponentRecruitingForm() {
   return (
     <Container maxWidth='sm'>
       <Typography variant='h4' component='h2' gutterBottom marginTop={2}>
-        対戦相手募集作成
+        {isEditing ? '対戦相手募集編集' : '対戦相手募集作成'}
       </Typography>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={3}>
@@ -374,7 +397,7 @@ function OpponentRecruitingForm() {
             />
           </Grid>
           <Grid item xs={12} style={{ marginBottom: '20px' }}>
-            <PrimaryButton>作成</PrimaryButton>
+            <PrimaryButton>{isEditing ? '更新' : '作成'}</PrimaryButton>
           </Grid>
         </Grid>
       </form>
