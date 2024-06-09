@@ -217,7 +217,7 @@ function OpponentRecruitingForm({
     }
     if (formData.has_ground && !formData.ground_name)
       errors.ground_name = 'グラウンド名の入力は必須です。'
-    if (!formData.ground_name && formData.ground_name.length > 50)
+    if (formData.ground_name && formData.ground_name.length > 50)
       errors.ground_name = 'グラウンド名は50文字以内でなければなりません。'
     if (formData.detail.length > 1000) errors.detail = '詳細は1000文字以内でなければなりません。'
     return errors
