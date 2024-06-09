@@ -23,6 +23,8 @@ import { TeamRole } from 'src/types/teamRole'
 import { AuthContext } from 'src/contexts/AuthContext'
 import CustomDatePicker from '../commons/CustomDatePicker'
 import { useNavigateOpponentRecruitingDetail } from 'src/hooks/useNavigateOpponentRecruitingDetail'
+import { OpponentRecruitingWithComments } from 'src/types/opponentRecruiting'
+import { GetOpponentRecruitingApiResponse } from 'src/types/apiResponses'
 
 type Errors = {
   [key in keyof OpponentRecruitingsFormData]?: string
@@ -43,14 +45,14 @@ interface OpponentRecruitingFormProps {
   isEditing: boolean
   initialData?: OpponentRecruitingsFormData
   id?: string
-  onEditComplete?: () => void
+  onUpdateSuccess?: (updatedData: GetOpponentRecruitingApiResponse) => void
 }
 
 function OpponentRecruitingForm({
   isEditing = false,
   initialData,
   id,
-  onEditComplete,
+  onUpdateSuccess,
 }: OpponentRecruitingFormProps) {
   const router = useRouter()
   const { user } = useContext(AuthContext)
@@ -70,7 +72,7 @@ function OpponentRecruitingForm({
     },
   )
   const [errors, setErrors] = useState<Errors>({})
-  const { request } = useApiWithFlashMessage<CreateOpponentRecruitingsApiRequest>()
+  const { request, data } = useApiWithFlashMessage<GetOpponentRecruitingApiResponse>()
   const navigateOpponentRecruitingsCreate = useNavigateOpponentRecruitingsCreate()
   const navigateOpponentRecruitingDetail = useNavigateOpponentRecruitingDetail(id!)
 
@@ -86,6 +88,15 @@ function OpponentRecruitingForm({
       navigateOpponentRecruitingsIndex()
     }
   }, [router])
+
+  useEffect(() => {
+    if (isEditing && data && onUpdateSuccess) {
+      // 編集完了を親コンポーネントに通知
+      onUpdateSuccess(data!)
+      // 対戦相手募集詳細に移動
+      navigateOpponentRecruitingDetail()
+    }
+  }, [data])
 
   if (!isAccessAllowed) {
     // 認証されていない場合は、何も表示しない
@@ -155,19 +166,12 @@ function OpponentRecruitingForm({
           body: JSON.stringify(requestData),
           credentials: 'include',
         }
-        console.log(JSON.stringify(requestData))
         await request(isEditing ? `/opponent_recruitings/${id}` : '/opponent_recruitings', options)
 
-        if (isEditing) {
-					// 編集完了を親コンポーネントに通知
-					if(onEditComplete){
-						onEditComplete()
-					}
-          // 対戦相手募集詳細に移動
-          navigateOpponentRecruitingDetail()
-        } else {
+        if (!isEditing) {
           // 対戦相手募集リストに移動
           navigateOpponentRecruitingsIndex()
+        } else {
         }
 
         // フォームをクリアする

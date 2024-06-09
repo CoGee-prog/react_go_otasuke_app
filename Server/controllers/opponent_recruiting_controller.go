@@ -220,10 +220,23 @@ func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {
 			return
 		}
 
+				// データを取得する
+		opponentRecruitingWithComment, err := oc.OpponentRecruitingService.FindOpponentRecruitingWithComment(db, uint(opponentRecruitingId))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, utils.NewResponse(
+				http.StatusBadRequest,
+				err.Error(),
+				nil,
+			))
+			return
+		}
+
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,
 			"対戦相手募集を更新しました",
-			nil,
+			&OpponentRecruitingGetResponse{
+				OpponentRecruiting: views.CreateOpponentRecruitingGetView(opponentRecruitingWithComment),
+			},
 		))
 	}
 

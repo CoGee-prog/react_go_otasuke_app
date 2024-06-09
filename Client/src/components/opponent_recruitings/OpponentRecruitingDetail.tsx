@@ -39,7 +39,7 @@ interface OpponentRecruitingDetailProps {
 // // OpponentRecruitingWithComments オブジェクトを OpponentRecruitingsFormData に変換
 function mapToFormData(recruiting: OpponentRecruitingWithComments): OpponentRecruitingsFormData {
   const date = recruiting.start_time.split('T')[0]
-	// 時間はフォームに必要な分単位(HH:mm)の形式で取り出す
+  // 時間はフォームに必要な分単位(HH:mm)の形式で取り出す
   const startTime = recruiting.start_time.split('T')[1].split('+')[0].slice(0, 5)
   const endTime = recruiting.end_time.split('T')[1].split('+')[0].slice(0, 5)
   const prefectureId = getPrefectureIdFromName(recruiting.prefecture)
@@ -98,6 +98,11 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
   const toggleEdit = () => {
     setIsEditing(!isEditing)
     handleCloseMenu()
+  }
+
+  const handleUpdateSuccess = (updatedData: GetOpponentRecruitingApiResponse) => {
+    setIsEditing(false)
+    setOpponentRecruitingWithComments(updatedData.opponent_recruiting)
   }
 
   const handleUpdateComment = async (commentId: number, updatedComment: string) => {
@@ -210,13 +215,13 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
           position: 'relative',
         }}
       >
-			 {/* 編集中であれば編集フォームを出す */}
+        {/* 編集中であれば編集フォームを出す */}
         {isEditing ? (
           <OpponentRecruitingForm
             isEditing={true}
             initialData={mapToFormData(initialOpponentRecruitingWithComments)}
             id={id}
-						onEditComplete={() => setIsEditing(false)}
+            onUpdateSuccess={handleUpdateSuccess}
           />
         ) : (
           <CardContent>
@@ -260,46 +265,56 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
             </Typography>
             {[
               { label: '都道府県', value: opponentRecruitingWithComments.prefecture },
-              { label: 'グラウンド名', value: opponentRecruitingWithComments.ground_name },
+              {
+                label: 'グラウンド名',
+                value: opponentRecruitingWithComments.ground_name,
+                condition: opponentRecruitingWithComments.has_ground,
+              },
               { label: 'チーム', value: opponentRecruitingWithComments.team.name },
               { label: 'レベル', value: opponentRecruitingWithComments.team.level },
               { label: '詳細', value: opponentRecruitingWithComments.detail },
-            ].map((item, index, arr) => (
-              <Box key={index} sx={{ my: 1 }}>
-                <Typography variant='body1' sx={{ fontWeight: 'bold' }} gutterBottom>
-                  {item.label}
-                </Typography>
-                <Typography variant='body1' gutterBottom>
-                  {item.value}
-                </Typography>
-                {index < arr.length - 1 && <Divider />}
-              </Box>
-            ))}
+            ]
+              .filter((item) => item.condition !== false)
+              .map((item, index, arr) => (
+                <Box key={index} sx={{ my: 1 }}>
+                  <Typography variant='body1' sx={{ fontWeight: 'bold' }} gutterBottom>
+                    {item.label}
+                  </Typography>
+                  <Typography variant='body1' gutterBottom>
+                    {item.value}
+                  </Typography>
+                  {index < arr.length - 1 && <Divider />}
+                </Box>
+              ))}
           </CardContent>
         )}
-        <IconButton
-          aria-label='more'
-          aria-controls='comment-menu'
-          aria-haspopup='true'
-          onClick={handleOpenMenu}
-          sx={{ position: 'absolute', top: 8, right: 8 }}
-        >
-          <MoreVertIcon />
-        </IconButton>
-        <Menu
-          id='comment-menu'
-          anchorEl={anchorEl}
-          keepMounted
-          open={Boolean(anchorEl)}
-          onClose={handleCloseMenu}
-        >
-          <MenuItem onClick={toggleEdit}>
-            <ListItemIcon>
-              <EditIcon fontSize='small' />
-            </ListItemIcon>
-            {isEditing ? <ListItemText>中止</ListItemText> : <ListItemText>編集</ListItemText>}
-          </MenuItem>
-        </Menu>
+        {opponentRecruitingWithComments.is_active ? (
+          <>
+            <IconButton
+              aria-label='more'
+              aria-controls='comment-menu'
+              aria-haspopup='true'
+              onClick={handleOpenMenu}
+              sx={{ position: 'absolute', top: 8, right: 8 }}
+            >
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              id='comment-menu'
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleCloseMenu}
+            >
+              <MenuItem onClick={toggleEdit}>
+                <ListItemIcon>
+                  <EditIcon fontSize='small' />
+                </ListItemIcon>
+                {isEditing ? <ListItemText>中止</ListItemText> : <ListItemText>編集</ListItemText>}
+              </MenuItem>
+            </Menu>
+          </>
+        ) : null}
       </Card>
       <Typography variant='h6' component='h2' gutterBottom marginTop={4}>
         コメント
