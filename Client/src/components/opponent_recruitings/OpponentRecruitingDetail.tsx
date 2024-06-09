@@ -1,5 +1,19 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Box, Card, CardContent, Typography, Divider, TextField, Grid, Chip } from '@mui/material'
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Divider,
+  TextField,
+  Grid,
+  Chip,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+} from '@mui/material'
 import { OpponentRecruitingWithComments } from 'src/types/opponentRecruiting'
 import PrimaryButton from '../commons/PrimaryButton'
 import { formatTimeRange } from 'src/utils/formatDateTime'
@@ -11,10 +25,34 @@ import { TeamRole } from 'src/types/teamRole'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import DangerButton from '../commons/DangerButton'
+import EditIcon from '@mui/icons-material/Edit'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
+import OpponentRecruitingForm from './OpponentRecruitingForm'
+import { OpponentRecruitingsFormData } from './OpponentRecruitingForm'
+import { getPrefectureIdFromName } from 'src/utils/prefectures'
 
 interface OpponentRecruitingDetailProps {
   initialOpponentRecruitingWithComments: OpponentRecruitingWithComments
   id: string
+}
+
+// // OpponentRecruitingWithComments オブジェクトを OpponentRecruitingsFormData に変換
+function mapToFormData(recruiting: OpponentRecruitingWithComments): OpponentRecruitingsFormData {
+  const date = recruiting.start_time.split('T')[0]
+	// 時間はフォームに必要な分単位(HH:mm)の形式で取り出す
+  const startTime = recruiting.start_time.split('T')[1].split('+')[0].slice(0, 5)
+  const endTime = recruiting.end_time.split('T')[1].split('+')[0].slice(0, 5)
+  const prefectureId = getPrefectureIdFromName(recruiting.prefecture)
+  return {
+    title: recruiting.title,
+    has_ground: recruiting.has_ground,
+    ground_name: recruiting.ground_name || '',
+    prefecture_id: prefectureId,
+    date: date,
+    start_time: startTime,
+    end_time: endTime,
+    detail: recruiting.detail,
+  }
 }
 
 const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
@@ -23,10 +61,12 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
 }) => {
   const [newComment, setNewComment] = useState('')
   const [error, setError] = useState(false)
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const { request, data } = useApiWithFlashMessage<GetOpponentRecruitingApiResponse>()
   const [opponentRecruitingWithComments, setOpponentRecruitingWithComments] = useState(
     initialOpponentRecruitingWithComments,
   )
+  const [isEditing, setIsEditing] = useState(false)
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null)
   const { user } = useContext(AuthContext)
   const router = useRouter()
@@ -45,6 +85,19 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
     } catch (error) {
       console.error('状態の更新に失敗しました', error)
     }
+  }
+
+  const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null)
+  }
+
+  const toggleEdit = () => {
+    setIsEditing(!isEditing)
+    handleCloseMenu()
   }
 
   const handleUpdateComment = async (commentId: number, updatedComment: string) => {
@@ -149,68 +202,104 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
           </Box>
         </Grid>
       </Grid>
+
       <Card
         sx={{
           mb: 2,
           backgroundColor: opponentRecruitingWithComments.is_active ? 'white' : '#d0d0d0',
+          position: 'relative',
         }}
       >
-        <CardContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
-            <Chip
-              label={opponentRecruitingWithComments.is_active ? '募集中' : '募集終了'}
-              size='small'
-              color={opponentRecruitingWithComments.is_active ? 'primary' : 'default'}
-            />
-          </Box>
-          <Typography variant='h5' gutterBottom>
-            {opponentRecruitingWithComments.title}
-          </Typography>
-          <Typography sx={{ fontWeight: 'bold', mb: 1.5 }}>
-            {formatTimeRange(
-              opponentRecruitingWithComments.start_time,
-              opponentRecruitingWithComments.end_time,
-            )
-              .text.split(' ')
-              .map((part, index, array) => (
-                <span
-                  key={index}
-                  style={{
-                    color:
-                      index === 1 || index === array.length - 2
-                        ? index === 1
-                          ? formatTimeRange(
-                              opponentRecruitingWithComments.start_time,
-                              opponentRecruitingWithComments.end_time,
-                            ).dayOfWeekColor
-                          : formatTimeRange(
-                              opponentRecruitingWithComments.start_time,
-                              opponentRecruitingWithComments.end_time,
-                            ).endDayOfWeekColor
-                        : 'inherit',
-                  }}
-                >
-                  {part}{' '}
-                </span>
-              ))}
-          </Typography>
-          {[
-            { label: '都道府県', value: opponentRecruitingWithComments.prefecture },
-            { label: 'チーム', value: opponentRecruitingWithComments.team.name },
-            { label: 'レベル', value: opponentRecruitingWithComments.team.level },
-            { label: '詳細', value: opponentRecruitingWithComments.detail },
-          ].map((item, index, arr) => (
-            <Box key={index} sx={{ my: 1 }}>
-              <Typography variant='body1' sx={{ fontWeight: 'bold' }} gutterBottom>
-                {item.label}
-              </Typography>
-              <Typography variant='body1' gutterBottom>
-                {item.value}
-              </Typography>
-              {index < arr.length - 1 && <Divider />}
+			 {/* 編集中であれば編集フォームを出す */}
+        {isEditing ? (
+          <OpponentRecruitingForm
+            isEditing={true}
+            initialData={mapToFormData(initialOpponentRecruitingWithComments)}
+            id={id}
+						onEditComplete={() => setIsEditing(false)}
+          />
+        ) : (
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+              <Chip
+                label={opponentRecruitingWithComments.is_active ? '募集中' : '募集終了'}
+                size='small'
+                color={opponentRecruitingWithComments.is_active ? 'primary' : 'default'}
+              />
             </Box>
-          ))}
-        </CardContent>
+            <Typography variant='h5' gutterBottom>
+              {opponentRecruitingWithComments.title}
+            </Typography>
+            <Typography sx={{ fontWeight: 'bold', mb: 1.5 }}>
+              {formatTimeRange(
+                opponentRecruitingWithComments.start_time,
+                opponentRecruitingWithComments.end_time,
+              )
+                .text.split(' ')
+                .map((part, index, array) => (
+                  <span
+                    key={index}
+                    style={{
+                      color:
+                        index === 1 || index === array.length - 2
+                          ? index === 1
+                            ? formatTimeRange(
+                                opponentRecruitingWithComments.start_time,
+                                opponentRecruitingWithComments.end_time,
+                              ).dayOfWeekColor
+                            : formatTimeRange(
+                                opponentRecruitingWithComments.start_time,
+                                opponentRecruitingWithComments.end_time,
+                              ).endDayOfWeekColor
+                          : 'inherit',
+                    }}
+                  >
+                    {part}{' '}
+                  </span>
+                ))}
+            </Typography>
+            {[
+              { label: '都道府県', value: opponentRecruitingWithComments.prefecture },
+              { label: 'グラウンド名', value: opponentRecruitingWithComments.ground_name },
+              { label: 'チーム', value: opponentRecruitingWithComments.team.name },
+              { label: 'レベル', value: opponentRecruitingWithComments.team.level },
+              { label: '詳細', value: opponentRecruitingWithComments.detail },
+            ].map((item, index, arr) => (
+              <Box key={index} sx={{ my: 1 }}>
+                <Typography variant='body1' sx={{ fontWeight: 'bold' }} gutterBottom>
+                  {item.label}
+                </Typography>
+                <Typography variant='body1' gutterBottom>
+                  {item.value}
+                </Typography>
+                {index < arr.length - 1 && <Divider />}
+              </Box>
+            ))}
+          </CardContent>
+        )}
+        <IconButton
+          aria-label='more'
+          aria-controls='comment-menu'
+          aria-haspopup='true'
+          onClick={handleOpenMenu}
+          sx={{ position: 'absolute', top: 8, right: 8 }}
+        >
+          <MoreVertIcon />
+        </IconButton>
+        <Menu
+          id='comment-menu'
+          anchorEl={anchorEl}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={handleCloseMenu}
+        >
+          <MenuItem onClick={toggleEdit}>
+            <ListItemIcon>
+              <EditIcon fontSize='small' />
+            </ListItemIcon>
+            {isEditing ? <ListItemText>中止</ListItemText> : <ListItemText>編集</ListItemText>}
+          </MenuItem>
+        </Menu>
       </Card>
       <Typography variant='h6' component='h2' gutterBottom marginTop={4}>
         コメント

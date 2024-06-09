@@ -14,7 +14,6 @@ import {
 import React, { useContext, useEffect, useState } from 'react'
 import useApiWithFlashMessage from 'src/hooks/useApiWithFlashMessage'
 import { useNavigateOpponentRecruitingsCreate } from 'src/hooks/useNavigateOpponentRecruitingsCreate'
-import { useNavigateOpponentRecruitingsUpdate } from 'src/hooks/useNavigateOpponentRecruitingsUpdate'
 import { useNavigateOpponentRecruitingsIndex } from 'src/hooks/useNavigateOpponentRecruitingsIndex'
 import { CreateOpponentRecruitingsApiRequest } from 'src/types/apiRequests'
 import { prefectures } from 'src/utils/prefectures'
@@ -23,16 +22,17 @@ import { useRouter } from 'next/router'
 import { TeamRole } from 'src/types/teamRole'
 import { AuthContext } from 'src/contexts/AuthContext'
 import CustomDatePicker from '../commons/CustomDatePicker'
+import { useNavigateOpponentRecruitingDetail } from 'src/hooks/useNavigateOpponentRecruitingDetail'
 
 type Errors = {
   [key in keyof OpponentRecruitingsFormData]?: string
 }
 
-interface OpponentRecruitingsFormData {
+export interface OpponentRecruitingsFormData {
   title: string
   has_ground: boolean
   ground_name: string
-  prefecture_id: string
+  prefecture_id: number
   date: string
   start_time: string
   end_time: string
@@ -43,12 +43,14 @@ interface OpponentRecruitingFormProps {
   isEditing: boolean
   initialData?: OpponentRecruitingsFormData
   id?: string
+  onEditComplete?: () => void
 }
 
 function OpponentRecruitingForm({
   isEditing = false,
   initialData,
   id,
+  onEditComplete,
 }: OpponentRecruitingFormProps) {
   const router = useRouter()
   const { user } = useContext(AuthContext)
@@ -60,7 +62,7 @@ function OpponentRecruitingForm({
       title: '',
       has_ground: false,
       ground_name: '',
-      prefecture_id: '',
+      prefecture_id: 0,
       date: '',
       start_time: '',
       end_time: '',
@@ -70,7 +72,7 @@ function OpponentRecruitingForm({
   const [errors, setErrors] = useState<Errors>({})
   const { request } = useApiWithFlashMessage<CreateOpponentRecruitingsApiRequest>()
   const navigateOpponentRecruitingsCreate = useNavigateOpponentRecruitingsCreate()
-  const navigateOpponentRecruitingsUpdate = useNavigateOpponentRecruitingsUpdate(id!)
+  const navigateOpponentRecruitingDetail = useNavigateOpponentRecruitingDetail(id!)
 
   useEffect(() => {
     // ユーザーの役割が管理者または副管理者であれば 、アクセス可能とする
@@ -100,7 +102,7 @@ function OpponentRecruitingForm({
 
   const handleSelectChange = (e: SelectChangeEvent<string>) => {
     const name = e.target.name as keyof OpponentRecruitingsFormData
-    const value = e.target.value
+    const value = parseInt(e.target.value)
     setFormData({
       ...formData,
       [name]: value,
@@ -138,8 +140,10 @@ function OpponentRecruitingForm({
         // 日付と時間を結合してフォーマット
         const formattedStartTime = `${formData.date}T${formData.start_time}:00+09:00`
         const formattedEndTime = `${formData.date}T${formData.end_time}:00+09:00`
+        // dateプロパティを除く
+        const { date, ...formDataExcludeDate } = formData
         const requestData = {
-          ...formData,
+          ...formDataExcludeDate,
           start_time: formattedStartTime,
           end_time: formattedEndTime,
         }
@@ -151,16 +155,27 @@ function OpponentRecruitingForm({
           body: JSON.stringify(requestData),
           credentials: 'include',
         }
+        console.log(JSON.stringify(requestData))
         await request(isEditing ? `/opponent_recruitings/${id}` : '/opponent_recruitings', options)
 
-        // 対戦相手募集リストに移動
-        navigateOpponentRecruitingsIndex()
+        if (isEditing) {
+					// 編集完了を親コンポーネントに通知
+					if(onEditComplete){
+						onEditComplete()
+					}
+          // 対戦相手募集詳細に移動
+          navigateOpponentRecruitingDetail()
+        } else {
+          // 対戦相手募集リストに移動
+          navigateOpponentRecruitingsIndex()
+        }
+
         // フォームをクリアする
         setFormData({
           title: '',
           has_ground: false,
           ground_name: '',
-          prefecture_id: '',
+          prefecture_id: 0,
           date: '',
           start_time: '',
           end_time: '',
@@ -176,8 +191,8 @@ function OpponentRecruitingForm({
     } else {
       setErrors(validationErrors)
       if (isEditing) {
-        // 対戦相手募集変更に移動
-        navigateOpponentRecruitingsUpdate()
+        // 対戦相手募集詳細に移動
+        navigateOpponentRecruitingDetail()
       } else {
         // 対戦相手募集作成に移動
         navigateOpponentRecruitingsCreate()
@@ -284,11 +299,11 @@ function OpponentRecruitingForm({
               <Select
                 labelId='prefecture-label'
                 name='prefecture_id'
-                value={formData.prefecture_id}
+                value={formData.prefecture_id.toString()}
                 onChange={handleSelectChange}
                 label='都道府県'
               >
-                <MenuItem value=''>
+                <MenuItem value='0'>
                   <em>選択してください</em>
                 </MenuItem>
                 {prefectures.map((prefecture) => (
