@@ -41,21 +41,35 @@ const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
   const navigateHome = useNavigateHome()
 
   useEffect(() => {
-    // ページが変更されるたびに、新しいデータを取得して状態を更新する
+    // ページが変更される度に、新しいデータを取得して状態を更新する
     handleChangePage(null, page)
-  }, [page, queryParams])
+  }, [page])
+
+  useEffect(() => {
+    // クエリパラメーターが変更される度に、新しいデータを取得して状態を更新する
+    handleChangePage(null, 0)
+  }, [queryParams])
+
+  const handleSearch = (newQueryParams: string) => {
+		// クエリパラメーターが変わっていなければ何もしない
+    if (newQueryParams !== queryParams) {
+      setQueryParams(newQueryParams)
+      setPage(1)
+    }
+  }
 
   const handleChangePage = async (event: React.ChangeEvent<unknown> | null, value: number) => {
-		// 同じページの場合は何もしない
-		if (page == value) {
-			return;
-		}
+    // 同じページの場合は何もしない
+    if (page === value) {
+      return
+    }
     const options: RequestInit = {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
     }
+
     fetchAPI<GetOpponentRecruitingsApiResponse>(
       `/opponent_recruitings?page=${value}&${queryParams}`,
       options,
@@ -99,7 +113,7 @@ const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
       <Grid container justifyContent='center'>
         <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
           <Box sx={{ maxWidth: 'md', width: '100%' }}>
-            <OpponentRecruitingSearchForm onSearch={(params) => setQueryParams(params)} />
+            <OpponentRecruitingSearchForm onSearch={(params) => handleSearch(params)} />
           </Box>
         </Grid>
       </Grid>
