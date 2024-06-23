@@ -26,7 +26,7 @@ const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) =
   const [isActive, setIsActive] = useState<boolean>(false)
   const [date, setDate] = useState<Date | null>(null)
   const [day, setDay] = useState<string>('')
-  const [dateOrDay, setDateOrDay] = useState<string>('date')
+  const [dateOrDay, setDateOrDay] = useState<string>('')
 
   const handleHasGroundChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
@@ -88,7 +88,7 @@ const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) =
                   日程
                 </Typography>
                 <RadioGroup row value={dateOrDay} onChange={(e) => setDateOrDay(e.target.value)}>
-                  <FormControlLabel value='none' control={<Radio />} label='選択しない' />
+                  <FormControlLabel value='' control={<Radio />} label='選択しない' />
                   <FormControlLabel value='date' control={<Radio />} label='日付' />
                   <FormControlLabel value='day' control={<Radio />} label='曜日' />
                 </RadioGroup>
