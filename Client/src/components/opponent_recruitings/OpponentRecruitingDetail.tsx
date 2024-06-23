@@ -288,7 +288,11 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
               ))}
           </CardContent>
         )}
-        {opponentRecruitingWithComments.is_active ? (
+        {user &&
+        user.current_team_id === opponentRecruitingWithComments.team.id &&
+        (user.current_team_role === TeamRole.ADMIN ||
+          user.current_team_role === TeamRole.SUB_ADMIN) &&
+        opponentRecruitingWithComments.is_active ? (
           <>
             <IconButton
               aria-label='more'
@@ -310,7 +314,11 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
                 <ListItemIcon>
                   <EditIcon fontSize='small' />
                 </ListItemIcon>
-                {isEditing ? <ListItemText>中止</ListItemText> : <ListItemText>編集</ListItemText>}
+                {isEditing ? (
+                  <ListItemText>キャンセル</ListItemText>
+                ) : (
+                  <ListItemText>編集</ListItemText>
+                )}
               </MenuItem>
             </Menu>
           </>
