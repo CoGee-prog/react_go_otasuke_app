@@ -22,6 +22,7 @@ import PrimaryButton from '../commons/PrimaryButton'
 import { TeamRole } from 'src/types/teamRole'
 import { AuthContext } from 'src/contexts/AuthContext'
 import OpponentRecruitingSearchForm from './OpponentRecruitingSearchForm'
+import { useRouter } from 'next/router'
 
 interface OpponentRecruitingListProps {
   initialRecruitings: OpponentRecruiting[]
@@ -32,29 +33,30 @@ const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
   initialRecruitings,
   initialPage,
 }) => {
+  const router = useRouter()
   const [opponentRecruitings, setOpponentRecruitings] =
     useState<OpponentRecruiting[]>(initialRecruitings)
   const [page, setPage] = useState<number>(initialPage.number)
   const [totalPages, setTotalPages] = useState<number>(initialPage.total_pages)
   const { user } = useContext(AuthContext)
-  const [queryParams, setQueryParams] = useState<string>('')
+  const [searchQueryParams, setSearchQueryParams] = useState<string>('')
   const navigateHome = useNavigateHome()
 
   useEffect(() => {
-    // ページが変更される度に、新しいデータを取得して状態を更新する
-    handleChangePage(null, page)
-  }, [page])
-
-  useEffect(() => {
-    // クエリパラメーターが変更される度に、新しいデータを取得して状態を更新する
-    handleChangePage(null, 0)
-  }, [queryParams])
+    if (router.isReady) {
+      // 検索条件をもとに検索を再実行
+      handleChangeList()
+    }
+  }, [router.isReady, router.query])
 
   const handleSearch = (newQueryParams: string) => {
-		// クエリパラメーターが変わっていなければ何もしない
-    if (newQueryParams !== queryParams) {
-      setQueryParams(newQueryParams)
+    // クエリパラメーターが変わっていなければ何もしない
+    if (newQueryParams !== searchQueryParams) {
+      setSearchQueryParams(newQueryParams)
       setPage(1)
+      // 検索条件のクエリパラメータがあればを付加して、なければそのまま
+      const url = `/opponent_recruitings?page=1` + (newQueryParams ? `&${newQueryParams}` : '')
+      router.push(url, undefined, { shallow: true })
     }
   }
 
@@ -63,6 +65,16 @@ const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
     if (page === value) {
       return
     }
+    // 検索条件のクエリパラメータがあればを付加して、なければそのまま
+    const url =
+      `/opponent_recruitings?page=${value}` + (searchQueryParams ? `&${searchQueryParams}` : '')
+    router.push(url, undefined, {
+      shallow: true,
+    })
+  }
+
+  const handleChangeList = async () => {
+    // const currentQueryParams = router.query
     const options: RequestInit = {
       method: 'GET',
       headers: {
@@ -70,10 +82,20 @@ const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
       },
     }
 
-    fetchAPI<GetOpponentRecruitingsApiResponse>(
-      `/opponent_recruitings?page=${value}&${queryParams}`,
-      options,
-    )
+    const { query } = router
+
+    // URLから検索条件を読み込む
+    const params = new URLSearchParams()
+    if (query.page) params.append('page', query.page as string)
+    if (query.has_ground) params.append('has_ground', query.has_ground as string)
+    if (query.prefecture_id) params.append('prefecture_id', query.prefecture_id as string)
+    if (query.is_active) params.append('is_active', query.is_active as string)
+    if (query.date) params.append('date', query.date as string)
+    if (query.day) params.append('day', query.day as string)
+
+    const queryParams = params.toString()
+
+    fetchAPI<GetOpponentRecruitingsApiResponse>(`/opponent_recruitings?${queryParams}`, options)
       .then((responseData) => {
         setOpponentRecruitings(responseData.result.opponent_recruitings)
         setPage(responseData.result.page.number)

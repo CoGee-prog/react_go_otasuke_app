@@ -36,13 +36,15 @@ const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) =
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    const queryParams = new URLSearchParams({
-      has_ground: hasGround,
-      prefecture_id: prefectureId,
-      is_active: isActive ? 'true' : '',
-      date: dateOrDay === 'date' && date ? date.toISOString().split('T')[0] : '',
-      day: dateOrDay === 'day' ? day : '',
-    }).toString()
+    const params = new URLSearchParams()
+
+    if (hasGround) params.append('has_ground', hasGround)
+    if (prefectureId) params.append('prefecture_id', prefectureId)
+    if (isActive) params.append('is_active', 'true')
+    if (dateOrDay === 'date' && date) params.append('date', date.toISOString().split('T')[0])
+    if (dateOrDay === 'day' && day) params.append('day', day)
+
+    const queryParams = params.toString()
 
     onSearch(queryParams)
   }
