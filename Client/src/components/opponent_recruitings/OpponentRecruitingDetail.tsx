@@ -30,6 +30,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 import OpponentRecruitingForm from './OpponentRecruitingForm'
 import { OpponentRecruitingsFormData } from './OpponentRecruitingForm'
 import { getPrefectureIdFromName } from 'src/utils/prefectures'
+import { ArrowBack } from '@mui/icons-material'
 
 interface OpponentRecruitingDetailProps {
   initialOpponentRecruitingWithComments: OpponentRecruitingWithComments
@@ -59,6 +60,7 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
   initialOpponentRecruitingWithComments,
   id,
 }) => {
+  const router = useRouter()
   const [newComment, setNewComment] = useState('')
   const [error, setError] = useState(false)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -69,7 +71,6 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
   const [isEditing, setIsEditing] = useState(false)
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null)
   const { user } = useContext(AuthContext)
-  const router = useRouter()
 
   const handleUpdateOpponentRecruitingStatus = async (isActive: boolean) => {
     try {
@@ -177,9 +178,26 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
 
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', my: 4, px: 2 }}>
-      <Typography variant='h4' component='h2' gutterBottom marginTop={2}>
-        対戦相手募集詳細
-      </Typography>
+        <Grid item>
+          <IconButton 
+            onClick={() => router.back()} 
+            aria-label="戻る" 
+            sx={{ 
+              color: 'black',
+              border: '1px solid black',
+              borderRadius: 0,
+              marginRight: 1
+            }}
+          >
+            <ArrowBack />
+            <Typography variant="button" sx={{ color: 'black', ml: 1 }}>戻る</Typography> {/* テキストの色も黒に、マージン左を追加 */}
+          </IconButton>
+        </Grid>
+      <Grid item xs>
+        <Typography variant='h4' component='h2' gutterBottom marginTop={2}>
+          対戦相手募集詳細
+        </Typography>
+      </Grid>
       <Grid
         container
         spacing={2}
