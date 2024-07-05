@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   TextField,
   Button,
@@ -13,6 +13,7 @@ import {
 } from '@mui/material'
 import { prefectures } from 'src/utils/prefectures'
 import CustomDatePicker from '../commons/CustomDatePicker'
+import { useRouter } from 'next/router'
 
 interface SearchFormProps {
   onSearch: (params: string) => void
@@ -21,12 +22,26 @@ interface SearchFormProps {
 const daysOfWeek = ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日']
 
 const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
+	const router = useRouter()
   const [hasGround, setHasGround] = useState<string>('')
   const [prefectureId, setPrefectureId] = useState<string>('')
   const [isActive, setIsActive] = useState<boolean>(false)
   const [date, setDate] = useState<Date | null>(null)
   const [day, setDay] = useState<string>('')
   const [dateOrDay, setDateOrDay] = useState<string>('')
+
+	useEffect(() => {
+    // クエリパラメータから初期値を設定
+    const query = router.query
+    if (router.isReady) {
+      setHasGround((query.has_ground as string) || '')
+      setPrefectureId((query.prefecture_id as string) || '')
+      setIsActive(query.is_active === 'true')
+      setDateOrDay(query.date ? 'date' : query.day ? 'day' : '')
+      if (query.date) setDate(new Date(query.date as string))
+      setDay((query.day as string) || '')
+    }
+  }, [router.isReady, router.query])
 
   const handleHasGroundChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
