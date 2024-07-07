@@ -30,7 +30,7 @@ const daysOfWeek = [
 ]
 
 const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
-	const router = useRouter()
+  const router = useRouter()
   const [hasGround, setHasGround] = useState<string>('')
   const [prefectureId, setPrefectureId] = useState<string>('')
   const [isActive, setIsActive] = useState<boolean>(false)
@@ -38,7 +38,7 @@ const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) =
   const [day, setDay] = useState<string>('')
   const [dateOrDay, setDateOrDay] = useState<string>('')
 
-	useEffect(() => {
+  useEffect(() => {
     // クエリパラメータから初期値を設定
     const query = router.query
     if (router.isReady) {
@@ -61,6 +61,15 @@ const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) =
     setHasGround(value === hasGround ? '' : value)
   }
 
+  const handleReset = () => {
+    setHasGround('')
+    setPrefectureId('')
+    setIsActive(false)
+    setDate(null)
+    setDay('')
+    setDateOrDay('')
+  }
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
@@ -70,7 +79,7 @@ const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) =
     if (prefectureId) params.append('prefecture_id', prefectureId)
     if (isActive) params.append('is_active', 'true')
     if (dateOrDay === 'date' && date) params.append('date', date.toISOString().split('T')[0])
-		if (dateOrDay === 'day' && day) {
+    if (dateOrDay === 'day' && day) {
       const dayInEnglish = daysOfWeek.find((d) => d.jp === day)?.en
       if (dayInEnglish) {
         params.append('day', dayInEnglish)
@@ -180,6 +189,24 @@ const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) =
                   fullWidth
                 >
                   検索
+                </Button>
+                <Button
+                  onClick={handleReset}
+                  sx={{
+                    marginTop: 2,
+                    color: 'gray',
+                    fontWeight: 'bold',
+                    fontSize: '16px',
+                    border: '1px solid #ccc',
+                    backgroundColor: 'transparent', 
+                    '&:hover': {
+                      backgroundColor: '#f0f0f0',
+                      borderColor: '#aaa',
+                    },
+                  }}
+                  fullWidth
+                >
+                  リセット
                 </Button>
               </Grid>
             </Grid>
