@@ -19,7 +19,15 @@ interface SearchFormProps {
   onSearch: (params: string) => void
 }
 
-const daysOfWeek = ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日']
+const daysOfWeek = [
+  { jp: '日曜日', en: 'Sunday' },
+  { jp: '月曜日', en: 'Monday' },
+  { jp: '火曜日', en: 'Tuesday' },
+  { jp: '水曜日', en: 'Wednesday' },
+  { jp: '木曜日', en: 'Thursday' },
+  { jp: '金曜日', en: 'Friday' },
+  { jp: '土曜日', en: 'Saturday' },
+]
 
 const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
 	const router = useRouter()
@@ -39,7 +47,12 @@ const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) =
       setIsActive(query.is_active === 'true')
       setDateOrDay(query.date ? 'date' : query.day ? 'day' : '')
       if (query.date) setDate(new Date(query.date as string))
-      setDay((query.day as string) || '')
+      const queryDay = query.day as string
+      if (queryDay) {
+        // 日本語の曜日名に変換する
+        const dayObject = daysOfWeek.find((day) => day.en === queryDay)
+        setDay(dayObject ? dayObject.jp : '')
+      }
     }
   }, [router.isReady, router.query])
 
@@ -57,7 +70,12 @@ const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) =
     if (prefectureId) params.append('prefecture_id', prefectureId)
     if (isActive) params.append('is_active', 'true')
     if (dateOrDay === 'date' && date) params.append('date', date.toISOString().split('T')[0])
-    if (dateOrDay === 'day' && day) params.append('day', day)
+		if (dateOrDay === 'day' && day) {
+      const dayInEnglish = daysOfWeek.find((d) => d.jp === day)?.en
+      if (dayInEnglish) {
+        params.append('day', dayInEnglish)
+      }
+    }
 
     const queryParams = params.toString()
 
@@ -123,8 +141,8 @@ const OpponentRecruitingSearchForm: React.FC<SearchFormProps> = ({ onSearch }) =
                     sx={{ '& .MuiInputBase-root': { color: '#333' } }}
                   >
                     {daysOfWeek.map((day, index) => (
-                      <MenuItem key={index} value={day}>
-                        {day}
+                      <MenuItem key={index} value={day.jp}>
+                        {day.jp}
                       </MenuItem>
                     ))}
                   </TextField>
