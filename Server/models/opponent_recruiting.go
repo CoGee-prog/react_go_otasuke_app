@@ -11,7 +11,7 @@ import (
 type OpponentRecruiting struct {
 	gorm.Model
 	TeamID       uint                         `json:"team_id" gorm:"type:int; not null"`
-	Team         Team                         `gorm:"foreignKey:TeamID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Team         Team                         `gorm:"foreignKey:TeamID;"`
 	Title        string                       `json:"title" gorm:"type:varchar(255); not null"`
 	HasGround    bool                         `json:"has_ground" gorm:"not null; default:false"`
 	GroundName   string                       `json:"ground_name" gorm:"type:varchar(255)"`
@@ -20,7 +20,7 @@ type OpponentRecruiting struct {
 	EndTime      time.Time                    `json:"end_time" gorm:"not null"`
 	Detail       string                       `json:"detail" gorm:"type:text"`
 	IsActive     bool                         `json:"is_active" gorm:"not null; default:true"`
-	Comments     []*OpponentRecruitingComment `json:"comments" gorm:"foreignKey:OpponentRecruitingID"`
+	Comments     []*OpponentRecruitingComment `json:"comments" gorm:"foreignKey:OpponentRecruitingID;OnDelete:CASCADE;"`
 }
 
 // 対戦相手募集のバリデーション

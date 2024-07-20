@@ -12,11 +12,11 @@ function useApiWithFlashMessage<T>() {
     setIsLoading(true)
     try {
       const responseData = await fetchAPI<T>(endpoint, options)
-      setData(responseData.result)
 			// HTTPステータスが200以外はエラー
 			if(responseData.status !== 200){
 				throw new Error(responseData.message)
 			}
+			setData(responseData.result)
 			showFlashMessage({ message: responseData.message, type: 'success' })
     } catch (error) {
 			setErrorMessage(error instanceof Error ? error.message : 'エラーが発生しました')

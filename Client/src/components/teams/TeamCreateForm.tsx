@@ -21,7 +21,7 @@ import PrimaryButton from '../commons/PrimaryButton'
 import { AuthContext } from 'src/contexts/AuthContext'
 import { User } from 'src/types/user'
 import { CreateTeamsApiResponse } from 'src/types/apiResponses'
-import { saveDataWithExpiry } from 'src/utils/localStrageHelper'
+import { saveDataWithExpiry } from 'src/utils/localStorageHelper'
 
 type Errors = {
   [key in keyof CreateTeamsApiRequest]?: string

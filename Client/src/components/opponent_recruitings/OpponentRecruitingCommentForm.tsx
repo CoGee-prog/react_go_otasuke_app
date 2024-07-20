@@ -29,14 +29,14 @@ interface OpponentRecruitingCommentProps {
   isActiveOpponentRecruiting: boolean
 }
 
-const OpponentRecruitingComment: React.FC<OpponentRecruitingCommentProps> = ({
+const OpponentRecruitingCommentForm: React.FC<OpponentRecruitingCommentProps> = ({
   comment,
   opponentRecruitingTeamId,
   isEditing,
   onEdit,
   onUpdate,
   onDelete,
-  isActiveOpponentRecruiting
+  isActiveOpponentRecruiting,
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [editedContent, setEditedContent] = useState(comment.content)
@@ -133,7 +133,7 @@ const OpponentRecruitingComment: React.FC<OpponentRecruitingCommentProps> = ({
           </Typography>
         )}
       </CardContent>
-      {isActiveOpponentRecruiting && !comment.deleted && user && user.id === comment.user_id&& ( 
+      {isActiveOpponentRecruiting && !comment.deleted && user && user.id === comment.user_id && (
         <>
           <IconButton
             aria-label='more'
@@ -172,4 +172,4 @@ const OpponentRecruitingComment: React.FC<OpponentRecruitingCommentProps> = ({
   )
 }
 
-export default OpponentRecruitingComment
+export default OpponentRecruitingCommentForm

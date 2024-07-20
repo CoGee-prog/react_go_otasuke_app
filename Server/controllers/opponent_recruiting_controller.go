@@ -244,7 +244,7 @@ func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {
 
 func (oc *OpponentRecruitingController) Delete() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		id, _ := strconv.Atoi(c.Param("id"))
+		id, _ := strconv.Atoi(c.Param("opponent_recruiting_id"))
 		db := c.MustGet("tx").(*gorm.DB)
 		userId := c.MustGet("userId").(string)
 		// データを削除する

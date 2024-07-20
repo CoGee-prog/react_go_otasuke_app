@@ -47,7 +47,7 @@ type Team struct {
 	HomePageUrl         *string               `json:"home_page_url" gorm:"type:text"`
 	Other               *string               `json:"other" gorm:"type:text"`
 	Users               []*User               `gorm:"many2many:user_teams"`
-	OpponentRecruitings []*OpponentRecruiting `json:"opponent_recruitings"`
+	OpponentRecruitings []*OpponentRecruiting `json:"opponent_recruitings" gorm:"foreignKey:TeamID;OnDelete:CASCADE;"`
 }
 
 // チームのバリデーション

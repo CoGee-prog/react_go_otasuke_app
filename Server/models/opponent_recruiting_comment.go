@@ -9,7 +9,7 @@ import (
 type OpponentRecruitingComment struct {
 	gorm.Model
 	OpponentRecruitingID uint               `json:"opponent_recruiting_id" gorm:"index"`
-	OpponentRecruiting   OpponentRecruiting `gorm:"foreignKey:OpponentRecruitingID;constraint:OnDelete:CASCADE;"`
+	OpponentRecruiting   OpponentRecruiting `gorm:"foreignKey:OpponentRecruitingID;"`
 	UserID               *string            `json:"user_id" gorm:"index"`
 	User                 *User              `gorm:"foreignKey:UserID;constraint:OnDelete:SET NULL;"`
 	TeamID               *uint              `json:"team_id"`

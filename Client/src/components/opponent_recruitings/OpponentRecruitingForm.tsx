@@ -169,7 +169,6 @@ function OpponentRecruitingForm({
         if (!isEditing) {
           // 対戦相手募集リストに移動
           navigateOpponentRecruitingsIndex()
-        } else {
         }
 
         // フォームをクリアする

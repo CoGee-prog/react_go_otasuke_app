@@ -11,8 +11,14 @@ import {
   IconButton,
   ListItemIcon,
   ListItemText,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Menu,
   MenuItem,
+  Button,
 } from '@mui/material'
 import { OpponentRecruitingWithComments } from 'src/types/opponentRecruiting'
 import PrimaryButton from '../commons/PrimaryButton'
@@ -20,17 +26,19 @@ import { formatTimeRange } from 'src/utils/formatDateTime'
 import { AuthContext } from 'src/contexts/AuthContext'
 import useApiWithFlashMessage from 'src/hooks/useApiWithFlashMessage'
 import { GetOpponentRecruitingApiResponse } from 'src/types/apiResponses'
-import OpponentRecruitingComment from './OpponentRecruitingComment'
+import OpponentRecruitingCommentForm from './OpponentRecruitingCommentForm'
 import { TeamRole } from 'src/types/teamRole'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import DangerButton from '../commons/DangerButton'
 import EditIcon from '@mui/icons-material/Edit'
+import DeleteIcon from '@mui/icons-material/Delete'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import OpponentRecruitingForm from './OpponentRecruitingForm'
 import { OpponentRecruitingsFormData } from './OpponentRecruitingForm'
 import { getPrefectureIdFromName } from 'src/utils/prefectures'
 import { ArrowBack } from '@mui/icons-material'
+import { useNavigateOpponentRecruitingsIndex } from 'src/hooks/useNavigateOpponentRecruitingsIndex'
 
 interface OpponentRecruitingDetailProps {
   initialOpponentRecruitingWithComments: OpponentRecruitingWithComments
@@ -71,6 +79,34 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
   const [isEditing, setIsEditing] = useState(false)
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null)
   const { user } = useContext(AuthContext)
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
+  const navigateOpponentRecruitingsIndex = useNavigateOpponentRecruitingsIndex()
+
+  const handleOpenDeleteDialog = () => {
+    setOpenDeleteDialog(true)
+  }
+
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false)
+  }
+
+  const handleDeleteConfirmed = async () => {
+    handleCloseDeleteDialog()
+    try {
+      const options: RequestInit = {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      }
+      await request(`/opponent_recruitings/${id}`, options)
+      // 対戦相手募集リストに移動
+      navigateOpponentRecruitingsIndex()
+    } catch (error) {
+      console.error('対戦相手募集の削除に失敗しました:', error)
+    }
+  }
 
   const handleUpdateOpponentRecruitingStatus = async (isActive: boolean) => {
     try {
@@ -178,21 +214,23 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
 
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', my: 4, px: 2 }}>
-        <Grid item>
-          <IconButton 
-            onClick={() => router.back()} 
-            aria-label="戻る" 
-            sx={{ 
-              color: 'black',
-              border: '1px solid black',
-              borderRadius: 0,
-              marginRight: 1
-            }}
-          >
-            <ArrowBack />
-            <Typography variant="button" sx={{ color: 'black', ml: 1 }}>戻る</Typography> {/* テキストの色も黒に、マージン左を追加 */}
-          </IconButton>
-        </Grid>
+      <Grid item>
+        <IconButton
+          onClick={() => router.back()}
+          aria-label='戻る'
+          sx={{
+            color: 'black',
+            border: '1px solid black',
+            borderRadius: 0,
+            marginRight: 1,
+          }}
+        >
+          <ArrowBack />
+          <Typography variant='button' sx={{ color: 'black', ml: 1 }}>
+            戻る
+          </Typography>
+        </IconButton>
+      </Grid>
       <Grid item xs>
         <Typography variant='h4' component='h2' gutterBottom marginTop={2}>
           対戦相手募集詳細
@@ -208,7 +246,7 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
       >
         <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
           <Box sx={{ maxWidth: 500, width: '100%', textAlign: 'center' }}>
-            {user &&
+            {user && opponentRecruitingWithComments && 
             user.current_team_id === opponentRecruitingWithComments.team.id &&
             (user.current_team_role === TeamRole.ADMIN ||
               user.current_team_role === TeamRole.SUB_ADMIN) ? (
@@ -309,8 +347,7 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
         {user &&
         user.current_team_id === opponentRecruitingWithComments.team.id &&
         (user.current_team_role === TeamRole.ADMIN ||
-          user.current_team_role === TeamRole.SUB_ADMIN) &&
-        opponentRecruitingWithComments.is_active ? (
+          user.current_team_role === TeamRole.SUB_ADMIN) ? (
           <>
             <IconButton
               aria-label='more'
@@ -328,17 +365,50 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
               open={Boolean(anchorEl)}
               onClose={handleCloseMenu}
             >
-              <MenuItem onClick={toggleEdit}>
-                <ListItemIcon>
-                  <EditIcon fontSize='small' />
-                </ListItemIcon>
-                {isEditing ? (
+              {isEditing ? (
+                <MenuItem onClick={toggleEdit}>
                   <ListItemText>キャンセル</ListItemText>
-                ) : (
-                  <ListItemText>編集</ListItemText>
-                )}
-              </MenuItem>
+                </MenuItem>
+              ) : (
+                opponentRecruitingWithComments.is_active && (
+                  <MenuItem onClick={toggleEdit}>
+                    <ListItemIcon>
+                      <EditIcon fontSize='small' />
+                    </ListItemIcon>
+                    <ListItemText>編集</ListItemText>
+                  </MenuItem>
+                )
+              )}
+              {!isEditing && (
+                <MenuItem onClick={handleOpenDeleteDialog}>
+                  <ListItemIcon>
+                    <DeleteIcon fontSize='small' />
+                  </ListItemIcon>
+                  <ListItemText>削除</ListItemText>
+                </MenuItem>
+              )}
             </Menu>
+            <Dialog
+              open={openDeleteDialog}
+              onClose={handleCloseDeleteDialog}
+              aria-labelledby='alert-dialog-title'
+              aria-describedby='alert-dialog-description'
+            >
+              <DialogTitle id='alert-dialog-title'>{'削除確認'}</DialogTitle>
+              <DialogContent>
+                <DialogContentText id='alert-dialog-description'>
+                  本当に削除してもよろしいですか？
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleCloseDeleteDialog} color='primary'>
+                  キャンセル
+                </Button>
+                <Button onClick={handleDeleteConfirmed} color='primary' autoFocus>
+                  削除
+                </Button>
+              </DialogActions>
+            </Dialog>
           </>
         ) : null}
       </Card>
@@ -347,7 +417,7 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
       </Typography>
       {opponentRecruitingWithComments.comments.map((comment, index) => (
         <Box key={index} sx={{ my: 2 }}>
-          <OpponentRecruitingComment
+          <OpponentRecruitingCommentForm
             comment={comment}
             opponentRecruitingTeamId={opponentRecruitingWithComments.team.id}
             isEditing={editingCommentId === comment.id}

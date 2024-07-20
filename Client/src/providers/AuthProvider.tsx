@@ -8,7 +8,7 @@ import { useNavigateHome } from 'src/hooks/useNavigateHome'
 import { useNavigateLogin } from 'src/hooks/useNavigateLogin'
 import { auth } from 'config/firebaseApp'
 import { useFlashMessage } from 'src/contexts/FlashMessageContext'
-import { loadDataWithExpiry, saveDataWithExpiry } from 'src/utils/localStrageHelper'
+import { loadDataWithExpiry, saveDataWithExpiry } from 'src/utils/localStorageHelper'
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
