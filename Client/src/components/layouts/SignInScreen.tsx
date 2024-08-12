@@ -17,9 +17,11 @@ const SignInScreen: React.FC = () => {
   const { isLoggedIn, isLoading } = useContext(AuthContext)
 
   useEffect(() => {
-    // ログイン状態であればホームページにリダイレクト
+    // ログイン状態であればリダイレクト
     if (isLoggedIn) {
-      router.push('/')
+        const redirectPath = sessionStorage.getItem('redirectPath')
+        router.push(redirectPath || '/opponent_recruitings')
+        sessionStorage.removeItem('redirectPath')
     }
   }, [isLoggedIn, router])
 
@@ -32,9 +34,6 @@ const SignInScreen: React.FC = () => {
     ],
     callbacks: {
       signInSuccessWithAuthResult: () => {
-        const redirectPath = sessionStorage.getItem('redirectPath')
-        router.push(redirectPath || '/opponent_recruitings')
-        sessionStorage.removeItem('redirectPath')
         return false
       },
     },

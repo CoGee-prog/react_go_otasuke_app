@@ -6,7 +6,6 @@ import { AuthProvider } from 'src/providers/AuthProvider'
 import { FlashMessageProvider } from 'src/providers/FlashMessageProvider'
 import { useRouter } from 'next/router'
 import FlashMessage from 'src/components/commons/FlashMessage'
-import SignInScreen from 'src/components/layouts/SignInScreen'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
