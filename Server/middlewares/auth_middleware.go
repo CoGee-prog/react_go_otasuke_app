@@ -5,7 +5,6 @@ import (
 	"react_go_otasuke_app/config"
 	"react_go_otasuke_app/services"
 	"react_go_otasuke_app/utils"
-	"strings"
 
 	firebase "firebase.google.com/go"
 	"github.com/gin-gonic/gin"
@@ -15,10 +14,9 @@ import (
 // Firebaseで認証を行うMiddleware関数
 func AuthMiddleware(firebaseApp *firebase.App) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// User-Agentヘッダーを取得
-		userAgent := c.GetHeader("User-Agent")
-		// 開発環境かつポストマンからのリクエストの場合は認証をスキップする
-		if config.Get().GetString("server.env") == "dev" && strings.Contains(userAgent, "Postman") {
+
+		// ローカル環境の場合は認証をスキップする
+		if config.Get().GetString("server.env") == "local" {
 			// ユーザーIDをセットする
 			c.Set("userId", c.GetHeader("x-user-id"))
 			return

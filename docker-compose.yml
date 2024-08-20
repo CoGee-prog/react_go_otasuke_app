@@ -22,7 +22,7 @@ services:
     volumes:
       - ./Server:/go/src/app
     environment:
-      - APP_ENV=dev
+      - APP_ENV=local
     ports:
       - "58080:8080"
     networks:
