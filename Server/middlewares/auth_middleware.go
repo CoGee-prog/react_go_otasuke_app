@@ -18,7 +18,7 @@ func AuthMiddleware(firebaseApp *firebase.App) gin.HandlerFunc {
 		// ローカル環境の場合は認証をスキップする
 		if config.Get().GetString("server.env") == "local" {
 			// ユーザーIDをセットする
-			c.Set("userId", c.GetHeader("x-user-id"))
+			c.Set("userId", c.GetHeader("X-User-Id"))
 			return
 		}
 		// クライアントから送信されたセッションCookieを取得

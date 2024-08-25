@@ -7,7 +7,6 @@ import (
 	"react_go_otasuke_app/services"
 	"react_go_otasuke_app/utils"
 	"react_go_otasuke_app/views"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -31,11 +30,10 @@ type loginResponse struct {
 func (uc *UserController) Login() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		db := c.MustGet("tx").(*gorm.DB)
-		userAgent := c.GetHeader("User-Agent")
-		// 開発環境かつPostmanからのリクエストの場合はIDトークン検証をスキップしてユーザーを作成する
-		if config.Get().GetString("server.env") == "dev" && strings.Contains(userAgent, "PostmanRuntime") {
+		// 開発環境の場合はIDトークン検証をスキップしてユーザーを作成する
+		if config.Get().GetString("server.env") == "local" {
 			// ユーザーデータを検索
-			devUser, err := uc.UserService.GetUser(db, c.GetHeader("x-user-id"))
+			devUser, err := uc.UserService.GetUser(db, c.GetHeader("X-User-Id"))
 			if err != nil {
 				c.JSON(http.StatusServiceUnavailable, utils.NewResponse(
 					http.StatusServiceUnavailable,
@@ -47,7 +45,7 @@ func (uc *UserController) Login() gin.HandlerFunc {
 			// ユーザーデータがなければ作成
 			if devUser == nil {
 				devUser = &models.User{
-					ID:   c.GetHeader("x-user-id"),
+					ID:   c.GetHeader("X-User-Id"),
 					Name: "dev-user",
 				}
 				// ユーザーデータを作成

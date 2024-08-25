@@ -12,6 +12,10 @@ export const saveDataWithExpiry = <T>(key: string, data: T, expiryInMinutes: num
 };
 
 export const loadDataWithExpiry = <T>(key: string): T | null => {
+  if (typeof localStorage === 'undefined') {
+    return null;
+  }
+	
   const dataWithExpiryString = localStorage.getItem(key);
 
   if (!dataWithExpiryString) {

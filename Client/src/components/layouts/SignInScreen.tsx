@@ -10,6 +10,7 @@ import { useRouter } from 'next/router'
 import React, { useContext, useEffect } from 'react'
 import { AuthContext } from 'src/contexts/AuthContext'
 import LoadingScreen from '../commons/LoadingScreen'
+import LocalLoginButton from '../commons/LocalLoginButton'
 
 const SignInScreen: React.FC = () => {
   const theme = useTheme()
@@ -84,6 +85,7 @@ const SignInScreen: React.FC = () => {
               ログイン
             </Typography>
             <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} />
+						<LocalLoginButton />
           </CardContent>
         </Card>
       )}
