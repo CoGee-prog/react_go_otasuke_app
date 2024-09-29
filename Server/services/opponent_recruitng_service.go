@@ -142,8 +142,6 @@ func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context, 
 	if isMyTeam {
 		var user models.User
 		userId := c.MustGet("userId")
-		println("ユーザーID")
-		println(userId)
 		result := db.Where("id = ?", userId).First(&user)
 		// エラーが起きた場合はreturn
 		if result.Error != nil {
