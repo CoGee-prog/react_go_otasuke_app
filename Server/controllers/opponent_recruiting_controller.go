@@ -36,7 +36,7 @@ type OpponentRecruitingIndexResponse struct {
 func (oc *OpponentRecruitingController) Index() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// データを取得する
-		opponentRecruitings, page := oc.OpponentRecruitingService.GetOpponentRecruitingList(c)
+		opponentRecruitings, page := oc.OpponentRecruitingService.GetOpponentRecruitingList(c, false)
 
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,
@@ -73,6 +73,27 @@ func (oc *OpponentRecruitingController) Get() gin.HandlerFunc {
 			"",
 			&OpponentRecruitingGetResponse{
 				OpponentRecruiting: views.CreateOpponentRecruitingGetView(opponentRecruiting),
+			},
+		))
+	}
+}
+
+type OpponentRecruitingGetMyTeamResponse struct {
+	OpponentRecruitings []*views.OpponentRecruitingGetMyTeamView `json:"opponent_recruitings"`
+	Page                *database.Page                           `json:"page"`
+}
+
+func (oc *OpponentRecruitingController) GetMyTeam() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// 自チームの対戦相手募集データを取得する
+		opponentRecruitings, page := oc.OpponentRecruitingService.GetOpponentRecruitingList(c, true)
+
+		c.JSON(http.StatusOK, utils.NewResponse(
+			http.StatusOK,
+			http.StatusText(http.StatusOK),
+			&OpponentRecruitingGetMyTeamResponse{
+				OpponentRecruitings: views.CreateOpponentRecruitingGetMyTeamView(opponentRecruitings),
+				Page:                page,
 			},
 		))
 	}
@@ -220,7 +241,7 @@ func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {
 			return
 		}
 
-				// データを取得する
+		// データを取得する
 		opponentRecruitingWithComment, err := oc.OpponentRecruitingService.FindOpponentRecruitingWithComment(db, uint(opponentRecruitingId))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(

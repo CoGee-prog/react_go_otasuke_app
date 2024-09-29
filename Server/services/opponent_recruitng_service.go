@@ -130,13 +130,35 @@ func (ors *OpponentRecruitingService) DeleteOpponentRecruiting(db *gorm.DB, user
 }
 
 // 対戦相手募集のリストとページ情報を返す
-func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context) ([]*models.OpponentRecruiting, *database.Page) {
+func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context, isMyTeam bool) ([]*models.OpponentRecruiting, *database.Page) {
 	// リスト表示時の1ページあたりの要素数
 	var pageSize int = 10
 
 	// 対戦相手募集の構造体の配列
 	var opponentRecruitings []*models.OpponentRecruiting
 	db := c.MustGet("tx").(*gorm.DB)
+
+	// 自チームフラグが立っている場合
+	if isMyTeam {
+		var user models.User
+		userId := c.MustGet("userId")
+		println("ユーザーID")
+		println(userId)
+		result := db.Where("id = ?", userId).First(&user)
+		// エラーが起きた場合はreturn
+		if result.Error != nil {
+			return opponentRecruitings, &database.Page{
+				Number:        1,
+				Size:          pageSize,
+				TotalElements: 0,
+				TotalPages:    1,
+			}
+		}
+
+		// 自チームの対戦相手募集に絞り込む
+		myTeamId := user.CurrentTeamId
+		db = db.Where("team_id = ?", myTeamId)
+	}
 
 	// クエリパラメータからフィルタリング条件を取得
 	hasGroundQuery := c.Query("has_ground")

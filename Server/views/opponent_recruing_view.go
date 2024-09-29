@@ -18,7 +18,7 @@ type OpponentRecruitingIndexView struct {
 	IsActive   bool      `json:"is_active"`
 }
 
-// 対戦相手募集の構造体から対戦相手募集一覧表示に必要なキーのみ返す
+// 対戦相手募集の構造体の配列から対戦相手募集一覧表示に必要なキーのみ返す
 func CreateOpponentRecruitingIndexView(opponentRecruitings []*models.OpponentRecruiting) []*OpponentRecruitingIndexView {
 	newArray := make([]*OpponentRecruitingIndexView, len(opponentRecruitings))
 	for i, v := range opponentRecruitings {
@@ -68,4 +68,38 @@ func CreateOpponentRecruitingGetView(opponentRecruiting *models.OpponentRecruiti
 		IsActive:   opponentRecruiting.IsActive,
 		Comments:   CreateOpponentRecruitingCommentView(opponentRecruiting.Comments),
 	}
+}
+
+type OpponentRecruitingGetMyTeamView struct {
+	ID         uint      `json:"id"`
+	Team       *TeamView `json:"team"`
+	Title      string    `json:"title"`
+	HasGround  bool      `json:"has_ground"`
+	GroundName string    `json:"ground_name"`
+	StartTime  time.Time `json:"start_time"`
+	EndTime    time.Time `json:"end_time"`
+	Prefecture string    `json:"prefecture"`
+	Detail     string    `json:"detail"`
+	IsActive   bool      `json:"is_active"`
+}
+
+// 対戦相手募集の構造体の配列から自チームの対戦相手募集一覧表示に必要なキーのみ返す
+func CreateOpponentRecruitingGetMyTeamView(opponentRecruitings []*models.OpponentRecruiting) []*OpponentRecruitingGetMyTeamView {
+	newArray := make([]*OpponentRecruitingGetMyTeamView, len(opponentRecruitings))
+	for i, v := range opponentRecruitings {
+		newArray[i] = &OpponentRecruitingGetMyTeamView{
+			ID:         v.ID,
+			Team:       CreateTeamView(v.Team),
+			Title:      v.Title,
+			HasGround:  v.HasGround,
+			GroundName: v.GroundName,
+			StartTime:  v.StartTime,
+			EndTime:    v.EndTime,
+			Prefecture: v.PrefectureID.ToString(),
+			Detail:     v.Detail,
+			IsActive:   v.IsActive,
+		}
+	}
+
+	return newArray
 }
