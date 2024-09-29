@@ -1,6 +1,5 @@
 import TabContext from '@mui/lab/TabContext'
 import TabList from '@mui/lab/TabList'
-import TabPanel from '@mui/lab/TabPanel'
 import Box from '@mui/material/Box'
 import Tab from '@mui/material/Tab'
 import { useRouter } from 'next/router'
@@ -9,12 +8,22 @@ import { useEffect, useState } from 'react'
 export default function Tabs() {
   const router = useRouter()
   // URLに基づいてタブの値を設定
-  const [basePath, setBasePath] = useState('/')
+  const [basePath, setBasePath] = useState<string | null>(null)
 
   useEffect(() => {
-    const path = router.pathname.split('/')[1]
-    const newBasePath = `/${path}`
-    setBasePath(newBasePath)
+    const pathSegments = router.pathname.split('/')
+    const firstSegment = pathSegments[1]
+    const secondSegment = pathSegments[2]
+
+    // /opponent_recruitingsか/opponent_recruitings/[id]のパスのみハイライトする
+    if (firstSegment === 'opponent_recruitings' && (!secondSegment || secondSegment === '[id]')) {
+      setBasePath('/opponent_recruitings')
+    } else if (firstSegment === '/schedules') {
+      setBasePath('/schedules')
+    } else {
+      // その他のパスではハイライトしない
+      setBasePath(null)
+    }
   }, [router.pathname])
 
   const handleTabClick = (nextPath: string) => {
@@ -26,7 +35,7 @@ export default function Tabs() {
 
   return (
     <Box sx={{ width: '100%', typography: 'body1' }}>
-      <TabContext value={basePath}>
+      <TabContext value={basePath || ''}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider', justifyContent: 'center' }}>
           <TabList onChange={() => {}} aria-label='Tabs' centered>
             <Tab

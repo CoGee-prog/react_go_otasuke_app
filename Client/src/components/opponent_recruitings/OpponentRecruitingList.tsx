@@ -27,11 +27,13 @@ import { useRouter } from 'next/router'
 interface OpponentRecruitingListProps {
   initialRecruitings: OpponentRecruiting[]
   initialPage: Page
+  isMyTeam?: boolean
 }
 
 const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
   initialRecruitings,
   initialPage,
+  isMyTeam = false,
 }) => {
   const router = useRouter()
   const [opponentRecruitings, setOpponentRecruitings] =
@@ -41,13 +43,19 @@ const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
   const { user } = useContext(AuthContext)
   const [searchQueryParams, setSearchQueryParams] = useState<string>('')
   const navigateHome = useNavigateHome()
+  const [endPoint, setEndPoint] = useState<string | null>(null)
 
   useEffect(() => {
-    if (router.isReady) {
+    const endpoint = isMyTeam ? '/opponent_recruitings/my_team' : '/opponent_recruitings'
+    setEndPoint(endpoint)
+  }, [isMyTeam])
+
+  useEffect(() => {
+    if (router.isReady && endPoint) {
       // 検索条件をもとに検索を再実行
       handleChangeList()
     }
-  }, [router.isReady, router.query])
+  }, [router.isReady, router.query, endPoint])
 
   const handleSearch = (newQueryParams: string) => {
     // クエリパラメーターが変わっていなければ何もしない
@@ -55,7 +63,7 @@ const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
       setSearchQueryParams(newQueryParams)
       setPage(1)
       // 検索条件のクエリパラメータがあればを付加して、なければそのまま
-      const url = `/opponent_recruitings?page=1` + (newQueryParams ? `&${newQueryParams}` : '')
+      const url = endPoint + `?page=1` + (newQueryParams ? `&${newQueryParams}` : '')
       router.push(url, undefined, { shallow: true })
     }
   }
@@ -66,15 +74,15 @@ const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
       return
     }
     // 検索条件のクエリパラメータがあればを付加して、なければそのまま
-    const url =
-      `/opponent_recruitings?page=${value}` + (searchQueryParams ? `&${searchQueryParams}` : '')
+    const url = endPoint + `?page=${value}` + (searchQueryParams ? `&${searchQueryParams}` : '')
     router.push(url, undefined, {
       shallow: true,
     })
   }
 
   const handleChangeList = async () => {
-    // const currentQueryParams = router.query
+    if (!endPoint) return
+
     const options: RequestInit = {
       method: 'GET',
       headers: {
@@ -95,7 +103,7 @@ const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
 
     const queryParams = params.toString()
 
-    fetchAPI<GetOpponentRecruitingsApiResponse>(`/opponent_recruitings?${queryParams}`, options)
+    fetchAPI<GetOpponentRecruitingsApiResponse>(endPoint + `?${queryParams}`, options)
       .then((responseData) => {
         setOpponentRecruitings(responseData.result.opponent_recruitings)
         setPage(responseData.result.page.number)
@@ -118,6 +126,11 @@ const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
         justifyContent='center'
         style={{ marginTop: '3px' }}
       >
+        {isMyTeam ? (
+          <Typography variant='h4' component='h2' gutterBottom marginTop={2}>
+            自チーム対戦相手募集一覧
+          </Typography>
+        ) : null}
         <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
           <Box sx={{ maxWidth: 500, width: '100%', textAlign: 'center' }}>
             {user &&
