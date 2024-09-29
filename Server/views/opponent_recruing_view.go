@@ -82,24 +82,3 @@ type OpponentRecruitingGetMyTeamView struct {
 	Detail     string    `json:"detail"`
 	IsActive   bool      `json:"is_active"`
 }
-
-// 対戦相手募集の構造体の配列から自チームの対戦相手募集一覧表示に必要なキーのみ返す
-func CreateOpponentRecruitingGetMyTeamView(opponentRecruitings []*models.OpponentRecruiting) []*OpponentRecruitingGetMyTeamView {
-	newArray := make([]*OpponentRecruitingGetMyTeamView, len(opponentRecruitings))
-	for i, v := range opponentRecruitings {
-		newArray[i] = &OpponentRecruitingGetMyTeamView{
-			ID:         v.ID,
-			Team:       CreateTeamView(v.Team),
-			Title:      v.Title,
-			HasGround:  v.HasGround,
-			GroundName: v.GroundName,
-			StartTime:  v.StartTime,
-			EndTime:    v.EndTime,
-			Prefecture: v.PrefectureID.ToString(),
-			Detail:     v.Detail,
-			IsActive:   v.IsActive,
-		}
-	}
-
-	return newArray
-}

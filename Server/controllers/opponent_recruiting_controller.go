@@ -78,11 +78,6 @@ func (oc *OpponentRecruitingController) Get() gin.HandlerFunc {
 	}
 }
 
-type OpponentRecruitingGetMyTeamResponse struct {
-	OpponentRecruitings []*views.OpponentRecruitingGetMyTeamView `json:"opponent_recruitings"`
-	Page                *database.Page                           `json:"page"`
-}
-
 func (oc *OpponentRecruitingController) GetMyTeam() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 自チームの対戦相手募集データを取得する
@@ -91,8 +86,8 @@ func (oc *OpponentRecruitingController) GetMyTeam() gin.HandlerFunc {
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,
 			http.StatusText(http.StatusOK),
-			&OpponentRecruitingGetMyTeamResponse{
-				OpponentRecruitings: views.CreateOpponentRecruitingGetMyTeamView(opponentRecruitings),
+			&OpponentRecruitingIndexResponse{
+				OpponentRecruitings: views.CreateOpponentRecruitingIndexView(opponentRecruitings),
 				Page:                page,
 			},
 		))
