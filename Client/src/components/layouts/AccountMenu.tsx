@@ -17,6 +17,7 @@ import GroupAddIcon from '@mui/icons-material/GroupAdd'
 import { useContext } from 'react'
 import { AuthContext } from 'src/contexts/AuthContext'
 import Link from 'next/link'
+import { TeamRole } from 'src/types/teamRole'
 
 export default function AccountMenu() {
   const [accountAnchorEl, setAccountAnchorEl] = React.useState<null | HTMLElement>(null)
@@ -25,7 +26,9 @@ export default function AccountMenu() {
   const teamMenuOpen = Boolean(teamAnchorEl)
 
   const handleTeamClick = (event: React.MouseEvent<HTMLElement>) => {
-    setTeamAnchorEl(event.currentTarget)
+    if (isTeamAdminUser) {
+      setTeamAnchorEl(event.currentTarget)
+    }
   }
   const handleTeamMenuClose = () => {
     setTeamAnchorEl(null)
@@ -41,21 +44,27 @@ export default function AccountMenu() {
     setAccountAnchorEl(null)
   }
   const { user, logout } = useContext(AuthContext)
+  console.log(user && user.current_team_role)
+  const isTeamAdminUser =
+    user &&
+    (user.current_team_role === TeamRole.ADMIN || user.current_team_role === TeamRole.SUB_ADMIN)
 
   return (
     <React.Fragment>
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
-        <Tooltip title='Team menus'>
+        <Tooltip title={isTeamAdminUser ? 'Team menus' : ''}>
           <Typography
             onClick={handleTeamClick}
             sx={{
               minWidth: 100,
               color: 'white',
-              cursor: 'pointer',
-              '&:hover': {
-                color: 'lightgray',
-                textDecoration: 'underline',
-              },
+              cursor: isTeamAdminUser ? 'pointer' : 'default',
+              '&:hover': isTeamAdminUser
+                ? {
+                    color: 'lightgray',
+                    textDecoration: 'underline',
+                  }
+                : undefined,
             }}
           >
             {user?.current_team_name}

@@ -44,11 +44,26 @@ const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
   const [searchQueryParams, setSearchQueryParams] = useState<string>('')
   const navigateHome = useNavigateHome()
   const [endPoint, setEndPoint] = useState<string | null>(null)
+  const [isAccessAllowed, setIsAccessAllowed] = useState(false)
 
   useEffect(() => {
     const endpoint = isMyTeam ? '/opponent_recruitings/my_team' : '/opponent_recruitings'
     setEndPoint(endpoint)
   }, [isMyTeam])
+
+  useEffect(() => {
+    // 自チームの対戦相手募集一覧でないまたは、ユーザーの役割が管理者または副管理者であれば 、アクセス可能とする
+    if (
+      !isMyTeam ||
+      (user &&
+        (user.current_team_role == TeamRole.ADMIN || user.current_team_role == TeamRole.SUB_ADMIN))
+    ) {
+      setIsAccessAllowed(true)
+    } else {
+      // 適切な権限がない場合、ホーム画面にリダイレクト
+      navigateHome()
+    }
+  }, [router])
 
   useEffect(() => {
     if (router.isReady && endPoint) {
@@ -114,6 +129,11 @@ const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
         // ホームページに移動
         navigateHome()
       })
+  }
+
+  if (!isAccessAllowed) {
+    // 認証されていない場合は、何も表示しない
+    return null
   }
 
   return (
