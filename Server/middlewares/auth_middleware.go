@@ -8,11 +8,10 @@ import (
 
 	firebase "firebase.google.com/go"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 // Firebaseで認証を行うMiddleware関数
-func AuthMiddleware(firebaseApp *firebase.App) gin.HandlerFunc {
+func AuthMiddleware(firebaseApp *firebase.App, userService *services.UserService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		// ローカル環境の場合は認証をスキップする
@@ -55,12 +54,9 @@ func AuthMiddleware(firebaseApp *firebase.App) gin.HandlerFunc {
 			return
 		}
 
-		// ユーザーサービスを取得する
-		userService := services.NewUserService()
 		userId := decoded.UID
-		db := c.MustGet("tx").(*gorm.DB)
 		// ユーザーを取得する
-		user, err := userService.GetUser(db, userId)
+		user, err := userService.GetUser(userId)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,

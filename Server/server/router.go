@@ -4,6 +4,7 @@ import (
 	"react_go_otasuke_app/controllers"
 	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/middlewares"
+	"react_go_otasuke_app/repositories"
 	"react_go_otasuke_app/services"
 
 	"github.com/gin-gonic/gin"
@@ -16,9 +17,13 @@ func NewRouter() (*gin.Engine, error) {
 	router := gin.Default()
 	// トランザクションを開始する
 	router.Use(middlewares.Transaction(db))
+
+	// リポジトリの作成
+	userRepo := repositories.NewUserRepository(db)
+	
 	// DIのためここでサービスを作成する
 	userTeamService := services.NewUserTeamService()
-	userService := services.NewUserService()
+	userService := services.NewUserService(userRepo)
 	teamService := services.NewTeamService()
 	opponentRecruitingService := services.NewOpponentRecruitingService(userTeamService)
 
@@ -41,7 +46,7 @@ func NewRouter() (*gin.Engine, error) {
 	firebaseApp := userService.GetFireBaseApp()
 	// 認証が必要なエンドポイント
 	authRequired := router.Group("/")
-	authRequired.Use(middlewares.AuthMiddleware(firebaseApp))
+	authRequired.Use(middlewares.AuthMiddleware(firebaseApp, userService))
 
 	{
 		authRequired.POST("/logout", userController.Logout())

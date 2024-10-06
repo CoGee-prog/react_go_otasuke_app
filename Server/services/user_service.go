@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"react_go_otasuke_app/config"
 	"react_go_otasuke_app/models"
+	"react_go_otasuke_app/repositories"
 	"time"
 
 	firebase "firebase.google.com/go"
@@ -15,13 +16,17 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserService struct{}
+type UserService struct{
+	userRepository *repositories.UserRepository
+}
 
 // ユーザーサービスを作成する
-func NewUserService() *UserService {
+func NewUserService(userRepo *repositories.UserRepository) *UserService {
 	// Firebase Admin SDKの初期化
 	initFirebase()
-	return &UserService{}
+	return &UserService{
+		userRepository: userRepo,
+	}
 }
 
 // Firebaseのアプリインスタンスを保持するためのグローバル変数
@@ -111,39 +116,28 @@ func (us *UserService) GetFireBaseApp() *firebase.App {
 }
 
 // ユーザーを取得する
-func (us *UserService) GetUser(db *gorm.DB, id string) (*models.User, error) {
-	var user models.User
-
-	result := db.Preload("CurrentTeam").Where("id = ?", id).First(&user)
-	// レコードが見つからない場合はnilを返す
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, nil
-		// その他のエラーの場合
-	} else if result.Error != nil {
-		return nil, result.Error
-	}
-	// レコードが見つかった場合
-	return &user, nil
+func (us *UserService) GetUser(id string) (*models.User, error) {
+	return us.userRepository.Get(id)
 }
 
 // 新規ユーザーを作成する
-func (us *UserService) CreateUser(db *gorm.DB, user *models.User) error {
-	if err := db.Create(user).Error; err != nil {
+func (us *UserService) CreateUser(tx *gorm.DB, user *models.User) error {
+	if err := us.userRepository.Create(tx, user); err != nil {
 		return errors.New("ユーザー作成に失敗しました")
 	}
 	return nil
 }
 
 // 現在のチームを変更する
-func (us *UserService) UpdateCurrentTeam(db *gorm.DB, userId string, teamId uint) error {
+func (us *UserService) UpdateCurrentTeam(tx *gorm.DB, userId string, teamId uint) error {
 	// チームに所属していなければエラー
 	var userTeam models.UserTeam
-	if err := db.Where("user_id = ? AND team_id = ?", userId, teamId).First(&userTeam).Error; err != nil {
+	if err := tx.Where("user_id = ? AND team_id = ?", userId, teamId).First(&userTeam).Error; err != nil {
 		return errors.New("所属チーム以外に切り替えられません")
 	}
 
 	// 現在のチームを変更する
-	if err := db.Model(&models.User{}).Where("id = ?", userId).Update("current_team_id", teamId).Error; err != nil {
+	if err := us.userRepository.ChangeUserCurrentTeam(tx, userId, teamId); err != nil {
 		return errors.New("チーム切り替えに失敗しました")
 	}
 	return nil

@@ -33,7 +33,7 @@ func (uc *UserController) Login() gin.HandlerFunc {
 		// 開発環境の場合はIDトークン検証をスキップしてユーザーを作成する
 		if config.Get().GetString("server.env") == "local" {
 			// ユーザーデータを検索
-			devUser, err := uc.UserService.GetUser(db, c.GetHeader("X-User-Id"))
+			devUser, err := uc.UserService.GetUser(c.GetHeader("X-User-Id"))
 			if err != nil {
 				c.JSON(http.StatusServiceUnavailable, utils.NewResponse(
 					http.StatusServiceUnavailable,
@@ -89,7 +89,7 @@ func (uc *UserController) Login() gin.HandlerFunc {
 		}
 
 		// ユーザーデータを検索
-		user, err := uc.UserService.GetUser(db, token.UID)
+		user, err := uc.UserService.GetUser(token.UID)
 		if err != nil {
 			c.JSON(http.StatusServiceUnavailable, utils.NewResponse(
 				http.StatusServiceUnavailable,

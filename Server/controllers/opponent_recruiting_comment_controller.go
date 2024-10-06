@@ -46,7 +46,7 @@ func (oc *OpponentRecruitingCommentController) Create() gin.HandlerFunc {
 
 		db := c.MustGet("tx").(*gorm.DB)
 		// ユーザーを取得する
-		user, err := oc.UserService.GetUser(db, c.MustGet("userId").(string))
+		user, err := oc.UserService.GetUser(c.MustGet("userId").(string))
 		if err != nil || user == nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
