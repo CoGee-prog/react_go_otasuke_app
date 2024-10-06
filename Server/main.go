@@ -6,7 +6,7 @@ import (
 	"react_go_otasuke_app/models"
 	"react_go_otasuke_app/server"
 
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "gorm.io/driver/mysql"
 )
 
 func init() {
@@ -20,8 +20,11 @@ func main() {
 	// データベースの設定
 	database.Init()
 	models := []interface{}{
-		&models.OpponentRecruiting{},
+		&models.Team{},
 		&models.User{},
+		&models.UserTeam{},
+		&models.OpponentRecruiting{},
+		&models.OpponentRecruitingComment{},
 	}
 	database.Migration(models...)
 	defer database.Close()

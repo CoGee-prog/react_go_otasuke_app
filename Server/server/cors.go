@@ -12,7 +12,7 @@ func setCors(r *gin.Engine) {
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:53000"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "X-Requested-With"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "X-Requested-With", "X-User-Id"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))

@@ -5,16 +5,26 @@ import (
 )
 
 type UserView struct {
-	Name            string  `json:"name"`
-	CurrentTeamId   *int    `json:"current_team_id"`
-	CurrentTeamName string `json:"current_team_name"`
+	Id              string           `json:"id"`
+	Name            string           `json:"name"`
+	CurrentTeamId   *uint            `json:"current_team_id"`
+	CurrentTeamName string           `json:"current_team_name"`
+	CurrentTeamRole *models.TeamRole `json:"current_team_role"`
 }
 
 // Userの構造体から必要なキーのみ返す
 func CreateUserView(user *models.User) *UserView {
-	return &UserView{
+	userView := &UserView{
+		Id:            user.ID,
 		Name:          user.Name,
 		CurrentTeamId: user.CurrentTeamId,
-		CurrentTeamName: "examples",
 	}
+
+	// CurrentTeamがnilでなければチーム情報を設定
+	if user.CurrentTeam != nil {
+		userView.CurrentTeamName = user.CurrentTeam.Name
+		userView.CurrentTeamRole = user.CurrentTeamRole
+	}
+
+	return userView
 }

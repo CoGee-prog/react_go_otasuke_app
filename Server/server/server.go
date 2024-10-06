@@ -8,10 +8,10 @@ import (
 // サーバー設定
 func Init() error {
 	router, err := NewRouter()
-	if err != nil {	
+	if err != nil {
 		return err
 	}
-	c := config.GetConfig()
+	c := config.Get()
 	router.Run(fmt.Sprintf(":%s", c.GetString("server.port")))
 
 	return nil
