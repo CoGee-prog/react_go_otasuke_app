@@ -56,9 +56,9 @@ type OpponentRecruitingGetResponse struct {
 func (oc *OpponentRecruitingController) Get() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, _ := strconv.Atoi(c.Param("id"))
-		db := c.MustGet("tx").(*gorm.DB)
+		tx := c.MustGet("tx").(*gorm.DB)
 		// データを取得する
-		opponentRecruiting, err := oc.OpponentRecruitingService.FindOpponentRecruitingWithComment(db, uint(id))
+		opponentRecruiting, err := oc.OpponentRecruitingService.FindOpponentRecruitingWithComment(tx, uint(id))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
@@ -118,9 +118,9 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 			return
 		}
 
-		db := c.MustGet("tx").(*gorm.DB)
+		tx := c.MustGet("tx").(*gorm.DB)
 		// ユーザーを取得する
-		user, err := oc.UserService.GetUser(c.MustGet("userId").(string))
+		user, err := oc.UserService.GetUser(tx, c.MustGet("userId").(string))
 		if err != nil || user == nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
@@ -152,7 +152,7 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 			return
 		}
 		// データを作成する
-		if err := oc.OpponentRecruitingService.CreateOpponentRecruiting(db, user.ID, opponentRecruiting); err != nil {
+		if err := oc.OpponentRecruitingService.CreateOpponentRecruiting(tx, user.ID, opponentRecruiting); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				err.Error(),
@@ -193,8 +193,8 @@ func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {
 			return
 		}
 
-		db := c.MustGet("tx").(*gorm.DB)
-		user, err := oc.UserService.GetUser(c.MustGet("userId").(string))
+		tx := c.MustGet("tx").(*gorm.DB)
+		user, err := oc.UserService.GetUser(tx, c.MustGet("userId").(string))
 		if err != nil || user == nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
@@ -227,7 +227,7 @@ func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {
 
 		opponentRecruitingId, _ := strconv.Atoi(c.Param("opponent_recruiting_id"))
 		// データを更新する
-		if err := oc.OpponentRecruitingService.UpdateOpponentRecruiting(db, user.ID, opponentRecruiting, uint(opponentRecruitingId)); err != nil {
+		if err := oc.OpponentRecruitingService.UpdateOpponentRecruiting(tx, user.ID, opponentRecruiting, uint(opponentRecruitingId)); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				err.Error(),
@@ -237,7 +237,7 @@ func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {
 		}
 
 		// データを取得する
-		opponentRecruitingWithComment, err := oc.OpponentRecruitingService.FindOpponentRecruitingWithComment(db, uint(opponentRecruitingId))
+		opponentRecruitingWithComment, err := oc.OpponentRecruitingService.FindOpponentRecruitingWithComment(tx, uint(opponentRecruitingId))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
@@ -261,10 +261,10 @@ func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {
 func (oc *OpponentRecruitingController) Delete() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, _ := strconv.Atoi(c.Param("opponent_recruiting_id"))
-		db := c.MustGet("tx").(*gorm.DB)
+		tx := c.MustGet("tx").(*gorm.DB)
 		userId := c.MustGet("userId").(string)
 		// データを削除する
-		if err := oc.OpponentRecruitingService.DeleteOpponentRecruiting(db, userId, uint(id)); err != nil {
+		if err := oc.OpponentRecruitingService.DeleteOpponentRecruiting(tx, userId, uint(id)); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				err.Error(),
@@ -316,10 +316,10 @@ func (oc *OpponentRecruitingController) ChangeStatus() gin.HandlerFunc {
 
 		opponentRecruitingId, _ := strconv.Atoi(c.Param("opponent_recruiting_id"))
 
-		db := c.MustGet("tx").(*gorm.DB)
+		tx := c.MustGet("tx").(*gorm.DB)
 		userId := c.MustGet("userId").(string)
 		// データを更新する
-		if err := oc.OpponentRecruitingService.UpdateStatusOpponentRecruiting(db, userId, opponentRecruiting, uint(opponentRecruitingId)); err != nil {
+		if err := oc.OpponentRecruitingService.UpdateStatusOpponentRecruiting(tx, userId, opponentRecruiting, uint(opponentRecruitingId)); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				err.Error(),
@@ -337,7 +337,7 @@ func (oc *OpponentRecruitingController) ChangeStatus() gin.HandlerFunc {
 		}
 
 		// データを取得する
-		opponentRecruiting, err := oc.OpponentRecruitingService.FindOpponentRecruitingWithComment(db, uint(opponentRecruitingId))
+		opponentRecruiting, err := oc.OpponentRecruitingService.FindOpponentRecruitingWithComment(tx, uint(opponentRecruitingId))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,

@@ -19,7 +19,7 @@ func NewRouter() (*gin.Engine, error) {
 	router.Use(middlewares.Transaction(db))
 
 	// リポジトリの作成
-	userRepo := repositories.NewUserRepository(db)
+	userRepo := repositories.NewUserRepository()
 	
 	// DIのためここでサービスを作成する
 	userTeamService := services.NewUserTeamService()

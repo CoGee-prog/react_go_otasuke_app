@@ -7,19 +7,23 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserRepository struct {
-    db *gorm.DB
+type UserRepository interface {
+	GetUser(tx *gorm.DB, userId string) (*models.User, error)
+	CreateUser(tx *gorm.DB, user *models.User) error
+	ChangeUserCurrentTeam(tx *gorm.DB, userId string, teamId uint) error
 }
 
-func NewUserRepository(db *gorm.DB) *UserRepository {
-    return &UserRepository{db: db}
+type userRepository struct{}
+
+func NewUserRepository() UserRepository {
+	return &userRepository{}
 }
 
 // ユーザーを取得する
-func (r *UserRepository) Get(userId string)(*models.User, error) {
+func (r *userRepository) GetUser(tx *gorm.DB, userId string) (*models.User, error) {
 	var user models.User
 
-	result := r.db.Preload("CurrentTeam").Where("id = ?", userId).First(&user)
+	result := tx.Preload("CurrentTeam").Where("id = ?", userId).First(&user)
 	// レコードが見つからない場合はnilを返す
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, nil
@@ -32,11 +36,11 @@ func (r *UserRepository) Get(userId string)(*models.User, error) {
 }
 
 // ユーザーを作成
-func (r *UserRepository) Create(tx *gorm.DB, user *models.User) error {
-  return tx.Create(user).Error
+func (r *userRepository) CreateUser(tx *gorm.DB, user *models.User) error {
+	return tx.Create(user).Error
 }
 
 // ユーザーの現在のチームを切り替える
-func (r *UserRepository) ChangeUserCurrentTeam(tx *gorm.DB, userId string, teamId uint) error {
+func (r *userRepository) ChangeUserCurrentTeam(tx *gorm.DB, userId string, teamId uint) error {
 	return tx.Model(&models.User{}).Where("id = ?", userId).Update("current_team_id", teamId).Error
 }

@@ -136,13 +136,13 @@ func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context, 
 
 	// 対戦相手募集の構造体の配列
 	var opponentRecruitings []*models.OpponentRecruiting
-	db := c.MustGet("tx").(*gorm.DB)
+	tx := c.MustGet("tx").(*gorm.DB)
 
 	// 自チームフラグが立っている場合
 	if isMyTeam {
 		var user models.User
 		userId := c.MustGet("userId")
-		result := db.Where("id = ?", userId).First(&user)
+		result := tx.Where("id = ?", userId).First(&user)
 		// エラーが起きた場合はreturn
 		if result.Error != nil {
 			return opponentRecruitings, &database.Page{
@@ -155,7 +155,7 @@ func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context, 
 
 		// 自チームの対戦相手募集に絞り込む
 		myTeamId := user.CurrentTeamId
-		db = db.Where("team_id = ?", myTeamId)
+		tx = tx.Where("team_id = ?", myTeamId)
 	}
 
 	// クエリパラメータからフィルタリング条件を取得
@@ -169,28 +169,28 @@ func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context, 
 	if hasGroundQuery != "" {
 		hasGround, err := strconv.ParseBool(hasGroundQuery)
 		if err == nil {
-			db = db.Where("has_ground = ?", hasGround)
+			tx = tx.Where("has_ground = ?", hasGround)
 		}
 	}
 	// 都道府県でフィルタリング
 	if prefectureId > 0 {
-		db = db.Where("prefecture_id = ?", prefectureId)
+		tx = tx.Where("prefecture_id = ?", prefectureId)
 	}
 	// 募集中かどうか
 	if isActive {
-		db = db.Where("is_active = ?", true)
+		tx = tx.Where("is_active = ?", true)
 	}
 	// 日付でフィルタリング
 	if date != "" && day == "" {
-		db = db.Where("DATE(start_time) = ?", date)
+		tx = tx.Where("DATE(start_time) = ?", date)
 		// 曜日でフィルタリング
 	} else if day != "" && date == "" {
-		db = db.Where("DAYNAME(start_time) = ?", day)
+		tx = tx.Where("DAYNAME(start_time) = ?", day)
 	}
 
 	// 合計要素数
 	var totalElements int64
-	db.Model(&models.OpponentRecruiting{}).Count(&totalElements)
+	tx.Model(&models.OpponentRecruiting{}).Count(&totalElements)
 
 	// 合計要素数がページサイズより小さい場合はページサイズを合計要素数に合わせる
 	if int(totalElements) < pageSize {
@@ -223,7 +223,7 @@ func (ors *OpponentRecruitingService) GetOpponentRecruitingList(c *gin.Context, 
 	}
 
 	// 対戦相手募集を指定されたページと作成順に並び替えて、チーム情報とまとめて返す
-	db = db.Scopes(page.Paginate(), sort.Sort()).Preload("Team").Find(&opponentRecruitings)
+	tx = tx.Scopes(page.Paginate(), sort.Sort()).Preload("Team").Find(&opponentRecruitings)
 
 	return opponentRecruitings, page
 }

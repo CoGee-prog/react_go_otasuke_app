@@ -16,12 +16,12 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserService struct{
-	userRepository *repositories.UserRepository
+type UserService struct {
+	userRepository repositories.UserRepository
 }
 
 // ユーザーサービスを作成する
-func NewUserService(userRepo *repositories.UserRepository) *UserService {
+func NewUserService(userRepo repositories.UserRepository) *UserService {
 	// Firebase Admin SDKの初期化
 	initFirebase()
 	return &UserService{
@@ -116,13 +116,13 @@ func (us *UserService) GetFireBaseApp() *firebase.App {
 }
 
 // ユーザーを取得する
-func (us *UserService) GetUser(id string) (*models.User, error) {
-	return us.userRepository.Get(id)
+func (us *UserService) GetUser(tx *gorm.DB, id string) (*models.User, error) {
+	return us.userRepository.GetUser(tx, id)
 }
 
 // 新規ユーザーを作成する
 func (us *UserService) CreateUser(tx *gorm.DB, user *models.User) error {
-	if err := us.userRepository.Create(tx, user); err != nil {
+	if err := us.userRepository.CreateUser(tx, user); err != nil {
 		return errors.New("ユーザー作成に失敗しました")
 	}
 	return nil
