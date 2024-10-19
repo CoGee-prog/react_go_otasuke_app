@@ -11,12 +11,12 @@ import (
 )
 
 type TeamController struct {
-	UserService *services.UserService
-	TeamService *services.TeamService
+	UserService services.UserService
+	TeamService services.TeamService
 }
 
 // チームコントローラーを返す
-func NewTeamController(userService *services.UserService, teamService *services.TeamService) *TeamController {
+func NewTeamController(userService services.UserService, teamService services.TeamService) *TeamController {
 	return &TeamController{
 		UserService: userService,
 		TeamService: teamService,
@@ -56,7 +56,7 @@ func (tc *TeamController) Create() gin.HandlerFunc {
 		tx := c.MustGet("tx").(*gorm.DB)
 		userId := c.MustGet("userId").(string)
 		// チームを作成する
-		if err := tc.TeamService.CreateTeam(tx, userId, team); err != nil {
+		if err := tc.TeamService.CreateTeamWithAdmin(tx, userId, team); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				"チーム作成に失敗しました",

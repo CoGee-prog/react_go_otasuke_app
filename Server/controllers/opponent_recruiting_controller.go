@@ -17,11 +17,11 @@ import (
 
 type OpponentRecruitingController struct {
 	OpponentRecruitingService *services.OpponentRecruitingService
-	UserService               *services.UserService
+	UserService               services.UserService
 }
 
 // 対戦相手募集のコントローラーを作成する
-func NewOpponentRecruitingController(opponentRecruitingService *services.OpponentRecruitingService, userService *services.UserService) *OpponentRecruitingController {
+func NewOpponentRecruitingController(opponentRecruitingService *services.OpponentRecruitingService, userService services.UserService) *OpponentRecruitingController {
 	return &OpponentRecruitingController{
 		OpponentRecruitingService: opponentRecruitingService,
 		UserService:               userService,

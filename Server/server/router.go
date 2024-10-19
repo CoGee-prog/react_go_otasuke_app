@@ -12,22 +12,24 @@ import (
 
 // ルーティング設定
 func NewRouter() (*gin.Engine, error) {
-	// DIのためここでDBを取得する
+	// DIのためここでDBを取得
 	db := database.GetDB()
 	router := gin.Default()
-	// トランザクションを開始する
+	// トランザクションを開始
 	router.Use(middlewares.Transaction(db))
 
 	// リポジトリの作成
 	userRepo := repositories.NewUserRepository()
+	teamRepo := repositories.NewTeamRepository()
+	userTeamRepo := repositories.NewUserTeamRepository()
 	
-	// DIのためここでサービスを作成する
-	userTeamService := services.NewUserTeamService()
+	// サービスを作成
+	userTeamService := services.NewUserTeamService(userTeamRepo)
 	userService := services.NewUserService(userRepo)
-	teamService := services.NewTeamService()
+	teamService := services.NewTeamService(teamRepo, userTeamRepo)
 	opponentRecruitingService := services.NewOpponentRecruitingService(userTeamService)
 
-	// コントローラーを作成する
+	// コントローラーを作成
 	userController := controllers.NewUserController(userService)
 	teamController := controllers.NewTeamController(userService, teamService)
 	opponentRecruitingController := controllers.NewOpponentRecruitingController(opponentRecruitingService, userService)

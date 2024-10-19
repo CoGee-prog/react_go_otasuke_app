@@ -1,48 +1,44 @@
 package services
 
 import (
-	"errors"
 	"react_go_otasuke_app/models"
+	"react_go_otasuke_app/repositories"
 
 	"gorm.io/gorm"
 )
 
-type TeamService struct{}
+type TeamService interface {
+	GetTeam(tx *gorm.DB, id string) (*models.Team, error)
+	CreateTeamWithAdmin(tx *gorm.DB, userId string, team *models.Team) error
+}
+
+type teamService struct {
+	teamRepository repositories.TeamRepository
+	userTeamRepository repositories.UserTeamRepository
+}
 
 // チームサービスを作成する
-func NewTeamService() *TeamService {
-	return &TeamService{}
+func NewTeamService(teamRepo repositories.TeamRepository, userTeamRepo repositories.UserTeamRepository) TeamService {
+	return &teamService{
+		teamRepository: teamRepo,
+		userTeamRepository: userTeamRepo,
+	}
 }
 
 // チームを取得する
-func (ts *TeamService) GetTeam(db *gorm.DB, id string) (*models.Team, error) {
-	var team models.Team
-	result := db.Where("id = ?", id).First(&team)
-	// レコードが見つからない場合はnilを返す
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, nil
-		// その他のエラーの場合
-	} else if result.Error != nil {
-		return nil, result.Error
-	}
-	// レコードが見つかった場合
-	return &team, nil
+func (ts *teamService) GetTeam(tx *gorm.DB, id string) (*models.Team, error) {
+	return ts.teamRepository.GetTeam(tx, id)
 }
 
-// チームを作成する
-func (ts *TeamService) CreateTeam(db *gorm.DB, userId string, team *models.Team) error {
+// チームを作成し、チーム作成者をチーム管理者とする
+func (ts *teamService) CreateTeamWithAdmin(tx *gorm.DB, userId string, team *models.Team) error {
 	// チームを作成する
-	if err := db.Create(team).Error; err != nil {
+	if err := ts.teamRepository.CreateTeam(tx, team); err != nil {
 		return err
 	}
 
 	// チーム作成者をチーム管理者としてチームに所属させる
-	userTeam := models.UserTeam{
-		UserID: userId,
-		TeamID: team.ID,
-		Role:   models.TeamAdmin,
-	}
-	if err := db.Create(&userTeam).Error; err != nil {
+	if err := ts.userTeamRepository.AddTeamAdmin(tx, userId, team); err != nil {
 		return err
 	}
 

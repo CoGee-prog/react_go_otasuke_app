@@ -12,7 +12,7 @@ import (
 )
 
 // Firebaseで認証を行うMiddleware関数
-func AuthMiddleware(firebaseApp *firebase.App, userService *services.UserService) gin.HandlerFunc {
+func AuthMiddleware(firebaseApp *firebase.App, userService services.UserService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		// ローカル環境の場合は認証をスキップする

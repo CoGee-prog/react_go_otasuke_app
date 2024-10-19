@@ -12,11 +12,11 @@ import (
 )
 
 type OpponentRecruitingService struct {
-	userTeamService *UserTeamService
+	userTeamService UserTeamService
 }
 
 // 対戦相手募集のサービスを作成する
-func NewOpponentRecruitingService(uts *UserTeamService) *OpponentRecruitingService {
+func NewOpponentRecruitingService(uts UserTeamService) *OpponentRecruitingService {
 	return &OpponentRecruitingService{
 		userTeamService: uts,
 	}

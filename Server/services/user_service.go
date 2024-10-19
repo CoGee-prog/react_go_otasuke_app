@@ -16,15 +16,24 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserService struct {
+type UserService interface {
+	RevokeRefreshTokens(c *gin.Context) error
+	GetFireBaseApp() *firebase.App
+	GetUser(tx *gorm.DB, id string) (*models.User, error)
+	CreateUser(tx *gorm.DB, user *models.User) error
+	UpdateCurrentTeam(tx *gorm.DB, userId string, teamId uint) error
+	GetUserTeam(db *gorm.DB, userId string, teamId uint) (*models.UserTeam, error)
+}
+
+type userService struct {
 	userRepository repositories.UserRepository
 }
 
 // ユーザーサービスを作成する
-func NewUserService(userRepo repositories.UserRepository) *UserService {
+func NewUserService(userRepo repositories.UserRepository) UserService {
 	// Firebase Admin SDKの初期化
 	initFirebase()
-	return &UserService{
+	return &userService{
 		userRepository: userRepo,
 	}
 }
@@ -99,7 +108,7 @@ func CreateSessionCookie(c *gin.Context) error {
 }
 
 // Firebaseのセッショントークンを無効化する
-func (us *UserService) RevokeRefreshTokens(c *gin.Context) error {
+func (us *userService) RevokeRefreshTokens(c *gin.Context) error {
 	var err error
 	// Firebase Admin SDKを使ってIDトークンを検証
 	firebaseClient, err = FirebaseApp.Auth(c)
@@ -111,17 +120,17 @@ func (us *UserService) RevokeRefreshTokens(c *gin.Context) error {
 }
 
 // Firebaseのアプリインスタンスを取得する
-func (us *UserService) GetFireBaseApp() *firebase.App {
+func (us *userService) GetFireBaseApp() *firebase.App {
 	return FirebaseApp
 }
 
 // ユーザーを取得する
-func (us *UserService) GetUser(tx *gorm.DB, id string) (*models.User, error) {
+func (us *userService) GetUser(tx *gorm.DB, id string) (*models.User, error) {
 	return us.userRepository.GetUser(tx, id)
 }
 
 // 新規ユーザーを作成する
-func (us *UserService) CreateUser(tx *gorm.DB, user *models.User) error {
+func (us *userService) CreateUser(tx *gorm.DB, user *models.User) error {
 	if err := us.userRepository.CreateUser(tx, user); err != nil {
 		return errors.New("ユーザー作成に失敗しました")
 	}
@@ -129,7 +138,7 @@ func (us *UserService) CreateUser(tx *gorm.DB, user *models.User) error {
 }
 
 // 現在のチームを変更する
-func (us *UserService) UpdateCurrentTeam(tx *gorm.DB, userId string, teamId uint) error {
+func (us *userService) UpdateCurrentTeam(tx *gorm.DB, userId string, teamId uint) error {
 	// チームに所属していなければエラー
 	var userTeam models.UserTeam
 	if err := tx.Where("user_id = ? AND team_id = ?", userId, teamId).First(&userTeam).Error; err != nil {
@@ -144,7 +153,7 @@ func (us *UserService) UpdateCurrentTeam(tx *gorm.DB, userId string, teamId uint
 }
 
 // ユーザーチームを取得する
-func (us *UserService) GetUserTeam(db *gorm.DB, userId string, teamId uint) (*models.UserTeam, error) {
+func (us *userService) GetUserTeam(db *gorm.DB, userId string, teamId uint) (*models.UserTeam, error) {
 	var userTeam models.UserTeam
 	result := db.Where("user_id = ? AND team_id = ?", userId, teamId).First(&userTeam)
 	// レコードが見つからない場合はnilを返す
