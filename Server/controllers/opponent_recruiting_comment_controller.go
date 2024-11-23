@@ -14,12 +14,12 @@ import (
 )
 
 type OpponentRecruitingCommentController struct {
-	OpponentRecruitingService *services.OpponentRecruitingService
+	OpponentRecruitingService services.OpponentRecruitingService
 	UserService               services.UserService
 }
 
 // 対戦相手募集のコメントのコントローラーを作成する
-func NewOpponentRecruitingCommentController(opponentRecruitingService *services.OpponentRecruitingService, userService services.UserService) *OpponentRecruitingCommentController {
+func NewOpponentRecruitingCommentController(opponentRecruitingService services.OpponentRecruitingService, userService services.UserService) *OpponentRecruitingCommentController {
 	return &OpponentRecruitingCommentController{
 		OpponentRecruitingService: opponentRecruitingService,
 		UserService:               userService,
@@ -46,7 +46,7 @@ func (oc *OpponentRecruitingCommentController) Create() gin.HandlerFunc {
 
 		tx := c.MustGet("tx").(*gorm.DB)
 		// ユーザーを取得する
-		user, err := oc.UserService.GetUser(tx, c.MustGet("userId").(string))
+		user, err := oc.UserService.GetUserWithCurrentTeam(tx, c.MustGet("userId").(string))
 		if err != nil || user == nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,

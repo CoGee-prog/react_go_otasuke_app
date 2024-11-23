@@ -9,6 +9,7 @@ import (
 
 type UserRepository interface {
 	GetUser(tx *gorm.DB, userId string) (*models.User, error)
+	GetUserWithCurrentTeam(tx *gorm.DB, userId string) (*models.User, error)
 	CreateUser(tx *gorm.DB, user *models.User) error
 	ChangeUserCurrentTeam(tx *gorm.DB, userId string, teamId uint) error
 }
@@ -21,6 +22,22 @@ func NewUserRepository() UserRepository {
 
 // ユーザーを取得する
 func (r *userRepository) GetUser(tx *gorm.DB, userId string) (*models.User, error) {
+	var user models.User
+
+	result := tx.Where("id = ?", userId).First(&user)
+	// レコードが見つからない場合はnilを返す
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, nil
+		// その他のエラーの場合
+	} else if result.Error != nil {
+		return nil, result.Error
+	}
+	// レコードが見つかった場合
+	return &user, nil
+}
+
+// ユーザーと現在のチームを取得する
+func (r *userRepository) GetUserWithCurrentTeam(tx *gorm.DB, userId string) (*models.User, error) {
 	var user models.User
 
 	result := tx.Preload("CurrentTeam").Where("id = ?", userId).First(&user)

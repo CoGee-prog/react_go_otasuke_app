@@ -19,10 +19,10 @@ import (
 type UserService interface {
 	RevokeRefreshTokens(c *gin.Context) error
 	GetFireBaseApp() *firebase.App
-	GetUser(tx *gorm.DB, id string) (*models.User, error)
+	GetUserWithCurrentTeam(tx *gorm.DB, id string) (*models.User, error)
 	CreateUser(tx *gorm.DB, user *models.User) error
 	UpdateCurrentTeam(tx *gorm.DB, userId string, teamId uint) error
-	GetUserTeam(db *gorm.DB, userId string, teamId uint) (*models.UserTeam, error)
+	GetUserTeam(tx *gorm.DB, userId string, teamId uint) (*models.UserTeam, error)
 }
 
 type userService struct {
@@ -125,8 +125,8 @@ func (us *userService) GetFireBaseApp() *firebase.App {
 }
 
 // ユーザーを取得する
-func (us *userService) GetUser(tx *gorm.DB, id string) (*models.User, error) {
-	return us.userRepository.GetUser(tx, id)
+func (us *userService) GetUserWithCurrentTeam(tx *gorm.DB, id string) (*models.User, error) {
+	return us.userRepository.GetUserWithCurrentTeam(tx, id)
 }
 
 // 新規ユーザーを作成する
@@ -153,9 +153,9 @@ func (us *userService) UpdateCurrentTeam(tx *gorm.DB, userId string, teamId uint
 }
 
 // ユーザーチームを取得する
-func (us *userService) GetUserTeam(db *gorm.DB, userId string, teamId uint) (*models.UserTeam, error) {
+func (us *userService) GetUserTeam(tx *gorm.DB, userId string, teamId uint) (*models.UserTeam, error) {
 	var userTeam models.UserTeam
-	result := db.Where("user_id = ? AND team_id = ?", userId, teamId).First(&userTeam)
+	result := tx.Where("user_id = ? AND team_id = ?", userId, teamId).First(&userTeam)
 	// レコードが見つからない場合はnilを返す
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, nil

@@ -22,12 +22,13 @@ func NewRouter() (*gin.Engine, error) {
 	userRepo := repositories.NewUserRepository()
 	teamRepo := repositories.NewTeamRepository()
 	userTeamRepo := repositories.NewUserTeamRepository()
-	
+	OpponentRecruitingRepo := repositories.NewOpponentRecruitingRepository()
+
 	// サービスを作成
 	userTeamService := services.NewUserTeamService(userTeamRepo)
 	userService := services.NewUserService(userRepo)
 	teamService := services.NewTeamService(teamRepo, userTeamRepo)
-	opponentRecruitingService := services.NewOpponentRecruitingService(userTeamService)
+	opponentRecruitingService := services.NewOpponentRecruitingService(userTeamService, userRepo, OpponentRecruitingRepo)
 
 	// コントローラーを作成
 	userController := controllers.NewUserController(userService)

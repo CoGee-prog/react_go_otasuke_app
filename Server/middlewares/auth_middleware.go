@@ -59,7 +59,7 @@ func AuthMiddleware(firebaseApp *firebase.App, userService services.UserService)
 
 		userId := decoded.UID
 		// ユーザーを取得する
-		user, err := userService.GetUser(tx, userId)
+		user, err := userService.GetUserWithCurrentTeam(tx, userId)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
