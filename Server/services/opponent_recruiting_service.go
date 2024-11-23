@@ -29,17 +29,24 @@ type OpponentRecruitingService interface {
 }
 
 type opponentRecruitingService struct {
-	userTeamService              UserTeamService
-	userRepository               repositories.UserRepository
-	opponentRecruitingRepository repositories.OpponentRecruitingRepository
+	userTeamService                     UserTeamService
+	userRepository                      repositories.UserRepository
+	opponentRecruitingRepository        repositories.OpponentRecruitingRepository
+	opponentRecruitingCommentRepository repositories.OpponentRecruitingCommentRepository
 }
 
 // 対戦相手募集のサービスを作成する
-func NewOpponentRecruitingService(uts UserTeamService, userRepo repositories.UserRepository, opponentRecruitingRepo repositories.OpponentRecruitingRepository) OpponentRecruitingService {
+func NewOpponentRecruitingService(
+	uts UserTeamService,
+	userRepo repositories.UserRepository,
+	opponentRecruitingRepo repositories.OpponentRecruitingRepository,
+	opponentRecruitingCommentRepo repositories.OpponentRecruitingCommentRepository,
+) OpponentRecruitingService {
 	return &opponentRecruitingService{
-		userTeamService:              uts,
-		userRepository:               userRepo,
-		opponentRecruitingRepository: opponentRecruitingRepo,
+		userTeamService:                     uts,
+		userRepository:                      userRepo,
+		opponentRecruitingRepository:        opponentRecruitingRepo,
+		opponentRecruitingCommentRepository: opponentRecruitingCommentRepo,
 	}
 }
 
@@ -226,8 +233,8 @@ func (ors *opponentRecruitingService) CreateOpponentRecruitingComment(tx *gorm.D
 		return errors.New("管理者または副管理者のみ対戦相手募集にコメントできます")
 	}
 	// 対戦相手募集のコメントを作成する
-	result := tx.Create(opponentRecruitingComment)
-	if result.Error != nil {
+	err := ors.opponentRecruitingCommentRepository.Create(tx, opponentRecruitingComment)
+	if err != nil {
 		return errors.New("対戦相手募集のコメントに失敗しました")
 	}
 	return nil
@@ -246,25 +253,12 @@ func (ors *opponentRecruitingService) UpdateOpponentRecruitingComment(tx *gorm.D
 	}
 
 	// データを更新する
-	result := tx.Model(&models.OpponentRecruitingComment{}).Where("id = ?", originalOpponentRecruitingComment.ID).Updates(opponentRecruitingComment)
-	if result.Error != nil {
-		return errors.New("更新に失敗しました")
-	}
-	// 更新したデータが0件の場合はエラー
-	if result.RowsAffected == 0 {
-		return errors.New("更新対象のデータがありません")
-	}
-	return nil
+	return ors.opponentRecruitingCommentRepository.UpdateById(tx, originalOpponentRecruitingComment.ID, opponentRecruitingComment)
 }
 
 // 対戦相手募集のコメントを取得する
 func (ors *opponentRecruitingService) findOpponentRecruitingComment(tx *gorm.DB, id uint) (*models.OpponentRecruitingComment, error) {
-	var opponentRecruitingComment models.OpponentRecruitingComment
-	result := tx.First(&opponentRecruitingComment, id)
-	if result.Error != nil {
-		return nil, errors.New("データ取得に失敗しました")
-	}
-	return &opponentRecruitingComment, nil
+	return ors.opponentRecruitingCommentRepository.FindById(tx, id)
 }
 
 // そのユーザーの対戦相手募集のコメントかどうか
@@ -298,19 +292,5 @@ func (ors *opponentRecruitingService) DeleteOpponentRecruitingComment(tx *gorm.D
 
 // 対戦相手募集コメントの削除済みフラグを立てて内容を削除する
 func (ors *opponentRecruitingService) softDeleteOpponentRecruitingComment(tx *gorm.DB, opponentRecruitingComment *models.OpponentRecruitingComment) error {
-	// コメントの内容を更新し、削除済みフラグを立てる
-	deleteOpponentRecruitingComment := &models.OpponentRecruitingComment{
-		Content: "削除済みコメント",
-		Deleted: true,
-	}
-	// データを更新する
-	result := tx.Model(&models.OpponentRecruitingComment{}).Where("id = ?", opponentRecruitingComment.ID).Updates(deleteOpponentRecruitingComment)
-	if result.Error != nil {
-		return errors.New("削除に失敗しました")
-	}
-	// 更新したデータが0件の場合はエラー
-	if result.RowsAffected == 0 {
-		return errors.New("削除対象のデータがありません")
-	}
-	return nil
+	return ors.opponentRecruitingCommentRepository.SetDeleteFlagById(tx, opponentRecruitingComment.ID)
 }
