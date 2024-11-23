@@ -26,15 +26,17 @@ type UserService interface {
 }
 
 type userService struct {
-	userRepository repositories.UserRepository
+	userRepository     repositories.UserRepository
+	userTeamRepository repositories.UserTeamRepository
 }
 
 // ユーザーサービスを作成する
-func NewUserService(userRepo repositories.UserRepository) UserService {
+func NewUserService(userRepo repositories.UserRepository, userTeamRepo repositories.UserTeamRepository) UserService {
 	// Firebase Admin SDKの初期化
 	initFirebase()
 	return &userService{
-		userRepository: userRepo,
+		userRepository:     userRepo,
+		userTeamRepository: userTeamRepo,
 	}
 }
 
@@ -140,8 +142,8 @@ func (us *userService) CreateUser(tx *gorm.DB, user *models.User) error {
 // 現在のチームを変更する
 func (us *userService) UpdateCurrentTeam(tx *gorm.DB, userId string, teamId uint) error {
 	// チームに所属していなければエラー
-	var userTeam models.UserTeam
-	if err := tx.Where("user_id = ? AND team_id = ?", userId, teamId).First(&userTeam).Error; err != nil {
+	_, err := us.userTeamRepository.FindByUserIdAndTeamId(tx, userId, teamId)
+	if err != nil {
 		return errors.New("所属チーム以外に切り替えられません")
 	}
 
@@ -154,15 +156,5 @@ func (us *userService) UpdateCurrentTeam(tx *gorm.DB, userId string, teamId uint
 
 // ユーザーチームを取得する
 func (us *userService) GetUserTeam(tx *gorm.DB, userId string, teamId uint) (*models.UserTeam, error) {
-	var userTeam models.UserTeam
-	result := tx.Where("user_id = ? AND team_id = ?", userId, teamId).First(&userTeam)
-	// レコードが見つからない場合はnilを返す
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, nil
-		// その他のエラーの場合
-	} else if result.Error != nil {
-		return nil, result.Error
-	}
-	// レコードが見つかった場合
-	return &userTeam, nil
+	return us.userTeamRepository.GetByUserIdAndTeamId(tx, userId, teamId)
 }

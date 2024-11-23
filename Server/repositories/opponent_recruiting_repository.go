@@ -25,7 +25,7 @@ func NewOpponentRecruitingRepository() OpponentRecruitingRepository {
 	return &opponentRecruitingRepository{}
 }
 
-// IDで対戦相手募集を取得
+// IDで対戦相手募集を取得(なければエラー)
 func (r *opponentRecruitingRepository) FindById(tx *gorm.DB, id uint) (*models.OpponentRecruiting, error) {
 	var opponentRecruiting models.OpponentRecruiting
 	result := tx.First(&opponentRecruiting, id)
@@ -38,7 +38,7 @@ func (r *opponentRecruitingRepository) FindById(tx *gorm.DB, id uint) (*models.O
 	return &opponentRecruiting, nil
 }
 
-// 対戦相手募集とコメントを取得
+// 対戦相手募集とコメントを取得(なければエラー)
 func (r *opponentRecruitingRepository) FindByIdWithComments(tx *gorm.DB, id uint) (*models.OpponentRecruiting, error) {
 	var opponentRecruiting models.OpponentRecruiting
 

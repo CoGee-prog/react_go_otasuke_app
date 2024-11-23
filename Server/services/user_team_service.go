@@ -1,14 +1,12 @@
 package services
 
 import (
-	"react_go_otasuke_app/models"
 	"react_go_otasuke_app/repositories"
 
 	"gorm.io/gorm"
 )
 
 type UserTeamService interface {
-	GetUserTeam(db *gorm.DB, userID string, teamId uint) (*models.UserTeam, error)
 	IsAdminOrSubAdmin(db *gorm.DB, userId string, teamId uint) bool
 }
 
@@ -21,11 +19,6 @@ func NewUserTeamService(userTeamRepo repositories.UserTeamRepository) UserTeamSe
 	return &userTeamService{
 		userTeamRepository: userTeamRepo,
 	}
-}
-
-// ユーザーチームを取得する
-func (uts *userTeamService) GetUserTeam(db *gorm.DB, userId string, teamId uint) (*models.UserTeam, error) {
-	return uts.userTeamRepository.GetByUserIdAndTeamId(db, userId, teamId)
 }
 
 // ユーザーが管理者または副管理者かどうか

@@ -26,7 +26,7 @@ func NewRouter() (*gin.Engine, error) {
 
 	// サービスを作成
 	userTeamService := services.NewUserTeamService(userTeamRepo)
-	userService := services.NewUserService(userRepo)
+	userService := services.NewUserService(userRepo, userTeamRepo)
 	teamService := services.NewTeamService(teamRepo, userTeamRepo)
 	opponentRecruitingService := services.NewOpponentRecruitingService(userTeamService, userRepo, OpponentRecruitingRepo)
 
