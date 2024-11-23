@@ -35,10 +35,10 @@ type opponentRecruitingService struct {
 }
 
 // 対戦相手募集のサービスを作成する
-func NewOpponentRecruitingService(uts UserTeamService,userRepo repositories.UserRepository, opponentRecruitingRepo repositories.OpponentRecruitingRepository) OpponentRecruitingService {
+func NewOpponentRecruitingService(uts UserTeamService, userRepo repositories.UserRepository, opponentRecruitingRepo repositories.OpponentRecruitingRepository) OpponentRecruitingService {
 	return &opponentRecruitingService{
-		userTeamService: uts,
-		userRepository: userRepo,
+		userTeamService:              uts,
+		userRepository:               userRepo,
 		opponentRecruitingRepository: opponentRecruitingRepo,
 	}
 }
@@ -66,7 +66,7 @@ func (ors *opponentRecruitingService) UpdateOpponentRecruiting(tx *gorm.DB, user
 	}
 
 	// データを更新する
-	return ors.opponentRecruitingRepository.UpdateByID(tx, id, opponentRecruiting)
+	return ors.opponentRecruitingRepository.UpdateById(tx, id, opponentRecruiting)
 }
 
 // 対戦相手募集の状態(募集中かどうか)を変更する
@@ -93,12 +93,12 @@ func (ors *opponentRecruitingService) UpdateStatusOpponentRecruiting(tx *gorm.DB
 
 // 対戦相手募集を取得する(なければエラー)
 func (ors *opponentRecruitingService) FindOpponentRecruiting(tx *gorm.DB, id uint) (*models.OpponentRecruiting, error) {
-	return ors.opponentRecruitingRepository.FindByID(tx, id)
+	return ors.opponentRecruitingRepository.FindById(tx, id)
 }
 
 // 対戦相手募集をコメントも含めて取得する(なければエラー)
 func (ors *opponentRecruitingService) FindOpponentRecruitingWithComment(tx *gorm.DB, id uint) (*models.OpponentRecruiting, error) {
-	return ors.opponentRecruitingRepository.FindByIDWithComments(tx, id)
+	return ors.opponentRecruitingRepository.FindByIdWithComments(tx, id)
 }
 
 // 対戦相手募集を削除する
@@ -114,7 +114,7 @@ func (ors *opponentRecruitingService) DeleteOpponentRecruiting(tx *gorm.DB, user
 	}
 
 	// 対戦相手募集を削除する
-	return ors.opponentRecruitingRepository.DeleteByID(tx, id)
+	return ors.opponentRecruitingRepository.DeleteById(tx, id)
 }
 
 // 対戦相手募集のリストとページ情報を返す
@@ -130,7 +130,7 @@ func (ors *opponentRecruitingService) GetOpponentRecruitingList(c *gin.Context, 
 	if isMyTeam {
 		//ユーザーを取得する
 		userId := c.MustGet("userId").(string)
-		user, err := ors.userRepository.GetUser(tx, userId)
+		user, err := ors.userRepository.GetByUserId(tx, userId)
 
 		// エラーが起きた場合
 		if err != nil {

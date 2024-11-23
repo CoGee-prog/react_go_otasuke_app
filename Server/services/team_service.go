@@ -13,27 +13,27 @@ type TeamService interface {
 }
 
 type teamService struct {
-	teamRepository repositories.TeamRepository
+	teamRepository     repositories.TeamRepository
 	userTeamRepository repositories.UserTeamRepository
 }
 
 // チームサービスを作成する
 func NewTeamService(teamRepo repositories.TeamRepository, userTeamRepo repositories.UserTeamRepository) TeamService {
 	return &teamService{
-		teamRepository: teamRepo,
+		teamRepository:     teamRepo,
 		userTeamRepository: userTeamRepo,
 	}
 }
 
 // チームを取得する
 func (ts *teamService) GetTeam(tx *gorm.DB, id string) (*models.Team, error) {
-	return ts.teamRepository.GetTeam(tx, id)
+	return ts.teamRepository.GetByTeamId(tx, id)
 }
 
 // チームを作成し、チーム作成者をチーム管理者とする
 func (ts *teamService) CreateTeamWithAdmin(tx *gorm.DB, userId string, team *models.Team) error {
 	// チームを作成する
-	if err := ts.teamRepository.CreateTeam(tx, team); err != nil {
+	if err := ts.teamRepository.Create(tx, team); err != nil {
 		return err
 	}
 

@@ -8,10 +8,10 @@ import (
 )
 
 type UserRepository interface {
-	GetUser(tx *gorm.DB, userId string) (*models.User, error)
-	GetUserWithCurrentTeam(tx *gorm.DB, userId string) (*models.User, error)
-	CreateUser(tx *gorm.DB, user *models.User) error
-	ChangeUserCurrentTeam(tx *gorm.DB, userId string, teamId uint) error
+	GetByUserId(tx *gorm.DB, userId string) (*models.User, error)
+	GetWithCurrentTeamByUserId(tx *gorm.DB, userId string) (*models.User, error)
+	Create(tx *gorm.DB, user *models.User) error
+	ChangeCurrentTeam(tx *gorm.DB, userId string, teamId uint) error
 }
 
 type userRepository struct{}
@@ -21,7 +21,7 @@ func NewUserRepository() UserRepository {
 }
 
 // ユーザーを取得する
-func (r *userRepository) GetUser(tx *gorm.DB, userId string) (*models.User, error) {
+func (r *userRepository) GetByUserId(tx *gorm.DB, userId string) (*models.User, error) {
 	var user models.User
 
 	result := tx.Where("id = ?", userId).First(&user)
@@ -37,7 +37,7 @@ func (r *userRepository) GetUser(tx *gorm.DB, userId string) (*models.User, erro
 }
 
 // ユーザーと現在のチームを取得する
-func (r *userRepository) GetUserWithCurrentTeam(tx *gorm.DB, userId string) (*models.User, error) {
+func (r *userRepository) GetWithCurrentTeamByUserId(tx *gorm.DB, userId string) (*models.User, error) {
 	var user models.User
 
 	result := tx.Preload("CurrentTeam").Where("id = ?", userId).First(&user)
@@ -53,11 +53,11 @@ func (r *userRepository) GetUserWithCurrentTeam(tx *gorm.DB, userId string) (*mo
 }
 
 // ユーザーを作成
-func (r *userRepository) CreateUser(tx *gorm.DB, user *models.User) error {
+func (r *userRepository) Create(tx *gorm.DB, user *models.User) error {
 	return tx.Create(user).Error
 }
 
 // ユーザーの現在のチームを切り替える
-func (r *userRepository) ChangeUserCurrentTeam(tx *gorm.DB, userId string, teamId uint) error {
+func (r *userRepository) ChangeCurrentTeam(tx *gorm.DB, userId string, teamId uint) error {
 	return tx.Model(&models.User{}).Where("id = ?", userId).Update("current_team_id", teamId).Error
 }

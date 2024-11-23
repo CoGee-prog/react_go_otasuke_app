@@ -9,14 +9,14 @@ import (
 )
 
 type OpponentRecruitingRepository interface {
-	FindByID(tx *gorm.DB, id uint) (*models.OpponentRecruiting, error)
-	FindByIDWithComments(tx *gorm.DB, id uint) (*models.OpponentRecruiting, error)
+	FindById(tx *gorm.DB, id uint) (*models.OpponentRecruiting, error)
+	FindByIdWithComments(tx *gorm.DB, id uint) (*models.OpponentRecruiting, error)
 	Create(tx *gorm.DB, opponentRecruiting *models.OpponentRecruiting) error
 	GetTotalCount(tx *gorm.DB) (int64, error)
 	GetListWithTeamByPaginate(tx *gorm.DB, page *database.Page, sort *database.Sort) ([]*models.OpponentRecruiting, error)
-	UpdateByID(tx *gorm.DB, id uint, opponentRecruiting *models.OpponentRecruiting) error
+	UpdateById(tx *gorm.DB, id uint, opponentRecruiting *models.OpponentRecruiting) error
 	UpdateIsActive(tx *gorm.DB, id uint, opponentRecruiting *models.OpponentRecruiting) error
-	DeleteByID(tx *gorm.DB, id uint) error
+	DeleteById(tx *gorm.DB, id uint) error
 }
 
 type opponentRecruitingRepository struct{}
@@ -26,7 +26,7 @@ func NewOpponentRecruitingRepository() OpponentRecruitingRepository {
 }
 
 // IDで対戦相手募集を取得
-func (r *opponentRecruitingRepository) FindByID(tx *gorm.DB, id uint) (*models.OpponentRecruiting, error) {
+func (r *opponentRecruitingRepository) FindById(tx *gorm.DB, id uint) (*models.OpponentRecruiting, error) {
 	var opponentRecruiting models.OpponentRecruiting
 	result := tx.First(&opponentRecruiting, id)
 	if result.Error != nil {
@@ -39,7 +39,7 @@ func (r *opponentRecruitingRepository) FindByID(tx *gorm.DB, id uint) (*models.O
 }
 
 // 対戦相手募集とコメントを取得
-func (r *opponentRecruitingRepository) FindByIDWithComments(tx *gorm.DB, id uint) (*models.OpponentRecruiting, error) {
+func (r *opponentRecruitingRepository) FindByIdWithComments(tx *gorm.DB, id uint) (*models.OpponentRecruiting, error) {
 	var opponentRecruiting models.OpponentRecruiting
 
 	result := tx.Preload("Team").Preload("Comments.User").Preload("Comments.Team").First(&opponentRecruiting, id)
@@ -85,7 +85,7 @@ func (r *opponentRecruitingRepository) GetListWithTeamByPaginate(tx *gorm.DB, pa
 }
 
 // IDを指定してOpponentRecruitingを更新する
-func (r *opponentRecruitingRepository) UpdateByID(tx *gorm.DB, id uint, opponentRecruiting *models.OpponentRecruiting) error {
+func (r *opponentRecruitingRepository) UpdateById(tx *gorm.DB, id uint, opponentRecruiting *models.OpponentRecruiting) error {
 	result := tx.Model(&models.OpponentRecruiting{}).Where("id = ?", id).Updates(opponentRecruiting)
 
 	if result.Error != nil {
@@ -116,7 +116,7 @@ func (r *opponentRecruitingRepository) UpdateIsActive(tx *gorm.DB, id uint, oppo
 }
 
 // IDを指定して対戦相手募集を削除する
-func (r *opponentRecruitingRepository) DeleteByID(tx *gorm.DB, id uint) error {
+func (r *opponentRecruitingRepository) DeleteById(tx *gorm.DB, id uint) error {
 	result := tx.Unscoped().Delete(&models.OpponentRecruiting{}, "id = ?", id)
 	if result.Error != nil {
 		return errors.New("データ削除に失敗しました")

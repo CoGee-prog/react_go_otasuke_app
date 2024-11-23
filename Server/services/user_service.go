@@ -126,12 +126,12 @@ func (us *userService) GetFireBaseApp() *firebase.App {
 
 // ユーザーを取得する
 func (us *userService) GetUserWithCurrentTeam(tx *gorm.DB, id string) (*models.User, error) {
-	return us.userRepository.GetUserWithCurrentTeam(tx, id)
+	return us.userRepository.GetWithCurrentTeamByUserId(tx, id)
 }
 
 // 新規ユーザーを作成する
 func (us *userService) CreateUser(tx *gorm.DB, user *models.User) error {
-	if err := us.userRepository.CreateUser(tx, user); err != nil {
+	if err := us.userRepository.Create(tx, user); err != nil {
 		return errors.New("ユーザー作成に失敗しました")
 	}
 	return nil
@@ -146,7 +146,7 @@ func (us *userService) UpdateCurrentTeam(tx *gorm.DB, userId string, teamId uint
 	}
 
 	// 現在のチームを変更する
-	if err := us.userRepository.ChangeUserCurrentTeam(tx, userId, teamId); err != nil {
+	if err := us.userRepository.ChangeCurrentTeam(tx, userId, teamId); err != nil {
 		return errors.New("チーム切り替えに失敗しました")
 	}
 	return nil

@@ -8,8 +8,8 @@ import (
 )
 
 type TeamRepository interface {
-	GetTeam(tx *gorm.DB, userId string) (*models.Team, error)
-	CreateTeam(tx *gorm.DB, team *models.Team) error
+	GetByTeamId(tx *gorm.DB, teamId string) (*models.Team, error)
+	Create(tx *gorm.DB, team *models.Team) error
 }
 
 type teamRepository struct{}
@@ -19,9 +19,9 @@ func NewTeamRepository() TeamRepository {
 }
 
 // チームを取得する
-func (r *teamRepository) GetTeam(tx *gorm.DB, id string) (*models.Team, error) {
+func (r *teamRepository) GetByTeamId(tx *gorm.DB, teamId string) (*models.Team, error) {
 	var team models.Team
-	result := tx.Where("id = ?", id).First(&team)
+	result := tx.Where("id = ?", teamId).First(&team)
 	// レコードが見つからない場合はnilを返す
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, nil
@@ -34,7 +34,7 @@ func (r *teamRepository) GetTeam(tx *gorm.DB, id string) (*models.Team, error) {
 }
 
 // チームを作成する
-func (r *teamRepository) CreateTeam(tx *gorm.DB, team *models.Team) error {
+func (r *teamRepository) Create(tx *gorm.DB, team *models.Team) error {
 	// チームを作成する
 	if err := tx.Create(team).Error; err != nil {
 		return err
