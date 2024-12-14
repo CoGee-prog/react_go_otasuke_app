@@ -44,6 +44,7 @@ func NewRouter() (*gin.Engine, error) {
 	{
 		router.GET("/opponent_recruitings", opponentRecruitingController.Index())
 		router.GET("/opponent_recruitings/:id", opponentRecruitingController.Get())
+		router.GET("/teams/:id", teamController.Get())
 		router.POST("/login", userController.Login())
 	}
 

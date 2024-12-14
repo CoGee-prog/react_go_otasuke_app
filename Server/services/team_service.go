@@ -8,7 +8,7 @@ import (
 )
 
 type TeamService interface {
-	GetTeam(tx *gorm.DB, id string) (*models.Team, error)
+	GetTeam(tx *gorm.DB, id uint) (*models.Team, error)
 	CreateTeamWithAdmin(tx *gorm.DB, userId string, team *models.Team) error
 }
 
@@ -26,7 +26,7 @@ func NewTeamService(teamRepo repositories.TeamRepository, userTeamRepo repositor
 }
 
 // チームを取得する
-func (ts *teamService) GetTeam(tx *gorm.DB, id string) (*models.Team, error) {
+func (ts *teamService) GetTeam(tx *gorm.DB, id uint) (*models.Team, error) {
 	return ts.teamRepository.GetByTeamId(tx, id)
 }
 

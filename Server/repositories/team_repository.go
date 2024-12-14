@@ -8,7 +8,7 @@ import (
 )
 
 type TeamRepository interface {
-	GetByTeamId(tx *gorm.DB, teamId string) (*models.Team, error)
+	GetByTeamId(tx *gorm.DB, teamId uint) (*models.Team, error)
 	Create(tx *gorm.DB, team *models.Team) error
 }
 
@@ -19,7 +19,7 @@ func NewTeamRepository() TeamRepository {
 }
 
 // チームを取得する
-func (r *teamRepository) GetByTeamId(tx *gorm.DB, teamId string) (*models.Team, error) {
+func (r *teamRepository) GetByTeamId(tx *gorm.DB, teamId uint) (*models.Team, error) {
 	var team models.Team
 	result := tx.Where("id = ?", teamId).First(&team)
 	// レコードが見つからない場合はnilを返す

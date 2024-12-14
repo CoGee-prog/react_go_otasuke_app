@@ -5,6 +5,7 @@ import (
 	"react_go_otasuke_app/models"
 	"react_go_otasuke_app/services"
 	"react_go_otasuke_app/utils"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -20,6 +21,44 @@ func NewTeamController(userService services.UserService, teamService services.Te
 	return &TeamController{
 		UserService: userService,
 		TeamService: teamService,
+	}
+}
+
+type TeamGetResponse struct {
+	Name         string              `json:"name"`
+	PrefectureId models.PrefectureID `json:"prefecture_id"`
+	LevelId      models.TeamLevelId  `json:"level_id"`
+	HomePageUrl  *string             `json:"home_page_url"`
+	Other        *string             `json:"other"`
+}
+
+func (tc *TeamController) Get() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id, _ := strconv.Atoi(c.Param("id"))
+		tx := c.MustGet("tx").(*gorm.DB)
+
+		team, err := tc.TeamService.GetTeam(tx, uint(id))
+
+		if err != nil || team == nil {
+			c.JSON(http.StatusBadRequest, utils.NewResponse(
+				http.StatusBadRequest,
+				"チームが見つかりません",
+				nil,
+			))
+			return
+		}
+
+		c.JSON(http.StatusOK, utils.NewResponse(
+			http.StatusOK,
+			"",
+			&TeamGetResponse{
+				Name:         team.Name,
+				PrefectureId: team.PrefectureId,
+				LevelId:      team.LevelId,
+				HomePageUrl:  team.HomePageUrl,
+				Other:        team.Other,
+			},
+		))
 	}
 }
 
