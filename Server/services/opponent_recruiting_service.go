@@ -143,9 +143,15 @@ func (ors *opponentRecruitingService) GetOpponentRecruitingList(c *gin.Context, 
 		if err != nil {
 			return nil, nil, err
 		}
-
+		
 		// 自チームの対戦相手募集に絞り込む
 		myTeamId := user.CurrentTeamId
+
+		// チームの副管理者以上でなければエラー
+		if !ors.userTeamService.IsAdminOrSubAdmin(tx, userId, *myTeamId) {
+			return nil, nil, errors.New("管理者または副管理者のみ自チームの対戦相手募集一覧を閲覧できます")
+		}
+
 		tx = tx.Where("team_id = ?", myTeamId)
 	}
 
