@@ -4,6 +4,7 @@ import (
 	"react_go_otasuke_app/controllers"
 	"react_go_otasuke_app/database"
 	"react_go_otasuke_app/middlewares"
+	"react_go_otasuke_app/repositories"
 	"react_go_otasuke_app/services"
 
 	"github.com/gin-gonic/gin"
@@ -11,18 +12,26 @@ import (
 
 // ルーティング設定
 func NewRouter() (*gin.Engine, error) {
-	// DIのためここでDBを取得する
+	// DIのためここでDBを取得
 	db := database.GetDB()
 	router := gin.Default()
-	// トランザクションを開始する
+	// トランザクションを開始
 	router.Use(middlewares.Transaction(db))
-	// DIのためここでサービスを作成する
-	userTeamService := services.NewUserTeamService()
-	userService := services.NewUserService()
-	teamService := services.NewTeamService()
-	opponentRecruitingService := services.NewOpponentRecruitingService(userTeamService)
 
-	// コントローラーを作成する
+	// リポジトリの作成
+	userRepo := repositories.NewUserRepository()
+	teamRepo := repositories.NewTeamRepository()
+	userTeamRepo := repositories.NewUserTeamRepository()
+	OpponentRecruitingRepo := repositories.NewOpponentRecruitingRepository()
+	OpponentRecruitingCommentRepo := repositories.NewOpponentRecruitingCommentRepository()
+
+	// サービスを作成
+	userTeamService := services.NewUserTeamService(userTeamRepo)
+	userService := services.NewUserService(userRepo, userTeamRepo)
+	teamService := services.NewTeamService(teamRepo, userTeamRepo)
+	opponentRecruitingService := services.NewOpponentRecruitingService(userTeamService, userRepo, OpponentRecruitingRepo, OpponentRecruitingCommentRepo)
+
+	// コントローラーを作成
 	userController := controllers.NewUserController(userService)
 	teamController := controllers.NewTeamController(userService, teamService)
 	opponentRecruitingController := controllers.NewOpponentRecruitingController(opponentRecruitingService, userService)
@@ -35,13 +44,14 @@ func NewRouter() (*gin.Engine, error) {
 	{
 		router.GET("/opponent_recruitings", opponentRecruitingController.Index())
 		router.GET("/opponent_recruitings/:id", opponentRecruitingController.Get())
+		router.GET("/teams/:id", teamController.Get())
 		router.POST("/login", userController.Login())
 	}
 
 	firebaseApp := userService.GetFireBaseApp()
 	// 認証が必要なエンドポイント
 	authRequired := router.Group("/")
-	authRequired.Use(middlewares.AuthMiddleware(firebaseApp))
+	authRequired.Use(middlewares.AuthMiddleware(firebaseApp, userService))
 
 	{
 		authRequired.POST("/logout", userController.Logout())

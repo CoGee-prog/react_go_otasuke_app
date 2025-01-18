@@ -5,21 +5,60 @@ import (
 	"react_go_otasuke_app/models"
 	"react_go_otasuke_app/services"
 	"react_go_otasuke_app/utils"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 type TeamController struct {
-	UserService *services.UserService
-	TeamService *services.TeamService
+	UserService services.UserService
+	TeamService services.TeamService
 }
 
 // チームコントローラーを返す
-func NewTeamController(userService *services.UserService, teamService *services.TeamService) *TeamController {
+func NewTeamController(userService services.UserService, teamService services.TeamService) *TeamController {
 	return &TeamController{
 		UserService: userService,
 		TeamService: teamService,
+	}
+}
+
+type TeamGetResponse struct {
+	Name         string              `json:"name"`
+	PrefectureId models.PrefectureID `json:"prefecture_id"`
+	LevelId      models.TeamLevelId  `json:"level_id"`
+	HomePageUrl  *string             `json:"home_page_url"`
+	Other        *string             `json:"other"`
+}
+
+func (tc *TeamController) Get() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id, _ := strconv.Atoi(c.Param("id"))
+		tx := c.MustGet("tx").(*gorm.DB)
+
+		team, err := tc.TeamService.GetTeam(tx, uint(id))
+
+		if err != nil || team == nil {
+			c.JSON(http.StatusBadRequest, utils.NewResponse(
+				http.StatusBadRequest,
+				"チームが見つかりません",
+				nil,
+			))
+			return
+		}
+
+		c.JSON(http.StatusOK, utils.NewResponse(
+			http.StatusOK,
+			"",
+			&TeamGetResponse{
+				Name:         team.Name,
+				PrefectureId: team.PrefectureId,
+				LevelId:      team.LevelId,
+				HomePageUrl:  team.HomePageUrl,
+				Other:        team.Other,
+			},
+		))
 	}
 }
 
@@ -53,10 +92,10 @@ func (tc *TeamController) Create() gin.HandlerFunc {
 			return
 		}
 
-		db := c.MustGet("tx").(*gorm.DB)
+		tx := c.MustGet("tx").(*gorm.DB)
 		userId := c.MustGet("userId").(string)
 		// チームを作成する
-		if err := tc.TeamService.CreateTeam(db, userId, team); err != nil {
+		if err := tc.TeamService.CreateTeamWithAdmin(tx, userId, team); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				"チーム作成に失敗しました",
@@ -65,7 +104,7 @@ func (tc *TeamController) Create() gin.HandlerFunc {
 			return
 		}
 		// ユーザーの現在のチームを作成したチームに変更する
-		if err := tc.UserService.UpdateCurrentTeam(db, userId, team.ID); err != nil {
+		if err := tc.UserService.UpdateCurrentTeam(tx, userId, team.ID); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				err.Error(),
@@ -75,7 +114,7 @@ func (tc *TeamController) Create() gin.HandlerFunc {
 		}
 
 		// ユーザーチームを取得する
-		userTeam, _ := tc.UserService.GetUserTeam(db, userId, team.ID)
+		userTeam, _ := tc.UserService.GetUserTeam(tx, userId, team.ID)
 
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,

@@ -13,11 +13,11 @@ import (
 )
 
 type UserController struct {
-	UserService *services.UserService
+	UserService services.UserService
 }
 
 // ユーザーコントローラーを返す
-func NewUserController(userService *services.UserService) *UserController {
+func NewUserController(userService services.UserService) *UserController {
 	return &UserController{
 		UserService: userService,
 	}
@@ -29,11 +29,11 @@ type loginResponse struct {
 
 func (uc *UserController) Login() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		db := c.MustGet("tx").(*gorm.DB)
+		tx := c.MustGet("tx").(*gorm.DB)
 		// 開発環境の場合はIDトークン検証をスキップしてユーザーを作成する
 		if config.Get().GetString("server.env") == "local" {
 			// ユーザーデータを検索
-			devUser, err := uc.UserService.GetUser(db, c.GetHeader("X-User-Id"))
+			devUser, err := uc.UserService.GetUserWithCurrentTeam(tx, c.GetHeader("X-User-Id"))
 			if err != nil {
 				c.JSON(http.StatusServiceUnavailable, utils.NewResponse(
 					http.StatusServiceUnavailable,
@@ -49,7 +49,7 @@ func (uc *UserController) Login() gin.HandlerFunc {
 					Name: "dev-user",
 				}
 				// ユーザーデータを作成
-				if err := uc.UserService.CreateUser(db, devUser); err != nil {
+				if err := uc.UserService.CreateUser(tx, devUser); err != nil {
 					c.JSON(http.StatusBadRequest, utils.NewResponse(
 						http.StatusBadRequest,
 						err.Error(),
@@ -61,7 +61,7 @@ func (uc *UserController) Login() gin.HandlerFunc {
 				// ユーザーデータがある場合はユーザーの現在のチームがあれば役割も設定する
 				if devUser.CurrentTeam != nil {
 					var userTeam models.UserTeam
-					if err := db.Where("user_id = ? AND team_id = ?", devUser.ID, devUser.CurrentTeamId).First(&userTeam).Error; err == nil {
+					if err := tx.Where("user_id = ? AND team_id = ?", devUser.ID, devUser.CurrentTeamId).First(&userTeam).Error; err == nil {
 						devUser.CurrentTeamRole = &userTeam.Role
 					}
 				}
@@ -89,7 +89,7 @@ func (uc *UserController) Login() gin.HandlerFunc {
 		}
 
 		// ユーザーデータを検索
-		user, err := uc.UserService.GetUser(db, token.UID)
+		user, err := uc.UserService.GetUserWithCurrentTeam(tx, token.UID)
 		if err != nil {
 			c.JSON(http.StatusServiceUnavailable, utils.NewResponse(
 				http.StatusServiceUnavailable,
@@ -107,7 +107,7 @@ func (uc *UserController) Login() gin.HandlerFunc {
 				Name: name,
 			}
 			// ユーザーデータを作成
-			if err := uc.UserService.CreateUser(db, user); err != nil {
+			if err := uc.UserService.CreateUser(tx, user); err != nil {
 				c.JSON(http.StatusBadRequest, utils.NewResponse(
 					http.StatusBadRequest,
 					err.Error(),
@@ -118,7 +118,7 @@ func (uc *UserController) Login() gin.HandlerFunc {
 		} else {
 			// ユーザーデータがある場合はユーザーの現在のチームがあれば役割も設定する
 			if user.CurrentTeam != nil {
-				if userTeam, err := uc.UserService.GetUserTeam(db, user.ID, *user.CurrentTeamId); err == nil {
+				if userTeam, err := uc.UserService.GetUserTeam(tx, user.ID, *user.CurrentTeamId); err == nil {
 					user.CurrentTeamRole = &userTeam.Role
 				}
 			}
