@@ -19,12 +19,15 @@ services:
     build:
       context: ./Server
       dockerfile: ./build/Dockerfile
+      target: development
     volumes:
-      - ./Server:/go/src/app
+      - ./Server:/app
     environment:
       - APP_ENV=local
     ports:
-      - "58080:8080"
+      - "58080:8080"       # アプリケーション用ポート
+      - "40000:40000"     # Delveデバッグ用ポート
+    command: air -c .air.toml
     networks:
       - otasuke_app_network
     restart: always
