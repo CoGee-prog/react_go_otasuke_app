@@ -127,3 +127,56 @@ func (tc *TeamController) Create() gin.HandlerFunc {
 		))
 	}
 }
+
+func (tc *TeamController) Update() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		team := &models.Team{}
+
+		// リクエストパラメーターをバインドする
+		if err := c.ShouldBindJSON(team); err != nil {
+			c.JSON(http.StatusBadRequest, utils.NewResponse(
+				http.StatusBadRequest,
+				"不正なリクエストです",
+				nil,
+			))
+			return
+		}
+
+		teamId, _ := strconv.Atoi(c.Param("team_id"))
+		tx := c.MustGet("tx").(*gorm.DB)
+
+		// リクエストのバリデーションチェック
+		if err := team.Validate(); err != nil {
+			c.JSON(http.StatusBadRequest, utils.NewResponse(
+				http.StatusBadRequest,
+				err.Error(),
+				nil,
+			))
+			return
+		}
+
+		userId := c.MustGet("userId").(string)
+
+		// チームを更新
+		if err := tc.TeamService.UpdateTeam(tx, userId, uint(teamId), team); err != nil {
+			c.JSON(http.StatusBadRequest, utils.NewResponse(
+				http.StatusBadRequest,
+				err.Error(),
+				nil,
+			))
+			return
+		}
+
+		c.JSON(http.StatusOK, utils.NewResponse(
+			http.StatusOK,
+			"",
+			&TeamGetResponse{
+				Name:         team.Name,
+				PrefectureId: team.PrefectureId,
+				LevelId:      team.LevelId,
+				HomePageUrl:  team.HomePageUrl,
+				Other:        team.Other,
+			},
+		))
+	}
+}

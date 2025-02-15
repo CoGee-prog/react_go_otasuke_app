@@ -79,7 +79,7 @@ func (ors *opponentRecruitingService) UpdateOpponentRecruiting(tx *gorm.DB, user
 // 対戦相手募集の状態(募集中かどうか)を変更する
 func (ors *opponentRecruitingService) UpdateStatusOpponentRecruiting(tx *gorm.DB, userId string, id uint, opponentRecruiting *models.OpponentRecruiting) error {
 	// 変更する対戦相手募集を取得する
-	originalOpponentRecruiting, err := ors.FindOpponentRecruiting(tx, id)
+	originalOpponentRecruiting, err := ors.opponentRecruitingRepository.FindById(tx, id)
 	if err != nil {
 		return err
 	}

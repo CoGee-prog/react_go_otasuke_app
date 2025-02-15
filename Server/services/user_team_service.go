@@ -25,8 +25,8 @@ func NewUserTeamService(userTeamRepo repositories.UserTeamRepository) UserTeamSe
 func (uts *userTeamService) IsAdminOrSubAdmin(db *gorm.DB, userId string, teamId uint) bool {
 	// ユーザーのチームを取得する
 	userTeam, err := uts.userTeamRepository.GetByUserIdAndTeamId(db, userId, teamId)
-	// チームに所属していなければfalse
-	if err != nil {
+	// レコードが見つからないかチームに所属していなければfalse
+	if userTeam == nil || err != nil {
 		return false
 	}
 

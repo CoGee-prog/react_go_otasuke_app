@@ -28,7 +28,7 @@ func NewRouter() (*gin.Engine, error) {
 	// サービスを作成
 	userTeamService := services.NewUserTeamService(userTeamRepo)
 	userService := services.NewUserService(userRepo, userTeamRepo)
-	teamService := services.NewTeamService(teamRepo, userTeamRepo)
+	teamService := services.NewTeamService(userTeamService, teamRepo, userTeamRepo)
 	opponentRecruitingService := services.NewOpponentRecruitingService(userTeamService, userRepo, OpponentRecruitingRepo, OpponentRecruitingCommentRepo)
 
 	// コントローラーを作成
@@ -56,6 +56,7 @@ func NewRouter() (*gin.Engine, error) {
 	{
 		authRequired.POST("/logout", userController.Logout())
 		authRequired.POST("/teams", teamController.Create())
+		authRequired.PATCH("/teams/:team_id", teamController.Update())
 		authRequired.POST("/opponent_recruitings", opponentRecruitingController.Create())
 		authRequired.PATCH("/opponent_recruitings/:opponent_recruiting_id", opponentRecruitingController.Update())
 		authRequired.PATCH("/opponent_recruitings/:opponent_recruiting_id/status", opponentRecruitingController.ChangeStatus())
