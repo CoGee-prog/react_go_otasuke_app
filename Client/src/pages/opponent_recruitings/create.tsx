@@ -4,7 +4,7 @@ import OpponentRecruitingForm from '../../components/opponent_recruitings/Oppone
 const CreateOpponentRecruitingPage = () => {
   return (
     <div>
-      <OpponentRecruitingForm isEditing={false} />
+      <OpponentRecruitingForm />
     </div>
   )
 }

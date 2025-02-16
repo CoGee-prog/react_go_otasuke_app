@@ -23,6 +23,7 @@ import { TeamRole } from 'src/types/teamRole'
 import { AuthContext } from 'src/contexts/AuthContext'
 import OpponentRecruitingSearchForm from './OpponentRecruitingSearchForm'
 import { useRouter } from 'next/router'
+import { getPrefectureNameFromId } from 'src/utils/prefectures'
 
 interface OpponentRecruitingListProps {
   initialRecruitings: OpponentRecruiting[]
@@ -262,7 +263,7 @@ const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
                         エリア:
                       </Typography>
                       <Typography variant='body2' component='div'>
-                        {recruitment.prefecture}
+                        {getPrefectureNameFromId(recruitment.prefecture_id)}
                       </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>

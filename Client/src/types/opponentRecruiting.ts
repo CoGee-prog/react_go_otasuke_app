@@ -8,7 +8,7 @@ export interface OpponentRecruiting {
 	ground_name: string;
 	start_time: string;
 	end_time: string;
-	prefecture: string;
+	prefecture_id: number;
 	detail: string;
 	is_active: boolean;
 }	

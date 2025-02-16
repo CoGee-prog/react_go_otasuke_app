@@ -36,7 +36,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import OpponentRecruitingForm from './OpponentRecruitingForm'
 import { OpponentRecruitingsFormData } from './OpponentRecruitingForm'
-import { getPrefectureIdFromName } from 'src/utils/prefectures'
+import { getPrefectureNameFromId } from 'src/utils/prefectures'
 import { ArrowBack } from '@mui/icons-material'
 import { useNavigateOpponentRecruitingsIndex } from 'src/hooks/useNavigateOpponentRecruitingsIndex'
 
@@ -51,12 +51,11 @@ function mapToFormData(recruiting: OpponentRecruitingWithComments): OpponentRecr
   // 時間はフォームに必要な分単位(HH:mm)の形式で取り出す
   const startTime = recruiting.start_time.split('T')[1].split('+')[0].slice(0, 5)
   const endTime = recruiting.end_time.split('T')[1].split('+')[0].slice(0, 5)
-  const prefectureId = getPrefectureIdFromName(recruiting.prefecture)
   return {
     title: recruiting.title,
     has_ground: recruiting.has_ground,
     ground_name: recruiting.ground_name || '',
-    prefecture_id: prefectureId,
+    prefecture_id: recruiting.prefecture_id,
     date: date,
     start_time: startTime,
     end_time: endTime,
@@ -137,9 +136,9 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
     handleCloseMenu()
   }
 
-  const handleUpdateSuccess = (updatedData: GetOpponentRecruitingApiResponse) => {
+  const handleUpdateSuccess = (updatedData: OpponentRecruitingWithComments) => {
     setIsEditing(false)
-    setOpponentRecruitingWithComments(updatedData.opponent_recruiting)
+    setOpponentRecruitingWithComments(updatedData)
   }
 
   const handleUpdateComment = async (commentId: number, updatedComment: string) => {
@@ -320,7 +319,7 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
                 ))}
             </Typography>
             {[
-              { label: '都道府県', value: opponentRecruitingWithComments.prefecture },
+              { label: '都道府県', value: getPrefectureNameFromId(opponentRecruitingWithComments.prefecture_id) },
               {
                 label: 'グラウンド名',
                 value: opponentRecruitingWithComments.ground_name,

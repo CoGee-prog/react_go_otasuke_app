@@ -48,7 +48,6 @@ export const prefectures = [
   { id: 47, name: '沖縄県' }
 ];
 
-export function getPrefectureIdFromName(prefectureName: string) {
-  const prefecture = prefectures.find(pref => pref.name === prefectureName);
-  return prefecture!.id
+export function getPrefectureNameFromId(id: number) {
+	return prefectures.find((p) => p.id === id)?.name ?? "不明"
 }

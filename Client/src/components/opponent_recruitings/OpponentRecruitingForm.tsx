@@ -23,6 +23,7 @@ import { AuthContext } from 'src/contexts/AuthContext'
 import CustomDatePicker from '../commons/CustomDatePicker'
 import { useNavigateOpponentRecruitingDetail } from 'src/hooks/useNavigateOpponentRecruitingDetail'
 import { GetOpponentRecruitingApiResponse } from 'src/types/apiResponses'
+import { OpponentRecruitingWithComments } from 'src/types/opponentRecruiting'
 
 type Errors = {
   [key in keyof OpponentRecruitingsFormData]?: string
@@ -40,10 +41,10 @@ export interface OpponentRecruitingsFormData {
 }
 
 interface OpponentRecruitingFormProps {
-  isEditing: boolean
+  isEditing?: boolean
   initialData?: OpponentRecruitingsFormData
   id?: string
-  onUpdateSuccess?: (updatedData: GetOpponentRecruitingApiResponse) => void
+  onUpdateSuccess?: (updatedData: OpponentRecruitingWithComments) => void
 }
 
 function OpponentRecruitingForm({
@@ -90,7 +91,7 @@ function OpponentRecruitingForm({
   useEffect(() => {
     if (isEditing && data && onUpdateSuccess) {
       // 編集完了を親コンポーネントに通知
-      onUpdateSuccess(data!)
+      onUpdateSuccess(data.opponent_recruiting)
       // 対戦相手募集詳細に移動
       navigateOpponentRecruitingDetail()
     }
