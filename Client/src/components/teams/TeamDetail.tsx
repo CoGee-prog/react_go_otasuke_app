@@ -66,29 +66,31 @@ const TeamDetail: React.FC<TeamProps> = ({ initialTeam }) => {
 
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', my: 4, px: 2 }}>
-      <Grid item>
-        <IconButton
-          onClick={() => router.back()}
-          aria-label='戻る'
-          sx={{
-            color: 'black',
-            border: '1px solid black',
-            borderRadius: 0,
-            marginRight: 1,
-          }}
-        >
-          <ArrowBack />
-          <Typography variant='button' sx={{ color: 'black', ml: 1 }}>
-            戻る
-          </Typography>
-        </IconButton>
-      </Grid>
-      {isEditing ? null : (
-        <Grid item xs>
-          <Typography variant='h4' component='h2' gutterBottom marginTop={2}>
-            チーム詳細
-          </Typography>
-        </Grid>
+      {!isEditing && (
+        <>
+          <Grid item>
+            <IconButton
+              onClick={() => router.back()}
+              aria-label='戻る'
+              sx={{
+                color: 'black',
+                border: '1px solid black',
+                borderRadius: 0,
+                marginRight: 1,
+              }}
+            >
+              <ArrowBack />
+              <Typography variant='button' sx={{ color: 'black', ml: 1 }}>
+                戻る
+              </Typography>
+            </IconButton>
+          </Grid>
+          <Grid item xs>
+            <Typography variant='h4' component='h2' gutterBottom marginTop={2}>
+              チーム詳細
+            </Typography>
+          </Grid>
+        </>
       )}
 
       <Card
