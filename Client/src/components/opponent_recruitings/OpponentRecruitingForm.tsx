@@ -224,7 +224,7 @@ function OpponentRecruitingForm({
   return (
     <Container maxWidth='sm'>
       <Typography variant='h4' component='h2' gutterBottom marginTop={2}>
-        {isEditing ? '対戦相手募集編集' : '対戦相手募集作成'}
+        {isEditing ? '対戦相手募集 編集' : '対戦相手募集 作成'}
       </Typography>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={3}>

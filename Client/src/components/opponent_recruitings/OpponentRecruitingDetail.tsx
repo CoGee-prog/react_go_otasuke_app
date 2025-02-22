@@ -231,39 +231,43 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
           </Typography>
         </IconButton>
       </Grid>
-      <Grid item xs>
-        <Typography variant='h4' component='h2' gutterBottom marginTop={2}>
-          対戦相手募集詳細
-        </Typography>
-      </Grid>
-      <Grid
-        container
-        spacing={2}
-        direction='column'
-        alignItems='center'
-        justifyContent='center'
-        style={{ marginTop: '3px', marginBottom: '10px' }}
-      >
-        <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
-          <Box sx={{ maxWidth: 500, width: '100%', textAlign: 'center' }}>
-            {user &&
-            opponentRecruitingWithComments &&
-            user.current_team_id === opponentRecruitingWithComments.team.id &&
-            (user.current_team_role === TeamRole.ADMIN ||
-              user.current_team_role === TeamRole.SUB_ADMIN) ? (
-              opponentRecruitingWithComments.is_active ? (
-                <DangerButton onClick={() => handleUpdateOpponentRecruitingStatus(false)}>
-                  募集を終了する
-                </DangerButton>
-              ) : (
-                <PrimaryButton onClick={() => handleUpdateOpponentRecruitingStatus(true)}>
-                  募集を再開する
-                </PrimaryButton>
-              )
-            ) : null}
-          </Box>
-        </Grid>
-      </Grid>
+      {!isEditing && (
+        <>
+          <Grid item xs>
+            <Typography variant='h4' component='h2' gutterBottom marginTop={2}>
+              対戦相手募集詳細
+            </Typography>
+          </Grid>
+          <Grid
+            container
+            spacing={2}
+            direction='column'
+            alignItems='center'
+            justifyContent='center'
+            style={{ marginTop: '3px', marginBottom: '10px' }}
+          >
+            <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
+              <Box sx={{ maxWidth: 500, width: '100%', textAlign: 'center' }}>
+                {user &&
+                opponentRecruitingWithComments &&
+                user.current_team_id === opponentRecruitingWithComments.team.id &&
+                (user.current_team_role === TeamRole.ADMIN ||
+                  user.current_team_role === TeamRole.SUB_ADMIN) ? (
+                  opponentRecruitingWithComments.is_active ? (
+                    <DangerButton onClick={() => handleUpdateOpponentRecruitingStatus(false)}>
+                      募集を終了する
+                    </DangerButton>
+                  ) : (
+                    <PrimaryButton onClick={() => handleUpdateOpponentRecruitingStatus(true)}>
+                      募集を再開する
+                    </PrimaryButton>
+                  )
+                ) : null}
+              </Box>
+            </Grid>
+          </Grid>
+        </>
+      )}
 
       <Card
         sx={{
@@ -434,95 +438,103 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
           </>
         ) : null}
       </Card>
-      <Typography variant='h6' component='h2' gutterBottom marginTop={4}>
-        コメント
-      </Typography>
-      {opponentRecruitingWithComments.comments.map((comment, index) => (
-        <Box key={index} sx={{ my: 2 }}>
-          <OpponentRecruitingCommentForm
-            comment={comment}
-            opponentRecruitingTeamId={opponentRecruitingWithComments.team.id}
-            isEditing={editingCommentId === comment.id}
-            onEdit={() => setEditingCommentId(comment.id)}
-            onUpdate={handleUpdateComment}
-            onDelete={handleDeleteComment}
-            isActiveOpponentRecruiting={opponentRecruitingWithComments.is_active}
-          />
-          {index < opponentRecruitingWithComments.comments.length - 1 && <Divider />}
-        </Box>
-      ))}
-      {user ? (
-        user.current_team_role === TeamRole.ADMIN ||
-        user.current_team_role === TeamRole.SUB_ADMIN ? (
-          opponentRecruitingWithComments.is_active ? (
-            <Card variant='outlined'>
-              <CardContent>
-                <Box
-                  sx={{
-                    my: 2,
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
-                  <TextField
-                    label='チーム'
-                    variant='filled'
-                    value={user?.current_team_name}
-                    InputProps={{ readOnly: true }}
-                    sx={{ width: '48%' }}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                  <TextField
-                    label='投稿者'
-                    variant='filled'
-                    value={user?.name}
-                    InputProps={{ readOnly: true }}
-                    sx={{ width: '48%' }}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </Box>
-                <TextField
-                  label='コメント'
-                  variant='outlined'
-                  fullWidth
-                  multiline
-                  rows={4}
-                  value={newComment}
-                  onChange={handleCommentChange}
-                  error={error}
-                  helperText={
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      {error ? 'コメントは1000文字以内で入力してください。' : <span>&nbsp;</span>}
-                      <span>{`${newComment.length}/1000`}</span>
-                    </Box>
-                  }
-                  sx={{ my: 1 }}
-                />
-                <PrimaryButton variant='contained' color='primary' onClick={handlePostComment}>
-                  コメントを投稿
-                </PrimaryButton>
-              </CardContent>
-            </Card>
-          ) : (
-            <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
-              <Box sx={{ maxWidth: 500, width: '100%', textAlign: 'center' }}>
-                <p>募集が終了しているのでコメントできません</p>
-              </Box>
-            </Grid>
-          )
-        ) : (
-          <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
-            <Box sx={{ maxWidth: 500, width: '100%', textAlign: 'center' }}>
-              <p>チームの管理者か副管理者のみコメントを作成できます</p>
+      {!isEditing && (
+        <>
+          <Typography variant='h6' component='h2' gutterBottom marginTop={4}>
+            コメント
+          </Typography>
+          {opponentRecruitingWithComments.comments.map((comment, index) => (
+            <Box key={index} sx={{ my: 2 }}>
+              <OpponentRecruitingCommentForm
+                comment={comment}
+                opponentRecruitingTeamId={opponentRecruitingWithComments.team.id}
+                isEditing={editingCommentId === comment.id}
+                onEdit={() => setEditingCommentId(comment.id)}
+                onUpdate={handleUpdateComment}
+                onDelete={handleDeleteComment}
+                isActiveOpponentRecruiting={opponentRecruitingWithComments.is_active}
+              />
+              {index < opponentRecruitingWithComments.comments.length - 1 && <Divider />}
             </Box>
-          </Grid>
-        )
-      ) : (
-        <Link href={`/login?from=${encodeURIComponent(router.asPath)}`} passHref>
-          <PrimaryButton color='inherit'>ログインしてコメントする</PrimaryButton>
-        </Link>
+          ))}
+          {user ? (
+            user.current_team_role === TeamRole.ADMIN ||
+            user.current_team_role === TeamRole.SUB_ADMIN ? (
+              opponentRecruitingWithComments.is_active ? (
+                <Card variant='outlined'>
+                  <CardContent>
+                    <Box
+                      sx={{
+                        my: 2,
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <TextField
+                        label='チーム'
+                        variant='filled'
+                        value={user?.current_team_name}
+                        InputProps={{ readOnly: true }}
+                        sx={{ width: '48%' }}
+                        InputLabelProps={{ shrink: true }}
+                      />
+                      <TextField
+                        label='投稿者'
+                        variant='filled'
+                        value={user?.name}
+                        InputProps={{ readOnly: true }}
+                        sx={{ width: '48%' }}
+                        InputLabelProps={{ shrink: true }}
+                      />
+                    </Box>
+                    <TextField
+                      label='コメント'
+                      variant='outlined'
+                      fullWidth
+                      multiline
+                      rows={4}
+                      value={newComment}
+                      onChange={handleCommentChange}
+                      error={error}
+                      helperText={
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          {error ? (
+                            'コメントは1000文字以内で入力してください。'
+                          ) : (
+                            <span>&nbsp;</span>
+                          )}
+                          <span>{`${newComment.length}/1000`}</span>
+                        </Box>
+                      }
+                      sx={{ my: 1 }}
+                    />
+                    <PrimaryButton variant='contained' color='primary' onClick={handlePostComment}>
+                      コメントを投稿
+                    </PrimaryButton>
+                  </CardContent>
+                </Card>
+              ) : (
+                <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
+                  <Box sx={{ maxWidth: 500, width: '100%', textAlign: 'center' }}>
+                    <p>募集が終了しているのでコメントできません</p>
+                  </Box>
+                </Grid>
+              )
+            ) : (
+              <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
+                <Box sx={{ maxWidth: 500, width: '100%', textAlign: 'center' }}>
+                  <p>チームの管理者か副管理者のみコメントを作成できます</p>
+                </Box>
+              </Grid>
+            )
+          ) : (
+            <Link href={`/login?from=${encodeURIComponent(router.asPath)}`} passHref>
+              <PrimaryButton color='inherit'>ログインしてコメントする</PrimaryButton>
+            </Link>
+          )}
+        </>
       )}
     </Box>
   )
