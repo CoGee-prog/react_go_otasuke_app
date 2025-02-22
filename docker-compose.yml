@@ -24,6 +24,7 @@ services:
       - ./Server:/app
     environment:
       - APP_ENV=local
+      - DEBUG_MODE=false
     ports:
       - "58080:8080"       # アプリケーション用ポート
       - "40000:40000"     # Delveデバッグ用ポート

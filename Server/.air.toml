@@ -11,8 +11,14 @@ cmd = "go build -gcflags \"all=-N -l\" -o tmp/main ."
 # Binary file yields from `cmd`.
 bin = "./tmp/main"
 # Customize binary, can setup environment variables when run your app.
-full_bin = "dlv --listen=:40000 --headless=true --api-version=2 --accept-multiclient exec ./tmp/main"
 # Watch these filename extensions.
+full_bin = """
+if [ \"$DEBUG_MODE\" = \"true\" ]; then
+  dlv --listen=:40000 --headless=true --api-version=2 --accept-multiclient exec ./tmp/main
+else
+  ./tmp/main
+fi
+"""
 include_ext = ["go", "tpl", "tmpl", "html"]
 # Ignore these filename extensions or directories.
 exclude_dir = ["assets", "tmp", "vendor", "frontend/node_modules"]
