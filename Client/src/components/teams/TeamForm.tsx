@@ -19,25 +19,107 @@ import { useNavigateOpponentRecruitingsIndex } from 'src/hooks/useNavigateOppone
 import PrimaryButton from '../commons/PrimaryButton'
 import { AuthContext } from 'src/contexts/AuthContext'
 import { User } from 'src/types/user'
-import { CreateTeamsApiResponse } from 'src/types/apiResponses'
+import { CreateTeamsApiResponse, UpdateTeamApiResponse } from 'src/types/apiResponses'
 import { saveDataWithExpiry } from 'src/utils/localStorageHelper'
+import { TeamRole } from 'src/types/teamRole'
+import { useRouter } from 'next/router'
+import { useNavigateTeamDetail } from 'src/hooks/useNavigateTeamDetail'
+import { useNavigateHome } from 'src/hooks/useNavigateHome'
 
 type Errors = {
   [key in keyof CreateTeamsApiRequest]?: string
 }
 
-function TeamCreateForm() {
-  const [formData, setFormData] = useState<CreateTeamsApiRequest>({
-    name: '',
-    prefecture_id: '',
-    level_id: '',
-    home_page_url: '',
-    other: '',
-  })
+export interface TeamFormData {
+  name: string
+  prefecture_id: number
+  level_id: number
+  home_page_url: string
+  other: string
+}
+
+interface TeamFormProps {
+  isEditing?: boolean
+  initialData?: TeamFormData
+  id?: number
+  onUpdateSuccess?: (updatedData: UpdateTeamApiResponse) => void
+}
+
+function TeamForm({ isEditing = false, initialData, id, onUpdateSuccess }: TeamFormProps) {
+  const router = useRouter()
+  const [formData, setFormData] = useState<TeamFormData>(
+    initialData || {
+      name: '',
+      prefecture_id: 0,
+      level_id: 0,
+      home_page_url: '',
+      other: '',
+    },
+  )
   const [errors, setErrors] = useState<Errors>({})
-  const { request, data } = useApiWithFlashMessage<CreateTeamsApiResponse>()
+  const { request, data } = isEditing
+    ? useApiWithFlashMessage<UpdateTeamApiResponse>()
+    : useApiWithFlashMessage<CreateTeamsApiResponse>()
   const { user, setUser } = useContext(AuthContext)
-  const navigateOpponentRecruitingsIndex = useNavigateOpponentRecruitingsIndex()
+  const navigateHome = useNavigateHome()
+  const navigateTeamDetail = useNavigateTeamDetail(id!)
+  const [isAccessAllowed, setIsAccessAllowed] = useState(false)
+
+  useEffect(() => {
+    // チーム新規作成またはユーザーの役割が管理者または副管理者であれば 、アクセス可能とする
+    if (
+      !isEditing ||
+      (user &&
+        (user.current_team_role == TeamRole.ADMIN || user.current_team_role == TeamRole.SUB_ADMIN))
+    ) {
+      setIsAccessAllowed(true)
+    } else {
+      // 適切な権限がない場合、ホーム画面にリダイレクト
+      navigateHome()
+    }
+  }, [router])
+
+  useEffect(() => {
+    // 編集かつdataがあるかつCreateTeamsApiのレスポンスではない(=UpdateTeamApiのレスポンス)かつonUpdateSuccessがある場合
+    if (isEditing && data && !isCreateTeamsApiResponse(data) && onUpdateSuccess) {
+      // 編集完了を親コンポーネントに通知
+      onUpdateSuccess(data)
+      // チーム詳細に移動
+      navigateTeamDetail()
+    }
+  }, [data])
+
+  useEffect(() => {
+    // dataがあるかつCreateTeamsApiのレスポンスの場合
+    if (data && isCreateTeamsApiResponse(data)) {
+      setFormData({
+        name: '',
+        prefecture_id: 0,
+        level_id: 0,
+        home_page_url: '',
+        other: '',
+      })
+      // チーム作成のレスポンスの場合
+      const userData: User = {
+        id: user?.id,
+        name: user?.name,
+        current_team_id: data.current_team_id,
+        current_team_name: data.current_team_name,
+        current_team_role: data.current_team_role,
+      }
+      // ユーザー情報をローカルストレージにキャッシュ
+      saveDataWithExpiry<User>('user', userData, 3600)
+      setUser(userData)
+      // ホーム画面に移動
+      // TODO: スケジュール管理画面に遷移させる
+      navigateHome()
+    }
+  }, [data])
+
+  if (!isAccessAllowed) {
+    // 認証されていない場合は、何も表示しない
+    return null
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -61,14 +143,14 @@ function TeamCreateForm() {
     if (Object.keys(validationErrors).length === 0) {
       try {
         const options: RequestInit = {
-          method: 'POST',
+          method: isEditing ? 'PATCH' : 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(formData),
           credentials: 'include',
         }
-        await request('/teams', options)
+        await request(isEditing ? `/teams/${id}` : '/teams', options)
       } catch (error) {
         console.error('チーム作成に失敗しました。', error)
       }
@@ -76,30 +158,6 @@ function TeamCreateForm() {
       setErrors(validationErrors)
     }
   }
-
-  useEffect(() => {
-    if (data) {
-      setFormData({
-        name: '',
-        prefecture_id: '',
-        level_id: '',
-        home_page_url: '',
-        other: '',
-      })
-      const userData: User = {
-        id: user?.id,
-        name: user?.name,
-        current_team_id: data.current_team_id,
-        current_team_name: data.current_team_name,
-        current_team_role: data.current_team_role,
-      }
-      // ユーザー情報をローカルストレージにキャッシュ
-      saveDataWithExpiry<User>('user', userData, 3600)
-      setUser(userData)
-      // 対戦相手募集リストに移動
-      navigateOpponentRecruitingsIndex()
-    }
-  }, [data])
 
   const validateForm = () => {
     const errors: Errors = {}
@@ -114,7 +172,7 @@ function TeamCreateForm() {
   return (
     <Container maxWidth='sm'>
       <Typography variant='h4' component='h2' gutterBottom marginTop={2}>
-        チーム作成
+        {isEditing ? 'チーム更新' : 'チーム作成'}
       </Typography>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={3}>
@@ -224,7 +282,7 @@ function TeamCreateForm() {
             />
           </Grid>
           <Grid item xs={12} style={{ marginBottom: '20px' }}>
-            <PrimaryButton>作成</PrimaryButton>
+            <PrimaryButton>{isEditing ? '更新' : '作成'}</PrimaryButton>
           </Grid>
         </Grid>
       </form>
@@ -232,4 +290,12 @@ function TeamCreateForm() {
   )
 }
 
-export default TeamCreateForm
+// CreateTeamsApiResponse型かどうか
+function isCreateTeamsApiResponse(
+  data: CreateTeamsApiResponse | UpdateTeamApiResponse,
+): data is CreateTeamsApiResponse {
+  // current_team_idが含まれていたらCreateTeamsApiResponse型とする
+  return 'current_team_id' in data
+}
+
+export default TeamForm

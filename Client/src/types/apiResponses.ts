@@ -1,5 +1,6 @@
 import { OpponentRecruiting, OpponentRecruitingWithComments } from "./opponentRecruiting";
 import { Page } from "./page";
+import { Team } from "./team";
 import { User } from "./user";
 
 // ログインのレスポンス
@@ -9,11 +10,7 @@ export interface LoginApiResponse {
 
 // チーム取得のレスポンス
 export interface GetTeamApiResponse {
-	name: string,
-	prefecture_id: number,
-	level_id: number,
-	home_page_url: string,
-	other: string,
+	team: Team
 }
 
 // チーム作成のレスポンス
@@ -25,11 +22,7 @@ export interface CreateTeamsApiResponse {
 
 // チーム更新のレスポンス
 export interface UpdateTeamApiResponse {
-	name: string,
-	prefecture_id: number,
-	level_id: number,
-	home_page_url: string,
-	other: string,
+	team: Team
 }
 
 // 対戦相手募集一覧のレスポンス

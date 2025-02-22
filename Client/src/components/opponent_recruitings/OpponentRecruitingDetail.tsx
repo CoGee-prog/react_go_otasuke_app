@@ -39,13 +39,14 @@ import { OpponentRecruitingsFormData } from './OpponentRecruitingForm'
 import { getPrefectureNameFromId } from 'src/utils/prefectures'
 import { ArrowBack } from '@mui/icons-material'
 import { useNavigateOpponentRecruitingsIndex } from 'src/hooks/useNavigateOpponentRecruitingsIndex'
+import { getLevelNameFromId } from 'src/utils/teamLevel'
 
 interface OpponentRecruitingDetailProps {
   initialOpponentRecruitingWithComments: OpponentRecruitingWithComments
   id: string
 }
 
-// // OpponentRecruitingWithComments オブジェクトを OpponentRecruitingsFormData に変換
+// OpponentRecruitingWithComments オブジェクトを OpponentRecruitingsFormData に変換
 function mapToFormData(recruiting: OpponentRecruitingWithComments): OpponentRecruitingsFormData {
   const date = recruiting.start_time.split('T')[0]
   // 時間はフォームに必要な分単位(HH:mm)の形式で取り出す
@@ -245,7 +246,8 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
       >
         <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
           <Box sx={{ maxWidth: 500, width: '100%', textAlign: 'center' }}>
-            {user && opponentRecruitingWithComments && 
+            {user &&
+            opponentRecruitingWithComments &&
             user.current_team_id === opponentRecruitingWithComments.team.id &&
             (user.current_team_role === TeamRole.ADMIN ||
               user.current_team_role === TeamRole.SUB_ADMIN) ? (
@@ -319,14 +321,20 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
                 ))}
             </Typography>
             {[
-              { label: '都道府県', value: getPrefectureNameFromId(opponentRecruitingWithComments.prefecture_id) },
+              {
+                label: '都道府県',
+                value: getPrefectureNameFromId(opponentRecruitingWithComments.prefecture_id),
+              },
               {
                 label: 'グラウンド名',
                 value: opponentRecruitingWithComments.ground_name,
                 condition: opponentRecruitingWithComments.has_ground,
               },
               { label: 'チーム', value: opponentRecruitingWithComments.team.name },
-              { label: 'レベル', value: opponentRecruitingWithComments.team.level },
+              {
+                label: 'レベル',
+                value: getLevelNameFromId(opponentRecruitingWithComments.team.level_id),
+              },
               { label: '詳細', value: opponentRecruitingWithComments.detail },
             ]
               .filter((item) => item.condition !== false)
@@ -336,7 +344,22 @@ const OpponentRecruitingDetail: React.FC<OpponentRecruitingDetailProps> = ({
                     {item.label}
                   </Typography>
                   <Typography variant='body1' gutterBottom>
-                    {item.value}
+                    {item.label === 'チーム' ? (
+                      <Link
+                        href={`/teams/${opponentRecruitingWithComments.team.id}`}
+                        passHref
+                        style={{ textDecoration: 'underline', cursor: 'pointer' }}
+                      >
+                        <Typography
+                          component='span'
+                          sx={{ textDecoration: 'underline', cursor: 'pointer' }}
+                        >
+                          {item.value}
+                        </Typography>
+                      </Link>
+                    ) : (
+                      item.value
+                    )}
                   </Typography>
                   {index < arr.length - 1 && <Divider />}
                 </Box>

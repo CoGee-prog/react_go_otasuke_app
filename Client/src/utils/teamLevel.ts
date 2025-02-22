@@ -5,3 +5,7 @@ export const teamLevels = [
   { id: 4, name: '都道府県上位レベル' },
   { id: 5, name: '全国レベル' },
 ];
+
+export function getLevelNameFromId(id: number) {
+	return teamLevels.find((p) => p.id === id)?.name ?? "不明"
+}

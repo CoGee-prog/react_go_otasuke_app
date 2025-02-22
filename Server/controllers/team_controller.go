@@ -5,6 +5,7 @@ import (
 	"react_go_otasuke_app/models"
 	"react_go_otasuke_app/services"
 	"react_go_otasuke_app/utils"
+	"react_go_otasuke_app/views"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -24,12 +25,8 @@ func NewTeamController(userService services.UserService, teamService services.Te
 	}
 }
 
-type TeamGetResponse struct {
-	Name         string              `json:"name"`
-	PrefectureId models.PrefectureID `json:"prefecture_id"`
-	LevelId      models.TeamLevelId  `json:"level_id"`
-	HomePageUrl  *string             `json:"home_page_url"`
-	Other        *string             `json:"other"`
+type TeamGetAndUpdateResponse struct {
+	Team *views.TeamView `json:"team"`
 }
 
 func (tc *TeamController) Get() gin.HandlerFunc {
@@ -51,12 +48,8 @@ func (tc *TeamController) Get() gin.HandlerFunc {
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,
 			"",
-			&TeamGetResponse{
-				Name:         team.Name,
-				PrefectureId: team.PrefectureId,
-				LevelId:      team.LevelId,
-				HomePageUrl:  team.HomePageUrl,
-				Other:        team.Other,
+			&TeamGetAndUpdateResponse{
+				Team: views.CreateTeamView(*team),
 			},
 		))
 	}
@@ -169,13 +162,9 @@ func (tc *TeamController) Update() gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, utils.NewResponse(
 			http.StatusOK,
-			"",
-			&TeamGetResponse{
-				Name:         team.Name,
-				PrefectureId: team.PrefectureId,
-				LevelId:      team.LevelId,
-				HomePageUrl:  team.HomePageUrl,
-				Other:        team.Other,
+			"チームを更新しました",
+			&TeamGetAndUpdateResponse{
+				Team: views.CreateTeamView(*team),
 			},
 		))
 	}

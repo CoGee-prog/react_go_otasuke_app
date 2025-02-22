@@ -24,6 +24,7 @@ import { AuthContext } from 'src/contexts/AuthContext'
 import OpponentRecruitingSearchForm from './OpponentRecruitingSearchForm'
 import { useRouter } from 'next/router'
 import { getPrefectureNameFromId } from 'src/utils/prefectures'
+import { getLevelNameFromId } from 'src/utils/teamLevel'
 
 interface OpponentRecruitingListProps {
   initialRecruitings: OpponentRecruiting[]
@@ -300,7 +301,7 @@ const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
                       チーム: {recruitment.team.name}
                     </Typography>
                     <Typography variant='body2' component='div'>
-                      レベル: {recruitment.team.level}
+                      レベル: {getLevelNameFromId(recruitment.team.level_id)}
                     </Typography>
                   </CardContent>
                   <Chip

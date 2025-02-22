@@ -26,7 +26,7 @@ export const getServerSideProps: GetServerSideProps = async (
   }
 }
 
-const OpponentRecruitingListPage: NextPage<{
+const OpponentRecruitingDetailPage: NextPage<{
   initialRecruitings: OpponentRecruitingWithComments
   id: string
 }> = ({ initialRecruitings, id }) => {
@@ -35,4 +35,4 @@ const OpponentRecruitingListPage: NextPage<{
   )
 }
 
-export default OpponentRecruitingListPage
+export default OpponentRecruitingDetailPage

@@ -18,6 +18,7 @@ import { useContext } from 'react'
 import { AuthContext } from 'src/contexts/AuthContext'
 import Link from 'next/link'
 import { TeamRole } from 'src/types/teamRole'
+import { InfoOutlined } from '@mui/icons-material'
 
 export default function AccountMenu() {
   const [accountAnchorEl, setAccountAnchorEl] = React.useState<null | HTMLElement>(null)
@@ -120,6 +121,14 @@ export default function AccountMenu() {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
+        <Link href={`/teams/${user?.current_team_id}`} passHref>
+          <MenuItem onClick={handleTeamMenuClose}>
+            <ListItemIcon>
+              <InfoOutlined fontSize='small' />
+            </ListItemIcon>
+            チーム詳細
+          </MenuItem>
+        </Link>
         <Link href='/opponent_recruitings/my_team' passHref>
           <MenuItem onClick={handleTeamMenuClose}>
             <ListItemIcon>

@@ -1,10 +1,10 @@
 import React from 'react'
-import TeamCreateForm from 'src/components/teams/TeamCreateForm'
+import TeamForm from 'src/components/teams/TeamForm'
 
 export const CreateTeamsPage = () => {
   return (
     <div>
-      <TeamCreateForm />
+      <TeamForm />
     </div>
   )
 }
