@@ -12,7 +12,6 @@ import {
 } from '@mui/material'
 import Link from 'next/link'
 import { useState, useEffect, useContext } from 'react'
-import { Page } from 'src/types/page'
 import { GetOpponentRecruitingsApiResponse } from 'src/types/apiResponses'
 import { OpponentRecruiting } from 'src/types/opponentRecruiting'
 import fetchAPI from 'src/utils/fetchApi'
@@ -27,21 +26,14 @@ import { getPrefectureNameFromId } from 'src/utils/prefectures'
 import { getLevelNameFromId } from 'src/utils/teamLevel'
 
 interface OpponentRecruitingListProps {
-  initialRecruitings: OpponentRecruiting[]
-  initialPage: Page
   isMyTeam?: boolean
 }
 
-const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({
-  initialRecruitings,
-  initialPage,
-  isMyTeam = false,
-}) => {
+const OpponentRecruitingList: React.FC<OpponentRecruitingListProps> = ({ isMyTeam = false }) => {
   const router = useRouter()
-  const [opponentRecruitings, setOpponentRecruitings] =
-    useState<OpponentRecruiting[]>(initialRecruitings)
-  const [page, setPage] = useState<number>(initialPage.number)
-  const [totalPages, setTotalPages] = useState<number>(initialPage.total_pages)
+  const [opponentRecruitings, setOpponentRecruitings] = useState<OpponentRecruiting[]>([])
+  const [page, setPage] = useState<number>(0)
+  const [totalPages, setTotalPages] = useState<number>(0)
   const { user } = useContext(AuthContext)
   const [searchQueryParams, setSearchQueryParams] = useState<string>('')
   const navigateHome = useNavigateHome()

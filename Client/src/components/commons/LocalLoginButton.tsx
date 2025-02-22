@@ -1,5 +1,4 @@
-import { useRouter } from 'next/router'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext } from 'react'
 import { AuthContext } from 'src/contexts/AuthContext'
 import { useFlashMessage } from 'src/contexts/FlashMessageContext'
 import { useNavigateHome } from 'src/hooks/useNavigateHome'
@@ -9,56 +8,45 @@ import fetchAPI from 'src/utils/fetchApi'
 import { saveDataWithExpiry } from 'src/utils/localStorageHelper'
 
 const LocalLoginButton = () => {
-	const { showFlashMessage } = useFlashMessage()
-	const navigateHome = useNavigateHome()
-	const { isLoggedIn, setIsLoggedIn, setUser } = useContext(AuthContext)
-	const router = useRouter()
-	const login = (userData: User) => {
+  const { showFlashMessage } = useFlashMessage()
+  const navigateHome = useNavigateHome()
+  const { setIsLoggedIn, setUser } = useContext(AuthContext)
+  const login = (userData: User) => {
     setIsLoggedIn(true)
     setUser(userData)
   }
 
-	useEffect(() => {
-		// ログイン状態であればリダイレクト
-		if (isLoggedIn) {
-			const redirectPath = sessionStorage.getItem('redirectPath')
-			router.push(redirectPath || '/opponent_recruitings')
-			sessionStorage.removeItem('redirectPath')
-		}
-	}, [isLoggedIn, router])
-
   // ボタンクリック時に実行される関数
   const handleLogin = async () => {
-		try {
-			const options: RequestInit = {
-							method: 'POST',
-							headers: {
-								'Content-Type': 'application/json'
-							},
-							credentials: 'include',
-						}
-						// APIサーバーにトークンを送信
-						fetchAPI<LoginApiResponse>('/login', options)
-							.then((responseData) => {
-								// ユーザー情報をローカルストレージにキャッシュ
-								saveDataWithExpiry<User>('user', responseData.result.user, 3600)
-								login(responseData.result.user)
-								showFlashMessage({ message: responseData.message, type: 'success' })
-							})
-							.catch((error) => {
-								showFlashMessage({
-									message:
-										error instanceof Error && error.message ? error.message : 'エラーが発生しました',
-									type: 'error',
-								})
-								// ホーム画面に戻す
-								navigateHome()
-							})
-							.finally()
-					}
-			catch (error) {
-				console.error('Login failed:', error)
-			}
+    try {
+      const options: RequestInit = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      }
+      // APIサーバーにトークンを送信
+      fetchAPI<LoginApiResponse>('/login', options)
+        .then((responseData) => {
+          // ユーザー情報をローカルストレージにキャッシュ
+          saveDataWithExpiry<User>('user', responseData.result.user, 3600)
+          login(responseData.result.user)
+          showFlashMessage({ message: responseData.message, type: 'success' })
+        })
+        .catch((error) => {
+          showFlashMessage({
+            message:
+              error instanceof Error && error.message ? error.message : 'エラーが発生しました',
+            type: 'error',
+          })
+          // ホーム画面に戻す
+          navigateHome()
+        })
+        .finally()
+    } catch (error) {
+      console.error('Login failed:', error)
+    }
   }
 
   // REACT_APP_FIREBASE_AUTH_DOMAINがlocalhostの場合のみボタンを表示

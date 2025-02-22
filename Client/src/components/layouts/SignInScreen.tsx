@@ -20,9 +20,9 @@ const SignInScreen: React.FC = () => {
   useEffect(() => {
     // ログイン状態であればリダイレクト
     if (isLoggedIn) {
-        const redirectPath = sessionStorage.getItem('redirectPath')
-        router.push(redirectPath || '/opponent_recruitings')
-        sessionStorage.removeItem('redirectPath')
+      const redirectPath = sessionStorage.getItem('redirectPath')
+      router.push(redirectPath || '/opponent_recruitings')
+      sessionStorage.removeItem('redirectPath')
     }
   }, [isLoggedIn, router])
 
@@ -85,7 +85,7 @@ const SignInScreen: React.FC = () => {
               ログイン
             </Typography>
             <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} />
-						<LocalLoginButton />
+            <LocalLoginButton />
           </CardContent>
         </Card>
       )}
