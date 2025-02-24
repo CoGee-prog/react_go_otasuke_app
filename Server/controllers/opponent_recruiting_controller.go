@@ -64,7 +64,7 @@ type OpponentRecruitingGetResponse struct {
 
 func (oc *OpponentRecruitingController) Get() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		id, _ := strconv.Atoi(c.Param("id"))
+		id, _ := strconv.Atoi(c.Param("opponent_recruiting_id"))
 		tx := c.MustGet("tx").(*gorm.DB)
 		// データを取得する
 		opponentRecruiting, err := oc.OpponentRecruitingService.FindOpponentRecruitingWithComment(tx, uint(id))

@@ -43,8 +43,8 @@ func NewRouter() (*gin.Engine, error) {
 	// 認証がいらないエンドポイント
 	{
 		router.GET("/opponent_recruitings", opponentRecruitingController.Index())
-		router.GET("/opponent_recruitings/:id", opponentRecruitingController.Get())
-		router.GET("/teams/:id", teamController.Get())
+		router.GET("/opponent_recruitings/:opponent_recruiting_id", opponentRecruitingController.Get())
+		router.GET("/teams/:team_id", teamController.Get())
 		router.POST("/login", userController.Login())
 	}
 

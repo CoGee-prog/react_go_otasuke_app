@@ -30,7 +30,7 @@ type TeamGetAndUpdateResponse struct {
 
 func (tc *TeamController) Get() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		id := c.Param("id")
+		id := c.Param("team_id")
 		tx := c.MustGet("tx").(*gorm.DB)
 
 		team, err := tc.TeamService.GetTeam(tx, id)
