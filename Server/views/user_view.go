@@ -7,7 +7,7 @@ import (
 type UserView struct {
 	ID              string           `json:"id"`
 	Name            string           `json:"name"`
-	CurrentTeamId   *uint            `json:"current_team_id"`
+	CurrentTeamId   *string          `json:"current_team_id"`
 	CurrentTeamName string           `json:"current_team_name"`
 	CurrentTeamRole *models.TeamRole `json:"current_team_role"`
 }

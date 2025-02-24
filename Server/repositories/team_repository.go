@@ -8,10 +8,10 @@ import (
 )
 
 type TeamRepository interface {
-	GetById(tx *gorm.DB, teamId uint) (*models.Team, error)
+	GetById(tx *gorm.DB, teamId string) (*models.Team, error)
 	Create(tx *gorm.DB, team *models.Team) error
-	UpdateById(tx *gorm.DB, id uint, team *models.Team) error
-	FindById(tx *gorm.DB, id uint) (*models.Team, error)
+	UpdateById(tx *gorm.DB, teamId string, team *models.Team) error
+	FindById(tx *gorm.DB, teamId string) (*models.Team, error)
 }
 
 type teamRepository struct{}
@@ -21,9 +21,9 @@ func NewTeamRepository() TeamRepository {
 }
 
 // IDでチームを取得する
-func (r *teamRepository) GetById(tx *gorm.DB, id uint) (*models.Team, error) {
+func (r *teamRepository) GetById(tx *gorm.DB, teamId string) (*models.Team, error) {
 	var team models.Team
-	result := tx.Where("id = ?", id).First(&team)
+	result := tx.Where("id = ?", teamId).First(&team)
 	// レコードが見つからない場合はnilを返す
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, nil
@@ -36,9 +36,9 @@ func (r *teamRepository) GetById(tx *gorm.DB, id uint) (*models.Team, error) {
 }
 
 // IDでチームを取得する(なければエラー)
-func (r *teamRepository) FindById(tx *gorm.DB, id uint) (*models.Team, error) {
+func (r *teamRepository) FindById(tx *gorm.DB, teamId string) (*models.Team, error) {
 	var team models.Team
-	result := tx.First(&team, id)
+	result := tx.First(&team, teamId)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, errors.New("データが見つかりません")
@@ -59,8 +59,8 @@ func (r *teamRepository) Create(tx *gorm.DB, team *models.Team) error {
 }
 
 // チームを更新する
-func (r *teamRepository) UpdateById(tx *gorm.DB, id uint, team *models.Team) error {
-	result := tx.Model(&models.Team{}).Where("id = ?", id).Updates(team)
+func (r *teamRepository) UpdateById(tx *gorm.DB, teamId string, team *models.Team) error {
+	result := tx.Model(&models.Team{}).Where("id = ?", teamId).Updates(team)
 
 	if result.Error != nil {
 		return result.Error

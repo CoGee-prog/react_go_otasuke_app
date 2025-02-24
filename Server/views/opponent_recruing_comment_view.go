@@ -9,7 +9,7 @@ type OpponentRecruitingCommentView struct {
 	OpponentRecruitingID uint    `json:"opponent_recruiting_id"`
 	UserID               *string `json:"user_id"`
 	UserName             *string `json:"user_name"`
-	TeamID               *uint   `json:"team_id"`
+	TeamID               *string `json:"team_id"`
 	TeamName             *string `json:"team_name"`
 	Content              string  `json:"content"`
 	Edited               bool    `json:"edited"`

@@ -10,7 +10,7 @@ import (
 
 type OpponentRecruiting struct {
 	gorm.Model
-	TeamID       uint                         `json:"team_id" gorm:"type:int; not null"`
+	TeamID       string                       `json:"team_id" gorm:"not null"`
 	Team         Team                         `gorm:"foreignKey:TeamID;"`
 	Title        string                       `json:"title" gorm:"type:varchar(255); not null"`
 	HasGround    bool                         `json:"has_ground" gorm:"not null; default:false"`
@@ -25,7 +25,7 @@ type OpponentRecruiting struct {
 
 // 対戦相手募集のバリデーション
 func (or *OpponentRecruiting) Validate() error {
-	if or.TeamID == 0 {
+	if or.TeamID == "" {
 		return errors.New("チームが選択されていません")
 	}
 	if or.Title == "" {

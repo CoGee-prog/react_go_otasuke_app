@@ -21,8 +21,8 @@ type UserService interface {
 	GetFireBaseApp() *firebase.App
 	GetUserWithCurrentTeam(tx *gorm.DB, id string) (*models.User, error)
 	CreateUser(tx *gorm.DB, user *models.User) error
-	UpdateCurrentTeam(tx *gorm.DB, userId string, teamId uint) error
-	GetUserTeam(tx *gorm.DB, userId string, teamId uint) (*models.UserTeam, error)
+	UpdateCurrentTeam(tx *gorm.DB, userId string, teamId string) error
+	GetUserTeam(tx *gorm.DB, userId string, teamId string) (*models.UserTeam, error)
 }
 
 type userService struct {
@@ -140,7 +140,7 @@ func (us *userService) CreateUser(tx *gorm.DB, user *models.User) error {
 }
 
 // 現在のチームを変更する
-func (us *userService) UpdateCurrentTeam(tx *gorm.DB, userId string, teamId uint) error {
+func (us *userService) UpdateCurrentTeam(tx *gorm.DB, userId string, teamId string) error {
 	// チームに所属していなければエラー
 	_, err := us.userTeamRepository.FindByUserIdAndTeamId(tx, userId, teamId)
 	if err != nil {
@@ -155,6 +155,6 @@ func (us *userService) UpdateCurrentTeam(tx *gorm.DB, userId string, teamId uint
 }
 
 // ユーザーチームを取得する
-func (us *userService) GetUserTeam(tx *gorm.DB, userId string, teamId uint) (*models.UserTeam, error) {
+func (us *userService) GetUserTeam(tx *gorm.DB, userId string, teamId string) (*models.UserTeam, error) {
 	return us.userTeamRepository.GetByUserIdAndTeamId(tx, userId, teamId)
 }

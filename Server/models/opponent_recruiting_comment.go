@@ -12,7 +12,7 @@ type OpponentRecruitingComment struct {
 	OpponentRecruiting   OpponentRecruiting `gorm:"foreignKey:OpponentRecruitingID;"`
 	UserID               *string            `json:"user_id" gorm:"index"`
 	User                 *User              `gorm:"foreignKey:UserID;constraint:OnDelete:SET NULL;"`
-	TeamID               *uint              `json:"team_id"`
+	TeamID               *string            `json:"team_id"`
 	Team                 *Team              `gorm:"foreignKey:TeamID;constraint:OnDelete:SET NULL;"`
 	Content              string             `json:"content"`
 	Deleted              bool               `json:"deleted" gorm:"not null; default:false"`

@@ -13,7 +13,7 @@ const (
 
 type UserTeam struct {
 	UserID string   `gorm:"primaryKey;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	TeamID uint     `gorm:"primaryKey;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	TeamID string   `gorm:"primaryKey;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Role   TeamRole `gorm:"type:int;not null"`
 	User   User     `gorm:"foreignKey:UserID;references:ID;"`
 	Team   Team     `gorm:"foreignKey:TeamID;references:ID;"`

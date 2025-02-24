@@ -5,7 +5,7 @@ import (
 )
 
 type TeamView struct {
-	ID           uint                `json:"id"`
+	ID           string              `json:"id"`
 	Name         string              `json:"name" gorm:"type:text;not null"`
 	PrefectureID models.PrefectureID `json:"prefecture_id" gorm:"type:integer;not null"`
 	LevelID      models.TeamLevelId  `json:"level_id" gorm:"type:integer;not null"`

@@ -7,7 +7,7 @@ import (
 )
 
 type UserTeamService interface {
-	IsAdminOrSubAdmin(db *gorm.DB, userId string, teamId uint) bool
+	IsAdminOrSubAdmin(db *gorm.DB, userId string, teamId string) bool
 }
 
 type userTeamService struct {
@@ -22,7 +22,7 @@ func NewUserTeamService(userTeamRepo repositories.UserTeamRepository) UserTeamSe
 }
 
 // ユーザーが管理者または副管理者かどうか
-func (uts *userTeamService) IsAdminOrSubAdmin(db *gorm.DB, userId string, teamId uint) bool {
+func (uts *userTeamService) IsAdminOrSubAdmin(db *gorm.DB, userId string, teamId string) bool {
 	// ユーザーのチームを取得する
 	userTeam, err := uts.userTeamRepository.GetByUserIdAndTeamId(db, userId, teamId)
 	// レコードが見つからないかチームに所属していなければfalse

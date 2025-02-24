@@ -2,9 +2,8 @@ package models
 
 import (
 	"errors"
+	"time"
 	"unicode/utf8"
-
-	"gorm.io/gorm"
 )
 
 type TeamLevelId int
@@ -40,10 +39,13 @@ func (TL TeamLevelId) ToString() string {
 }
 
 type Team struct {
-	gorm.Model
+	ID                  string `json:"id" gorm:"type:varchar(64);primary_key"`
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
+	DeletedAt           *time.Time            `sql:"index"`
 	Name                string                `json:"name" gorm:"type:text;not null"`
-	PrefectureId        PrefectureID          `json:"prefecture_id" gorm:"type:int; not null"`
-	LevelId             TeamLevelId           `json:"level_id" gorm:"type:integer;not null"`
+	PrefectureId        PrefectureID          `json:"prefecture_id" gorm:"type:int;not null"`
+	LevelId             TeamLevelId           `json:"level_id" gorm:"type:int;not null"`
 	HomePageUrl         *string               `json:"home_page_url" gorm:"type:text"`
 	Other               *string               `json:"other" gorm:"type:text"`
 	Users               []*User               `gorm:"many2many:user_teams"`

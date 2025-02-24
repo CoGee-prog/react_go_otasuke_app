@@ -6,7 +6,6 @@ import (
 	"react_go_otasuke_app/services"
 	"react_go_otasuke_app/utils"
 	"react_go_otasuke_app/views"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -31,10 +30,10 @@ type TeamGetAndUpdateResponse struct {
 
 func (tc *TeamController) Get() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		id, _ := strconv.Atoi(c.Param("id"))
+		id := c.Param("id")
 		tx := c.MustGet("tx").(*gorm.DB)
 
-		team, err := tc.TeamService.GetTeam(tx, uint(id))
+		team, err := tc.TeamService.GetTeam(tx, id)
 
 		if err != nil || team == nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
@@ -56,7 +55,7 @@ func (tc *TeamController) Get() gin.HandlerFunc {
 }
 
 type TeamCreateResponse struct {
-	CurrentTeamId   uint            `json:"current_team_id"`
+	CurrentTeamId   string          `json:"current_team_id"`
 	CurrentTeamName string          `json:"current_team_name"`
 	CurrentTeamRole models.TeamRole `json:"current_team_role"`
 }
@@ -135,7 +134,7 @@ func (tc *TeamController) Update() gin.HandlerFunc {
 			return
 		}
 
-		teamId, _ := strconv.Atoi(c.Param("team_id"))
+		teamId := c.Param("team_id")
 		tx := c.MustGet("tx").(*gorm.DB)
 
 		// リクエストのバリデーションチェック
@@ -151,7 +150,7 @@ func (tc *TeamController) Update() gin.HandlerFunc {
 		userId := c.MustGet("userId").(string)
 
 		// チームを更新
-		if err := tc.TeamService.UpdateTeam(tx, userId, uint(teamId), team); err != nil {
+		if err := tc.TeamService.UpdateTeam(tx, userId, teamId, team); err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
 				err.Error(),

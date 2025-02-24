@@ -11,7 +11,7 @@ type UserRepository interface {
 	GetByUserId(tx *gorm.DB, userId string) (*models.User, error)
 	GetWithCurrentTeamByUserId(tx *gorm.DB, userId string) (*models.User, error)
 	Create(tx *gorm.DB, user *models.User) error
-	ChangeCurrentTeam(tx *gorm.DB, userId string, teamId uint) error
+	ChangeCurrentTeam(tx *gorm.DB, userId string, teamId string) error
 }
 
 type userRepository struct{}
@@ -58,6 +58,6 @@ func (r *userRepository) Create(tx *gorm.DB, user *models.User) error {
 }
 
 // ユーザーの現在のチームを切り替える
-func (r *userRepository) ChangeCurrentTeam(tx *gorm.DB, userId string, teamId uint) error {
+func (r *userRepository) ChangeCurrentTeam(tx *gorm.DB, userId string, teamId string) error {
 	return tx.Model(&models.User{}).Where("id = ?", userId).Update("current_team_id", teamId).Error
 }
