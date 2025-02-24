@@ -23,6 +23,7 @@ import { ArrowBack } from '@mui/icons-material'
 import { Team } from 'src/types/team'
 import TeamForm, { TeamFormData } from './TeamForm'
 import { getLevelNameFromId } from 'src/utils/teamLevel'
+import Link from 'next/link'
 
 interface TeamProps {
   initialTeam: Team
@@ -124,9 +125,24 @@ const TeamDetail: React.FC<TeamProps> = ({ initialTeam }) => {
                   <Typography variant='body1' sx={{ fontWeight: 'bold' }} gutterBottom>
                     {item.label}
                   </Typography>
-                  <Typography variant='body1' gutterBottom>
-                    {item.value}
-                  </Typography>
+                  {item.label === 'ホームページリンク' ? (
+                    <Typography
+                      variant='body1'
+                      gutterBottom
+                      color='primary'
+                      sx={{ textDecoration: 'underline', cursor: 'pointer' }}
+                      component='a'
+                      href={item.value}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                    >
+                      {item.value}
+                    </Typography>
+                  ) : (
+                    <Typography variant='body1' gutterBottom>
+                      {item.value}
+                    </Typography>
+                  )}
                   {index < arr.length - 1 && <Divider />}
                 </Box>
               ))}
