@@ -6,6 +6,7 @@ import (
 	"react_go_otasuke_app/services"
 	"react_go_otasuke_app/utils"
 	"react_go_otasuke_app/views"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -164,6 +165,50 @@ func (tc *TeamController) Update() gin.HandlerFunc {
 			"チームを更新しました",
 			&TeamGetAndUpdateResponse{
 				Team: views.CreateTeamView(*team),
+			},
+		))
+	}
+}
+
+type CreateInviteTokenResponse struct {
+	InviteToken string `json:"invite_token"`
+	ExpiresAt   string `json:"expires_at"`
+}
+
+func (tc *TeamController) CreateInviteToken() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("team_id")
+		tx := c.MustGet("tx").(*gorm.DB)
+
+		team, err := tc.TeamService.GetTeam(tx, id)
+
+		if err != nil || team == nil {
+			c.JSON(http.StatusBadRequest, utils.NewResponse(
+				http.StatusBadRequest,
+				"チームが見つかりません",
+				nil,
+			))
+			return
+		}
+
+		userId := c.MustGet("userId").(string)
+		// 招待トークンを作成する
+		teamInvite ,err := tc.TeamService.CreateInviteToken(tx, userId, team); 
+		if err != nil {
+			c.JSON(http.StatusBadRequest, utils.NewResponse(
+				http.StatusBadRequest,
+				err.Error(),
+				nil,
+			))
+			return
+		}
+
+		c.JSON(http.StatusOK, utils.NewResponse(
+			http.StatusOK,
+			"招待トークンを発行しました",
+			&CreateInviteTokenResponse{
+				InviteToken: teamInvite.Token,
+				ExpiresAt:   teamInvite.ExpiresAt.Format(time.RFC3339),
 			},
 		))
 	}
