@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type TeamRole int
 
 const (
@@ -12,11 +14,14 @@ const (
 )
 
 type UserTeam struct {
-	UserID string   `gorm:"primaryKey;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	TeamID string   `gorm:"primaryKey;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Role   TeamRole `gorm:"type:int;not null"`
-	User   User     `gorm:"foreignKey:UserID;references:ID;"`
-	Team   Team     `gorm:"foreignKey:TeamID;references:ID;"`
+	UserID    string `gorm:"primaryKey;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	TeamID    string `gorm:"primaryKey;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time `sql:"index"`
+	Role      TeamRole   `gorm:"type:int;not null"`
+	User      User       `gorm:"foreignKey:UserID;references:ID;"`
+	Team      Team       `gorm:"foreignKey:TeamID;references:ID;"`
 }
 
 // ユーザーがチームの管理者または副管理者であるかどうかを確認する

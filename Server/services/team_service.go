@@ -13,20 +13,23 @@ type TeamService interface {
 	GetTeam(tx *gorm.DB, teamId string) (*models.Team, error)
 	CreateTeamWithAdmin(tx *gorm.DB, userId string, team *models.Team) error
 	UpdateTeam(tx *gorm.DB, userId string, teamId string, team *models.Team) error
+	CreateInviteToken(tx *gorm.DB, userId string, team *models.Team) (*models.TeamInvite, error)
 }
 
 type teamService struct {
 	userTeamService    UserTeamService
 	teamRepository     repositories.TeamRepository
 	userTeamRepository repositories.UserTeamRepository
+	teamInviteRepository repositories.TeamInviteRepository
 }
 
 // チームサービスを作成する
-func NewTeamService(uts UserTeamService, teamRepo repositories.TeamRepository, userTeamRepo repositories.UserTeamRepository) TeamService {
+func NewTeamService(uts UserTeamService, teamRepo repositories.TeamRepository, userTeamRepo repositories.UserTeamRepository, teamInviteRepo repositories.TeamInviteRepository) TeamService {
 	return &teamService{
 		userTeamService:    uts,
 		teamRepository:     teamRepo,
 		userTeamRepository: userTeamRepo,
+		teamInviteRepository: teamInviteRepo,
 	}
 }
 
@@ -76,4 +79,17 @@ func (ts *teamService) UpdateTeam(tx *gorm.DB, userId string, teamId string, tea
 
 	// データを更新する
 	return ts.teamRepository.UpdateById(tx, teamId, team)
+}
+
+func (ts *teamService) CreateInviteToken(tx *gorm.DB, userId string, team *models.Team) (*models.TeamInvite, error) {
+	// チームの管理者または副管理者でなければエラー
+	if !ts.userTeamService.IsAdminOrSubAdmin(tx, userId, team.ID) {
+		return nil, errors.New("管理者または副管理者のみ招待トークンを発行できます")
+	}
+	
+	// トークンを生成する
+	token, _ := utils.GenerateRandomString(30)
+
+	// 招待トークンを作成する
+	return ts.teamInviteRepository.CreateOrUpdateInvite(tx, team.ID, token)
 }
