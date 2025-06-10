@@ -66,10 +66,10 @@ func (t *Team) Validate() error {
 	if t.LevelId < LocalLevel || t.LevelId > NationalLevel {
 		return errors.New("不正なチームレベルです")
 	}
-	if utf8.RuneCountInString(*t.HomePageUrl) > 500 {
+	if t.HomePageUrl != nil && utf8.RuneCountInString(*t.HomePageUrl) > 500 {
 		return errors.New("ホームページリンクは500文字以下でなければなりません")
 	}
-	if utf8.RuneCountInString(*t.Other) > 500 {
+	if t.Other != nil && utf8.RuneCountInString(*t.Other) > 500 {
 		return errors.New("その他は500文字以下でなければなりません")
 	}
 	return nil
