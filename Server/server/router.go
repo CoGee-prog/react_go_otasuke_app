@@ -46,6 +46,7 @@ func NewRouter() (*gin.Engine, error) {
 		router.GET("/opponent_recruitings", opponentRecruitingController.Index())
 		router.GET("/opponent_recruitings/:opponent_recruiting_id", opponentRecruitingController.Get())
 		router.GET("/teams/:team_id", teamController.Get())
+		router.GET("/teams/invite/:invite_token", teamController.GetByInviteToken())
 		router.POST("/login", userController.Login())
 	}
 
@@ -59,6 +60,7 @@ func NewRouter() (*gin.Engine, error) {
 		authRequired.POST("/teams", teamController.Create())
 		authRequired.PATCH("/teams/:team_id", teamController.Update())
 		authRequired.POST("/teams/:team_id/invite_token", teamController.CreateInviteToken())
+		authRequired.POST("/teams/invite/:invite_token", teamController.JoinByInviteToken())
 		authRequired.POST("/opponent_recruitings", opponentRecruitingController.Create())
 		authRequired.PATCH("/opponent_recruitings/:opponent_recruiting_id", opponentRecruitingController.Update())
 		authRequired.PATCH("/opponent_recruitings/:opponent_recruiting_id/status", opponentRecruitingController.ChangeStatus())
