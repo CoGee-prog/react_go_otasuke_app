@@ -9,6 +9,7 @@ import (
 
 type UserTeamRepository interface {
 	AddTeamAdmin(tx *gorm.DB, userId string, team *models.Team) error
+	AddTeamMember(tx *gorm.DB, userId string, team *models.Team) error
 	GetByUserIdAndTeamId(tx *gorm.DB, userId string, teamId string) (*models.UserTeam, error)
 	FindByUserIdAndTeamId(tx *gorm.DB, userId string, teamId string) (*models.UserTeam, error)
 }
@@ -31,6 +32,19 @@ func (r *userTeamRepository) AddTeamAdmin(tx *gorm.DB, userId string, team *mode
 		return err
 	}
 
+	return nil
+}
+
+// チームメンバーとしてユーザーを追加する
+func (r *userTeamRepository) AddTeamMember(tx *gorm.DB, userId string, team *models.Team) error {
+	userTeam := models.UserTeam{
+		UserID: userId,
+		TeamID: team.ID,
+		Role:   models.TeamMember,
+	}
+	if err := tx.Create(&userTeam).Error; err != nil {
+		return err
+	}
 	return nil
 }
 

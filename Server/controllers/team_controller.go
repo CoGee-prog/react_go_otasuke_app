@@ -193,7 +193,7 @@ func (tc *TeamController) CreateInviteToken() gin.HandlerFunc {
 
 		userId := c.MustGet("userId").(string)
 		// 招待トークンを作成する
-		teamInvite ,err := tc.TeamService.CreateInviteToken(tx, userId, team); 
+		teamInvite, err := tc.TeamService.CreateInviteToken(tx, userId, team)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, utils.NewResponse(
 				http.StatusBadRequest,
@@ -209,6 +209,69 @@ func (tc *TeamController) CreateInviteToken() gin.HandlerFunc {
 			&CreateInviteTokenResponse{
 				InviteToken: teamInvite.Token,
 				ExpiresAt:   teamInvite.ExpiresAt.Format(time.RFC3339),
+			},
+		))
+	}
+}
+
+type TeamInviteResponse struct {
+	Team *views.TeamView `json:"team"`
+}
+
+func (tc *TeamController) GetByInviteToken() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token := c.Param("invite_token")
+		tx := c.MustGet("tx").(*gorm.DB)
+
+		team, err := tc.TeamService.GetTeamByInviteToken(tx, token)
+		if err != nil || team == nil {
+			c.JSON(http.StatusBadRequest, utils.NewResponse(
+				http.StatusBadRequest,
+				err.Error(),
+				nil,
+			))
+			return
+		}
+
+		c.JSON(http.StatusOK, utils.NewResponse(
+			http.StatusOK,
+			http.StatusText(http.StatusOK),
+			&TeamInviteResponse{
+				Team: views.CreateTeamView(*team),
+			},
+		))
+	}
+}
+
+func (tc *TeamController) JoinByInviteToken() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token := c.Param("invite_token")
+		tx := c.MustGet("tx").(*gorm.DB)
+		userId := c.MustGet("userId").(string)
+
+		team, err := tc.TeamService.JoinTeamByInviteToken(tx, userId, token)
+		if err != nil || team == nil {
+			c.JSON(http.StatusBadRequest, utils.NewResponse(
+				http.StatusBadRequest,
+				err.Error(),
+				nil,
+			))
+			return
+		}
+
+		user, _ := tc.UserService.GetUserWithCurrentTeam(tx, userId)
+		if user != nil && user.CurrentTeamId == nil {
+			tc.UserService.UpdateCurrentTeam(tx, userId, team.ID)
+		}
+		userTeam, _ := tc.UserService.GetUserTeam(tx, userId, team.ID)
+
+		c.JSON(http.StatusOK, utils.NewResponse(
+			http.StatusOK,
+			"チームに参加しました",
+			&TeamCreateResponse{
+				CurrentTeamId:   team.ID,
+				CurrentTeamName: team.Name,
+				CurrentTeamRole: userTeam.Role,
 			},
 		))
 	}
