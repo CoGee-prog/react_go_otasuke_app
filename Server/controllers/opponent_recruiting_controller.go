@@ -148,16 +148,25 @@ func (oc *OpponentRecruitingController) Create() gin.HandlerFunc {
 			return
 		}
 
-		// 対戦相手募集の構造体を作成
-		opponentRecruiting := &models.OpponentRecruiting{
-			Title:        request.Title,
-			HasGround:    request.HasGround,
-			GroundName:   *request.GroundName,
+               groundName := ""
+               if request.GroundName != nil {
+                       groundName = *request.GroundName
+               }
+               detail := ""
+               if request.Detail != nil {
+                       detail = *request.Detail
+               }
+
+               // 対戦相手募集の構造体を作成
+               opponentRecruiting := &models.OpponentRecruiting{
+                       Title:        request.Title,
+                       HasGround:    request.HasGround,
+                       GroundName:   groundName,
 			TeamID:       *user.CurrentTeamId,
 			PrefectureID: request.PrefectureId,
 			StartTime:    request.StartTime,
 			EndTime:      request.EndTime,
-			Detail:       *request.Detail,
+			Detail:       detail,
 		}
 
 		// リクエストのバリデーションチェック
@@ -222,16 +231,25 @@ func (oc *OpponentRecruitingController) Update() gin.HandlerFunc {
 			return
 		}
 
-		// 対戦相手募集の構造体を作成
-		opponentRecruiting := &models.OpponentRecruiting{
-			Title:        request.Title,
-			HasGround:    request.HasGround,
-			GroundName:   *request.GroundName,
+               groundName := ""
+               if request.GroundName != nil {
+                       groundName = *request.GroundName
+               }
+               detail := ""
+               if request.Detail != nil {
+                       detail = *request.Detail
+               }
+
+               // 対戦相手募集の構造体を作成
+               opponentRecruiting := &models.OpponentRecruiting{
+                       Title:        request.Title,
+                       HasGround:    request.HasGround,
+                       GroundName:   groundName,
 			TeamID:       *user.CurrentTeamId,
 			PrefectureID: request.PrefectureId,
 			StartTime:    request.StartTime,
 			EndTime:      request.EndTime,
-			Detail:       *request.Detail,
+			Detail:       detail,
 		}
 		// リクエストのバリデーションチェック
 		if err := opponentRecruiting.Validate(); err != nil {
