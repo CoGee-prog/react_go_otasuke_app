@@ -22,13 +22,14 @@ func NewRouter() (*gin.Engine, error) {
 	userRepo := repositories.NewUserRepository()
 	teamRepo := repositories.NewTeamRepository()
 	userTeamRepo := repositories.NewUserTeamRepository()
+	teamInviteRepo := repositories.NewTeamInviteRepository()
 	OpponentRecruitingRepo := repositories.NewOpponentRecruitingRepository()
 	OpponentRecruitingCommentRepo := repositories.NewOpponentRecruitingCommentRepository()
 
 	// サービスを作成
 	userTeamService := services.NewUserTeamService(userTeamRepo)
 	userService := services.NewUserService(userRepo, userTeamRepo)
-	teamService := services.NewTeamService(userTeamService, teamRepo, userTeamRepo)
+	teamService := services.NewTeamService(userTeamService, teamRepo, userTeamRepo, teamInviteRepo)
 	opponentRecruitingService := services.NewOpponentRecruitingService(userTeamService, userRepo, OpponentRecruitingRepo, OpponentRecruitingCommentRepo)
 
 	// コントローラーを作成
@@ -57,6 +58,7 @@ func NewRouter() (*gin.Engine, error) {
 		authRequired.POST("/logout", userController.Logout())
 		authRequired.POST("/teams", teamController.Create())
 		authRequired.PATCH("/teams/:team_id", teamController.Update())
+		authRequired.POST("/teams/:team_id/invite_token", teamController.CreateInviteToken())
 		authRequired.POST("/opponent_recruitings", opponentRecruitingController.Create())
 		authRequired.PATCH("/opponent_recruitings/:opponent_recruiting_id", opponentRecruitingController.Update())
 		authRequired.PATCH("/opponent_recruitings/:opponent_recruiting_id/status", opponentRecruitingController.ChangeStatus())
